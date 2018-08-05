@@ -3,11 +3,10 @@
 // It will render "Hello Elm!" within the page.
 
 import 'csrf-xhr'
+import 'style/application.scss'
 import Elm from '../Main'
 
 document.addEventListener('DOMContentLoaded', () => {
-  const target = document.createElement('div')
-
-  document.body.appendChild(target)
+  const target = document.getElementById('elm-container')
   Elm.Main.embed(target)
 })

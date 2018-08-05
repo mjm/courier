@@ -5,7 +5,6 @@ import Data.Tweet as Tweet exposing (Tweet)
 import Data.User as User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
 import Http
 import Json.Encode
 import Request.Post
@@ -54,10 +53,56 @@ loadPosts =
 view : Model -> Html Message
 view model =
     div []
-        [ h1 [] [ text "Courier" ]
-        , welcomeMessage model.user
-        , Html.hr [] []
-        , postList model.posts
+        [ navbar model
+        , pageContent model
+        ]
+
+
+navbar : Model -> Html Message
+navbar model =
+    nav [ class "navbar is-info" ]
+        [ navbarBrand
+        , navbarMenu model
+        ]
+
+
+navbarBrand : Html Message
+navbarBrand =
+    div [ class "navbar-brand" ]
+        [ a [ class "navbar-item has-text-weight-bold is-size-5" ]
+            [ span [ class "icon" ]
+                [ i [ class "fas fa-paper-plane" ] [] ]
+            , span [] [ text "Courier" ]
+            ]
+        ]
+
+
+navbarMenu : Model -> Html Message
+navbarMenu model =
+    div [ class "navbar-menu" ]
+        [ div [ class "navbar-end" ]
+            [ div [ class "navbar-item" ]
+                [ case model.user of
+                    Just user ->
+                        span []
+                            [ span [ class "icon" ]
+                                [ i [ class "fab fa-twitter" ] [] ]
+                            , span [ class "has-text-weight-semibold" ]
+                                [ text user.name ]
+                            ]
+
+                    Nothing ->
+                        text ""
+                ]
+            ]
+        ]
+
+
+pageContent : Model -> Html Message
+pageContent model =
+    section [ class "section" ]
+        [ div [ class "container" ]
+            [ postList model.posts ]
         ]
 
 
@@ -89,7 +134,7 @@ postEntry post =
 postTitle : Post -> Html Message
 postTitle post =
     if String.isEmpty post.title then
-        h2 [] [ text post.title ]
+        h2 [ class "subtitle" ] [ text post.title ]
     else
         text ""
 
@@ -99,21 +144,25 @@ postContent post =
     if String.isEmpty post.contentHtml then
         article [] [ text post.contentText ]
     else
-        article [ property "innerHTML" (Json.Encode.string post.contentHtml) ] []
+        article
+            [ class "content"
+            , property "innerHTML" (Json.Encode.string post.contentHtml)
+            ]
+            []
 
 
 postTweets : Post -> Html Message
 postTweets post =
     div []
-        [ h3 [] [ text "Tweets" ]
+        [ h3 [ class "title is-5" ] [ text "Tweets" ]
         , div [] (List.map postTweet post.tweets)
         ]
 
 
 postTweet : Tweet -> Html Message
 postTweet tweet =
-    article []
-        [ blockquote [] [ text tweet.body ] ]
+    article [ class "box" ]
+        [ text tweet.body ]
 
 
 

@@ -2,7 +2,9 @@
   "name": "courier-gateway",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.2.0",
     "@rails/webpacker": "3.5",
+    "bulma": "^0.7.1",
     "csrf-xhr": "^1.0.0",
     "elm": "^0.18.0",
     "elm-webpack-loader": "^4.5.0"
