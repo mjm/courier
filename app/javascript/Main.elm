@@ -2,10 +2,12 @@ module Main exposing (..)
 
 import Data.Post as Post exposing (Post)
 import Data.Tweet as Tweet exposing (Tweet)
+import Data.User as User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
+import Request.User
 import Request.Translate
 
 
@@ -15,6 +17,7 @@ import Request.Translate
 type alias Model =
     { post : Post
     , tweet : Tweet
+    , user : Maybe User
     }
 
 
@@ -24,11 +27,20 @@ type alias Model =
 
 init : ( Model, Cmd Message )
 init =
-    ( Model
-        (Post "")
-        (Tweet "")
-    , Cmd.none
-    )
+    ( initialModel, loadUserInfo )
+
+
+initialModel : Model
+initialModel =
+    { post = Post ""
+    , tweet = Tweet ""
+    , user = Nothing
+    }
+
+
+loadUserInfo : Cmd Message
+loadUserInfo =
+    Http.send UserInfoResp Request.User.getUserInfo
 
 
 
@@ -38,7 +50,8 @@ init =
 view : Model -> Html Message
 view model =
     div []
-        [ h1 [] [ text "Welcome to Courier" ]
+        [ h1 [] [ text "Courier" ]
+        , welcomeMessage model.user
         , Html.form [ onSubmit Translate ]
             [ textarea
                 [ placeholder "HTML to translate"
@@ -52,6 +65,16 @@ view model =
         ]
 
 
+welcomeMessage : Maybe User -> Html Message
+welcomeMessage user =
+    case user of
+        Just user ->
+            p [] [ text ("Welcome, " ++ user.name) ]
+
+        Nothing ->
+            text ""
+
+
 
 -- MESSAGE
 
@@ -60,6 +83,7 @@ type Message
     = SetPostHtml String
     | Translate
     | TranslateResp (Result Http.Error Tweet)
+    | UserInfoResp (Result Http.Error User)
 
 
 
@@ -85,6 +109,12 @@ update message model =
             ( { model | tweet = tweet }, Cmd.none )
 
         TranslateResp (Err _) ->
+            ( model, Cmd.none )
+
+        UserInfoResp (Ok user) ->
+            ( { model | user = Just user }, Cmd.none )
+
+        UserInfoResp (Err _) ->
             ( model, Cmd.none )
 
 

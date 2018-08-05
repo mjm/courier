@@ -3,6 +3,11 @@ class ApiHandler
     forward translator.translate(req)
   end
 
+  def get_user_info(req, env)
+    { username: 'foo',
+      name: 'Foo McDude' }
+  end
+
   private
 
   def forward(resp)

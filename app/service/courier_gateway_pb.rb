@@ -5,7 +5,15 @@ require 'google/protobuf'
 
 require 'courier/translator/service_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
+  add_message "courier.UserInfoRequest" do
+  end
+  add_message "courier.UserInfo" do
+    optional :username, :string, 1
+    optional :name, :string, 2
+  end
 end
 
 module Courier
+  UserInfoRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("courier.UserInfoRequest").msgclass
+  UserInfo = Google::Protobuf::DescriptorPool.generated_pool.lookup("courier.UserInfo").msgclass
 end

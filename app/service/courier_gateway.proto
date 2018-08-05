@@ -5,4 +5,13 @@ import "courier/translator/service.proto";
 
 service Api {
   rpc Translate(TranslateRequest) returns (TranslatedTweet);
+  rpc GetUserInfo(UserInfoRequest) returns (UserInfo);
+}
+
+message UserInfoRequest {
+}
+
+message UserInfo {
+  string username = 1;
+  string name = 2;
 }

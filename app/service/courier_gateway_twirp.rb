@@ -7,6 +7,7 @@ module Courier
     package 'courier'
     service 'Api'
     rpc :Translate, TranslateRequest, TranslatedTweet, :ruby_method => :translate
+    rpc :GetUserInfo, UserInfoRequest, UserInfo, :ruby_method => :get_user_info
   end
 
   class ApiClient < Twirp::Client
