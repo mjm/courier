@@ -1,0 +1,8 @@
+syntax = "proto3";
+package courier;
+
+import "courier/translator/service.proto";
+
+service Api {
+  rpc Translate(TranslateRequest) returns (TranslatedTweet);
+}
