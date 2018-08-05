@@ -7,16 +7,16 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
+import Json.Encode
+import Request.Post
 import Request.User
-import Request.Translate
 
 
 -- MODEL
 
 
 type alias Model =
-    { post : Post
-    , tweet : Tweet
+    { posts : List Post
     , user : Maybe User
     }
 
@@ -27,13 +27,12 @@ type alias Model =
 
 init : ( Model, Cmd Message )
 init =
-    ( initialModel, loadUserInfo )
+    initialModel ! [ loadUserInfo, loadPosts ]
 
 
 initialModel : Model
 initialModel =
-    { post = Post ""
-    , tweet = Tweet ""
+    { posts = []
     , user = Nothing
     }
 
@@ -41,6 +40,11 @@ initialModel =
 loadUserInfo : Cmd Message
 loadUserInfo =
     Http.send UserInfoResp Request.User.getUserInfo
+
+
+loadPosts : Cmd Message
+loadPosts =
+    Http.send PostsLoaded Request.Post.posts
 
 
 
@@ -52,16 +56,8 @@ view model =
     div []
         [ h1 [] [ text "Courier" ]
         , welcomeMessage model.user
-        , Html.form [ onSubmit Translate ]
-            [ textarea
-                [ placeholder "HTML to translate"
-                , value model.post.contentHtml
-                , onInput SetPostHtml
-                ]
-                []
-            , button [] [ text "Translate" ]
-            , pre [] [ text model.tweet.body ]
-            ]
+        , Html.hr [] []
+        , postList model.posts
         ]
 
 
@@ -75,15 +71,58 @@ welcomeMessage user =
             text ""
 
 
+postList : List Post -> Html Message
+postList posts =
+    List.concatMap postEntry posts
+        |> div []
+
+
+postEntry : Post -> List (Html Message)
+postEntry post =
+    [ postTitle post
+    , postContent post
+    , postTweets post
+    , hr [] []
+    ]
+
+
+postTitle : Post -> Html Message
+postTitle post =
+    if String.isEmpty post.title then
+        h2 [] [ text post.title ]
+    else
+        text ""
+
+
+postContent : Post -> Html Message
+postContent post =
+    if String.isEmpty post.contentHtml then
+        article [] [ text post.contentText ]
+    else
+        article [ property "innerHTML" (Json.Encode.string post.contentHtml) ] []
+
+
+postTweets : Post -> Html Message
+postTweets post =
+    div []
+        [ h3 [] [ text "Tweets" ]
+        , div [] (List.map postTweet post.tweets)
+        ]
+
+
+postTweet : Tweet -> Html Message
+postTweet tweet =
+    article []
+        [ blockquote [] [ text tweet.body ] ]
+
+
 
 -- MESSAGE
 
 
 type Message
-    = SetPostHtml String
-    | Translate
-    | TranslateResp (Result Http.Error Tweet)
-    | UserInfoResp (Result Http.Error User)
+    = UserInfoResp (Result Http.Error User)
+    | PostsLoaded (Result Http.Error (List Post))
 
 
 
@@ -93,28 +132,16 @@ type Message
 update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
-        SetPostHtml text ->
-            let
-                currentPost =
-                    model.post
-            in
-                ( { model | post = { currentPost | contentHtml = text } }, Cmd.none )
-
-        Translate ->
-            ( model
-            , Http.send TranslateResp (Request.Translate.translate model.post)
-            )
-
-        TranslateResp (Ok tweet) ->
-            ( { model | tweet = tweet }, Cmd.none )
-
-        TranslateResp (Err _) ->
-            ( model, Cmd.none )
-
         UserInfoResp (Ok user) ->
             ( { model | user = Just user }, Cmd.none )
 
         UserInfoResp (Err _) ->
+            ( model, Cmd.none )
+
+        PostsLoaded (Ok posts) ->
+            ( { model | posts = posts }, Cmd.none )
+
+        PostsLoaded (Err _) ->
             ( model, Cmd.none )
 
 

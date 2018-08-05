@@ -1,4 +1,14 @@
 GIT
+  remote: https://github.com/mjm/courier-posts.git
+  revision: cb9b8dfd90f617c1a81ef2217a0f66358a951042
+  glob: client/*.gemspec
+  specs:
+    courier-posts (0.0.1)
+      jwt
+      twirp
+      typhoeus
+
+GIT
   remote: https://github.com/mjm/courier-translator.git
   revision: 2884d0c6d14cd40ee90641dd1b20a4f80d481d09
   glob: client/*.gemspec
@@ -211,6 +221,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap (>= 1.1.0)
   byebug
+  courier-posts!
   courier-translator!
   courier-tweeter!
   jbuilder (~> 2.5)

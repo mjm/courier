@@ -1,14 +1,19 @@
 syntax = "proto3";
 package courier;
 
+import "courier/posts/service.proto";
 import "courier/translator/service.proto";
 
 service Api {
   rpc Translate(TranslateRequest) returns (TranslatedTweet);
   rpc GetUserInfo(UserInfoRequest) returns (UserInfo);
+  rpc GetPosts(PostsRequest) returns (PostList);
 }
 
 message UserInfoRequest {
+}
+
+message PostsRequest {
 }
 
 message UserInfo {
