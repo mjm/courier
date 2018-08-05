@@ -1,5 +1,7 @@
 module Main exposing (..)
 
+import Data.Post as Post exposing (Post)
+import Data.Tweet as Tweet exposing (Tweet)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -12,8 +14,8 @@ import Json.Encode as Encode
 
 
 type alias Model =
-    { text : String
-    , tweetText : String
+    { post : Post
+    , tweet : Tweet
     }
 
 
@@ -23,7 +25,11 @@ type alias Model =
 
 init : ( Model, Cmd Message )
 init =
-    ( Model "" "", Cmd.none )
+    ( Model
+        (Post "")
+        (Tweet "")
+    , Cmd.none
+    )
 
 
 
@@ -36,13 +42,13 @@ view model =
         [ h1 [] [ text "Welcome to Courier" ]
         , Html.form [ onSubmit Translate ]
             [ textarea
-                [ placeholder "Text to translate"
-                , value model.text
-                , onInput SetText
+                [ placeholder "HTML to translate"
+                , value model.post.contentHtml
+                , onInput SetPostHtml
                 ]
                 []
             , button [] [ text "Translate" ]
-            , pre [] [ text model.tweetText ]
+            , pre [] [ text model.tweet.body ]
             ]
         ]
 
@@ -53,9 +59,9 @@ view model =
 
 type Message
     = None
-    | SetText String
+    | SetPostHtml String
     | Translate
-    | TranslateResp (Result Http.Error String)
+    | TranslateResp (Result Http.Error Tweet)
 
 
 
@@ -68,14 +74,18 @@ update message model =
         None ->
             ( model, Cmd.none )
 
-        SetText text ->
-            ( { model | text = text }, Cmd.none )
+        SetPostHtml text ->
+            let
+                currentPost =
+                    model.post
+            in
+                ( { model | post = { currentPost | contentHtml = text } }, Cmd.none )
 
         Translate ->
-            ( model, translateText model.text )
+            ( model, translatePost model.post )
 
-        TranslateResp (Ok tweetText) ->
-            ( { model | tweetText = tweetText }, Cmd.none )
+        TranslateResp (Ok tweet) ->
+            ( { model | tweet = tweet }, Cmd.none )
 
         TranslateResp (Err _) ->
             ( model, Cmd.none )
@@ -85,11 +95,11 @@ update message model =
 -- HTTP
 
 
-translateText : String -> Cmd Message
-translateText text =
+translatePost : Post -> Cmd Message
+translatePost post =
     let
         request =
-            callApi "Translate" (encodeTweetText text) decodeTranslatedTweet
+            callApi "Translate" (Post.encode post) Tweet.decoder
     in
         Http.send TranslateResp request
 
@@ -97,16 +107,6 @@ translateText text =
 callApi : String -> Encode.Value -> Decode.Decoder a -> Http.Request a
 callApi method bodyValue =
     Http.post ("/courier.Api/" ++ method) (Http.jsonBody bodyValue)
-
-
-encodeTweetText : String -> Encode.Value
-encodeTweetText text =
-    Encode.object [ ( "content_html", Encode.string text ) ]
-
-
-decodeTranslatedTweet : Decode.Decoder String
-decodeTranslatedTweet =
-    Decode.field "body" Decode.string
 
 
 
