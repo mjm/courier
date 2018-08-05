@@ -70,7 +70,7 @@ navbarBrand : Html Message
 navbarBrand =
     div [ class "navbar-brand" ]
         [ a [ class "navbar-item has-text-weight-bold is-size-5" ]
-            [ span [ class "icon" ]
+            [ span [ class "icon is-medium" ]
                 [ i [ class "fas fa-paper-plane" ] [] ]
             , span [] [ text "Courier" ]
             ]
@@ -118,17 +118,34 @@ welcomeMessage user =
 
 postList : List Post -> Html Message
 postList posts =
-    List.concatMap postEntry posts
-        |> div []
+    div []
+        [ div [ class "columns" ]
+            [ div [ class "column has-text-centered" ]
+                [ h2 [ class "title is-size-4" ] [ text "Posts" ]
+                , hr [] []
+                ]
+            , div [ class "column has-text-centered" ]
+                [ h2 [ class "title is-size-4" ] [ text "Tweets" ]
+                , hr [] []
+                ]
+            ]
+        , List.map postEntry posts
+            |> div []
+        ]
 
 
-postEntry : Post -> List (Html Message)
+postEntry : Post -> Html Message
 postEntry post =
-    [ postTitle post
-    , postContent post
-    , postTweets post
-    , hr [] []
-    ]
+    div []
+        [ div [ class "columns" ]
+            [ div [ class "column" ]
+                [ postTitle post
+                , postContent post
+                ]
+            , div [ class "column" ] [ postTweets post ]
+            ]
+        , hr [] []
+        ]
 
 
 postTitle : Post -> Html Message
@@ -153,16 +170,15 @@ postContent post =
 
 postTweets : Post -> Html Message
 postTweets post =
-    div []
-        [ h3 [ class "title is-5" ] [ text "Tweets" ]
-        , div [] (List.map postTweet post.tweets)
-        ]
+    div [] <| List.map postTweet post.tweets
 
 
 postTweet : Tweet -> Html Message
 postTweet tweet =
-    article [ class "box" ]
-        [ text tweet.body ]
+    article [ class "card is-primary" ]
+        [ div [ class "card-content" ]
+            [ text tweet.body ]
+        ]
 
 
 
