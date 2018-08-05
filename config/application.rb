@@ -29,5 +29,7 @@ module CourierGateway
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    config.middleware.use OmniAuth::Strategies::Twitter, ENV['TWITTER_CONSUMER_API_KEY'], ENV['TWITTER_CONSUMER_API_SECRET']
   end
 end
