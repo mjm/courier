@@ -9,6 +9,7 @@ import Http
 import Json.Encode
 import Request.Post
 import Request.User
+import Views.Page as Page
 
 
 -- MODEL
@@ -52,50 +53,11 @@ loadPosts =
 
 view : Model -> Html Message
 view model =
-    div []
-        [ navbar model
-        , pageContent model
-        ]
-
-
-navbar : Model -> Html Message
-navbar model =
-    nav [ class "navbar is-info" ]
-        [ navbarBrand
-        , navbarMenu model
-        ]
-
-
-navbarBrand : Html Message
-navbarBrand =
-    div [ class "navbar-brand" ]
-        [ a [ class "navbar-item has-text-weight-bold is-size-5" ]
-            [ span [ class "icon is-medium" ]
-                [ i [ class "fas fa-paper-plane" ] [] ]
-            , span [] [ text "Courier" ]
-            ]
-        ]
-
-
-navbarMenu : Model -> Html Message
-navbarMenu model =
-    div [ class "navbar-menu" ]
-        [ div [ class "navbar-end" ]
-            [ div [ class "navbar-item" ]
-                [ case model.user of
-                    Just user ->
-                        span []
-                            [ span [ class "icon" ]
-                                [ i [ class "fab fa-twitter" ] [] ]
-                            , span [ class "has-text-weight-semibold" ]
-                                [ text user.name ]
-                            ]
-
-                    Nothing ->
-                        text ""
-                ]
-            ]
-        ]
+    [ Page.navbar model.user
+    , pageContent model
+    , Page.footer
+    ]
+        |> div []
 
 
 pageContent : Model -> Html Message
@@ -104,16 +66,6 @@ pageContent model =
         [ div [ class "container" ]
             [ postList model.posts ]
         ]
-
-
-welcomeMessage : Maybe User -> Html Message
-welcomeMessage user =
-    case user of
-        Just user ->
-            p [] [ text ("Welcome, " ++ user.name) ]
-
-        Nothing ->
-            text ""
 
 
 postList : List Post -> Html Message
