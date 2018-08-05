@@ -6,8 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import Json.Decode as Decode
-import Json.Encode as Encode
+import Request.Translate
 
 
 -- MODEL
@@ -58,8 +57,7 @@ view model =
 
 
 type Message
-    = None
-    | SetPostHtml String
+    = SetPostHtml String
     | Translate
     | TranslateResp (Result Http.Error Tweet)
 
@@ -71,9 +69,6 @@ type Message
 update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
-        None ->
-            ( model, Cmd.none )
-
         SetPostHtml text ->
             let
                 currentPost =
@@ -82,31 +77,15 @@ update message model =
                 ( { model | post = { currentPost | contentHtml = text } }, Cmd.none )
 
         Translate ->
-            ( model, translatePost model.post )
+            ( model
+            , Http.send TranslateResp (Request.Translate.translate model.post)
+            )
 
         TranslateResp (Ok tweet) ->
             ( { model | tweet = tweet }, Cmd.none )
 
         TranslateResp (Err _) ->
             ( model, Cmd.none )
-
-
-
--- HTTP
-
-
-translatePost : Post -> Cmd Message
-translatePost post =
-    let
-        request =
-            callApi "Translate" (Post.encode post) Tweet.decoder
-    in
-        Http.send TranslateResp request
-
-
-callApi : String -> Encode.Value -> Decode.Decoder a -> Http.Request a
-callApi method bodyValue =
-    Http.post ("/courier.Api/" ++ method) (Http.jsonBody bodyValue)
 
 
 
