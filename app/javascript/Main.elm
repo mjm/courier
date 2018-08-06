@@ -64,12 +64,12 @@ pageContent : Model -> Html Message
 pageContent model =
     section [ class "section" ]
         [ div [ class "container" ]
-            [ postList model.posts ]
+            [ postList model.user model.posts ]
         ]
 
 
-postList : List Post -> Html Message
-postList posts =
+postList : Maybe User -> List Post -> Html Message
+postList user posts =
     div []
         [ div [ class "columns" ]
             [ div [ class "column has-text-centered" ]
@@ -81,20 +81,20 @@ postList posts =
                 , hr [] []
                 ]
             ]
-        , List.map postEntry posts
+        , List.map (postEntry user) posts
             |> div []
         ]
 
 
-postEntry : Post -> Html Message
-postEntry post =
+postEntry : Maybe User -> Post -> Html Message
+postEntry user post =
     div []
         [ div [ class "columns" ]
             [ div [ class "column" ]
                 [ postTitle post
                 , postContent post
                 ]
-            , div [ class "column" ] [ postTweets post ]
+            , div [ class "column" ] [ postTweets user post ]
             ]
         , hr [] []
         ]
@@ -120,17 +120,48 @@ postContent post =
             []
 
 
-postTweets : Post -> Html Message
-postTweets post =
-    div [] <| List.map postTweet post.tweets
+postTweets : Maybe User -> Post -> Html Message
+postTweets user post =
+    div [] <| List.map (tweetCard user) post.tweets
 
 
-postTweet : Tweet -> Html Message
-postTweet tweet =
-    article [ class "card is-primary" ]
+tweetCard : Maybe User -> Tweet -> Html Message
+tweetCard user tweet =
+    article [ class "card" ]
         [ div [ class "card-content" ]
-            [ text tweet.body ]
+            [ tweetUserInfo user
+            , p [] [ text tweet.body ]
+            ]
+        , footer [ class "card-footer" ]
+            [ a [ href "#", class "card-footer-item has-background-danger has-text-white" ]
+                [ span [ class "icon" ] [ i [ class "fas fa-ban" ] [] ]
+                , span [] [ text "Don't Post" ]
+                ]
+            , a [ href "#", class "card-footer-item has-background-primary has-text-white" ]
+                [ span [ class "icon" ] [ i [ class "fas fa-pencil-alt" ] [] ]
+                , span [] [ text "Edit Tweet" ]
+                ]
+            , a [ href "#", class "card-footer-item has-background-link has-text-white" ]
+                [ span [ class "icon" ] [ i [ class "fas fa-share" ] [] ]
+                , span [] [ text "Post Now" ]
+                ]
+            ]
         ]
+
+
+tweetUserInfo : Maybe User -> Html msg
+tweetUserInfo user =
+    case user of
+        Just user ->
+            header [ class "media" ]
+                [ div [ class "media-content" ]
+                    [ h1 [ class "title is-5" ] [ text user.name ]
+                    , h2 [ class "subtitle is-6 has-text-grey" ] [ text <| "@" ++ user.username ]
+                    ]
+                ]
+
+        Nothing ->
+            text ""
 
 
 
