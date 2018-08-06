@@ -22,6 +22,14 @@ class ApiHandler
     end
   end
 
+  def cancel_tweet(req, env)
+    if env[:user]
+      forward posts_client(env).cancel_tweet(req)
+    else
+      Twirp::Error.unauthenticated 'You are not logged in'
+    end
+  end
+
   class << self
     def service
       handler = new

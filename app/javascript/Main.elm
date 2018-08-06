@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Data.Post as Post exposing (Post)
+import Data.Tweet as Tweet exposing (Tweet)
 import Data.User as User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -8,7 +9,7 @@ import Http
 import Request.Post
 import Request.User
 import Views.Page as Page
-import Views.Post exposing (postList)
+import Views.Post exposing (PostActions, postList)
 
 
 -- MODEL
@@ -59,11 +60,16 @@ view model =
         |> div []
 
 
+postActions : PostActions Message
+postActions =
+    { cancelTweet = CancelTweet }
+
+
 pageContent : Model -> Html Message
 pageContent model =
     section [ class "section" ]
         [ div [ class "container" ]
-            [ postList model.user model.posts ]
+            [ postList postActions model.user model.posts ]
         ]
 
 
@@ -74,6 +80,8 @@ pageContent model =
 type Message
     = UserInfoResp (Result Http.Error User)
     | PostsLoaded (Result Http.Error (List Post))
+    | CancelTweet Tweet
+    | CanceledTweet (Result Http.Error Tweet)
 
 
 
@@ -93,6 +101,15 @@ update message model =
             ( { model | posts = posts }, Cmd.none )
 
         PostsLoaded (Err _) ->
+            ( model, Cmd.none )
+
+        CancelTweet tweet ->
+            ( model, Http.send CanceledTweet <| Request.Post.cancelTweet tweet )
+
+        CanceledTweet (Ok tweet) ->
+            ( model, Cmd.none )
+
+        CanceledTweet (Err _) ->
             ( model, Cmd.none )
 
 

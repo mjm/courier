@@ -8,6 +8,7 @@ service Api {
   rpc Translate(TranslateRequest) returns (TranslatedTweet);
   rpc GetUserInfo(UserInfoRequest) returns (UserInfo);
   rpc GetPosts(PostsRequest) returns (PostList);
+  rpc CancelTweet(CancelTweetRequest) returns (PostTweet);
 }
 
 message UserInfoRequest {
