@@ -90,18 +90,17 @@ tweetCard actions user tweet =
 draftActions : PostActions msg -> Tweet -> List (Html msg)
 draftActions actions tweet =
     [ a
-        [ href "#"
-        , onClick <| actions.cancelTweet tweet
+        [ onClick <| actions.cancelTweet tweet
         , class "card-footer-item has-background-danger has-text-white"
         ]
         [ span [ class "icon" ] [ i [ class "fas fa-ban" ] [] ]
         , span [] [ text "Don't Post" ]
         ]
-    , a [ href "#", class "card-footer-item has-background-primary has-text-white" ]
+    , a [ class "card-footer-item has-background-primary has-text-white" ]
         [ span [ class "icon" ] [ i [ class "fas fa-pencil-alt" ] [] ]
         , span [] [ text "Edit Tweet" ]
         ]
-    , a [ href "#", class "card-footer-item has-background-link has-text-white" ]
+    , a [ class "card-footer-item has-background-link has-text-white" ]
         [ span [ class "icon" ] [ i [ class "fas fa-share" ] [] ]
         , span [] [ text "Post Now" ]
         ]

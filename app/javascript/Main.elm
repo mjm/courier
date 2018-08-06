@@ -107,10 +107,36 @@ update message model =
             ( model, Http.send CanceledTweet <| Request.Post.cancelTweet tweet )
 
         CanceledTweet (Ok tweet) ->
-            ( model, Cmd.none )
+            ( updateTweet tweet model, Cmd.none )
 
         CanceledTweet (Err _) ->
             ( model, Cmd.none )
+
+
+updateTweet : Tweet -> Model -> Model
+updateTweet tweet model =
+    let
+        posts =
+            List.map (updatePostTweet tweet)
+                model.posts
+    in
+        { model | posts = posts }
+
+
+updatePostTweet : Tweet -> Post -> Post
+updatePostTweet tweet post =
+    let
+        tweets =
+            List.map
+                (\postTweet ->
+                    if tweet.id == postTweet.id then
+                        tweet
+                    else
+                        postTweet
+                )
+                post.tweets
+    in
+        { post | tweets = tweets }
 
 
 
