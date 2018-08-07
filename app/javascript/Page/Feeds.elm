@@ -30,7 +30,10 @@ init =
 initialModel : Model
 initialModel =
     { user = Nothing
-    , feeds = [ Feed 1 "https://example.com/feed.json" ]
+    , feeds =
+        [ Feed 1 "https://example.com/feed.json"
+        , Feed 2 "https://example.org/feed/json"
+        ]
     }
 
 
@@ -59,6 +62,7 @@ pageContent model =
             [ h1 [ class "title has-text-centered" ] [ text "Your Feeds" ]
             , hr [] []
             , feeds model.feeds
+            , addFeed
             ]
         ]
 
@@ -71,13 +75,36 @@ feeds fs =
                 [ text "You don't have any feeds registered." ]
 
         fs ->
-            List.map feedRow fs
-                |> ul []
+            feedList fs
+
+
+feedList : List Feed -> Html Message
+feedList feeds =
+    div [ class "columns" ]
+        [ div [ class "column is-half is-offset-one-quarter" ]
+            [ List.map feedRow feeds |> ul []
+            ]
+        ]
 
 
 feedRow : Feed -> Html Message
 feedRow feed =
-    li [] [ text feed.url ]
+    li [ class "box" ]
+        [ button [ class "delete is-pulled-right" ] []
+        , span [ class "icon is-medium has-text-link" ]
+            [ i [ class "fas fa-rss fa-lg" ] [] ]
+        , span [ class "is-size-5" ] [ text feed.url ]
+        ]
+
+
+addFeed : Html Message
+addFeed =
+    p [ class "has-text-centered" ]
+        [ button [ class "button is-rounded is-primary is-large" ]
+            [ span [ class "icon" ] [ i [ class "fas fa-plus-circle" ] [] ]
+            , span [] [ text "Add Feed" ]
+            ]
+        ]
 
 
 
