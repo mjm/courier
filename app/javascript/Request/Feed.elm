@@ -1,6 +1,6 @@
 module Request.Feed exposing (..)
 
-import Data.Feed as Feed exposing (Feed)
+import Data.Feed as Feed exposing (Feed, DraftFeed)
 import Http
 import HttpBuilder exposing (withExpect, withJsonBody, toRequest)
 import Json.Decode as Decode
@@ -18,3 +18,11 @@ feeds =
             |> withJsonBody (Encode.object [])
             |> withExpect (Http.expectJson decoder)
             |> toRequest
+
+
+register : DraftFeed -> Http.Request Feed
+register feed =
+    apiBuilder "RegisterFeed"
+        |> withJsonBody (Feed.encode feed)
+        |> withExpect (Http.expectJson Feed.decoder)
+        |> toRequest

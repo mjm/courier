@@ -170,6 +170,7 @@ type Message
     | SetAddingFeed Bool
     | SetDraftFeedUrl String
     | AddFeed
+    | FeedAdded (Result Http.Error Feed)
 
 
 
@@ -206,11 +207,19 @@ update message model =
             ( { model | draftFeedUrl = url }, Cmd.none )
 
         AddFeed ->
+            ( { model | draftFeedUrl = "", isAddingFeed = False }
+            , Http.send FeedAdded (Request.Feed.register { url = model.draftFeedUrl })
+            )
+
+        FeedAdded (Ok feed) ->
             let
                 feeds =
-                    model.feeds ++ [ Feed 123 model.draftFeedUrl ]
+                    model.feeds ++ [ feed ]
             in
-                ( { model | feeds = feeds, isAddingFeed = False }, Cmd.none )
+                ( { model | feeds = feeds }, Cmd.none )
+
+        FeedAdded (Err _) ->
+            ( model, Cmd.none )
 
 
 

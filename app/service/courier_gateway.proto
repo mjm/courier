@@ -11,6 +11,7 @@ service Api {
   rpc GetPosts(PostsRequest) returns (PostList);
   rpc CancelTweet(CancelTweetRequest) returns (PostTweet);
   rpc GetFeeds(FeedsRequest) returns (FeedList);
+  rpc RegisterFeed(RegisterFeedRequest) returns (Feed);
 }
 
 message UserInfoRequest {

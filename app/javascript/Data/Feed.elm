@@ -1,4 +1,4 @@
-module Data.Feed exposing (Feed, decoder, listDecoder, encode)
+module Data.Feed exposing (Feed, DraftFeed, decoder, listDecoder, encode)
 
 import Json.Decode as Decode exposing (Decoder, int, string, list)
 import Json.Decode.Pipeline exposing (decode, required, optional)
@@ -9,6 +9,10 @@ type alias Feed =
     { id : Int
     , url : String
     }
+
+
+type alias DraftFeed =
+    { url : String }
 
 
 decoder : Decoder Feed
@@ -23,7 +27,7 @@ listDecoder =
     Decode.list decoder
 
 
-encode : Feed -> Value
+encode : DraftFeed -> Value
 encode feed =
     Encode.object
         [ ( "url", Encode.string feed.url ) ]
