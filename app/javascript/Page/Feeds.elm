@@ -2,10 +2,14 @@ module Page.Feeds exposing (main)
 
 import Data.Feed exposing (Feed)
 import Data.User exposing (User)
+import Dom
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Events.Extra exposing (onClickPreventDefault)
 import Http
 import Request.User
+import Task
 import Views.Page as Page
 
 
@@ -15,6 +19,8 @@ import Views.Page as Page
 type alias Model =
     { user : Maybe User
     , feeds : List Feed
+    , isAddingFeed : Bool
+    , draftFeedUrl : String
     }
 
 
@@ -34,6 +40,8 @@ initialModel =
         [ Feed 1 "https://example.com/feed.json"
         , Feed 2 "https://example.org/feed/json"
         ]
+    , isAddingFeed = False
+    , draftFeedUrl = ""
     }
 
 
@@ -61,8 +69,13 @@ pageContent model =
         [ div [ class "container" ]
             [ h1 [ class "title has-text-centered" ] [ text "Your Feeds" ]
             , hr [] []
-            , feeds model.feeds
-            , addFeed
+            , div [ class "columns" ]
+                [ div [ class "column is-8 is-offset-2" ]
+                    [ feeds model.feeds
+                    , p [] [ text " " ]
+                    , addFeed model
+                    ]
+                ]
             ]
         ]
 
@@ -75,16 +88,7 @@ feeds fs =
                 [ text "You don't have any feeds registered." ]
 
         fs ->
-            feedList fs
-
-
-feedList : List Feed -> Html Message
-feedList feeds =
-    div [ class "columns" ]
-        [ div [ class "column is-half is-offset-one-quarter" ]
-            [ List.map feedRow feeds |> ul []
-            ]
-        ]
+            List.map feedRow fs |> ul []
 
 
 feedRow : Feed -> Html Message
@@ -97,12 +101,57 @@ feedRow feed =
         ]
 
 
-addFeed : Html Message
-addFeed =
+addFeed : Model -> Html Message
+addFeed model =
+    if model.isAddingFeed then
+        addFeedForm
+    else
+        addFeedButton
+
+
+addFeedButton : Html Message
+addFeedButton =
     p [ class "has-text-centered" ]
-        [ button [ class "button is-rounded is-primary is-large" ]
+        [ button
+            [ class "button is-rounded is-primary is-large"
+            , onClick (SetAddingFeed True)
+            ]
             [ span [ class "icon" ] [ i [ class "fas fa-plus-circle" ] [] ]
             , span [] [ text "Add Feed" ]
+            ]
+        ]
+
+
+addFeedForm : Html Message
+addFeedForm =
+    Html.form
+        [ action "javascript:void(0);"
+        , onSubmit AddFeed
+        ]
+        [ div [ class "field" ]
+            [ div [ class "control" ]
+                [ input
+                    [ id "add-feed-url"
+                    , type_ "text"
+                    , class "input is-medium"
+                    , placeholder "Feed URL"
+                    , onInput SetDraftFeedUrl
+                    ]
+                    []
+                ]
+            ]
+        , div [ class "field is-grouped is-grouped-right" ]
+            [ p [ class "control" ]
+                [ button
+                    [ class "button is-light"
+                    , onClickPreventDefault (SetAddingFeed False)
+                    ]
+                    [ text "Cancel" ]
+                ]
+            , p [ class "control" ]
+                [ button [ class "button is-primary" ]
+                    [ text "Add Feed" ]
+                ]
             ]
         ]
 
@@ -112,7 +161,11 @@ addFeed =
 
 
 type Message
-    = UserInfoLoaded (Result Http.Error User)
+    = Noop
+    | UserInfoLoaded (Result Http.Error User)
+    | SetAddingFeed Bool
+    | SetDraftFeedUrl String
+    | AddFeed
 
 
 
@@ -122,11 +175,32 @@ type Message
 update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
+        Noop ->
+            ( model, Cmd.none )
+
         UserInfoLoaded (Ok user) ->
             ( { model | user = Just user }, Cmd.none )
 
         UserInfoLoaded (Err _) ->
             ( model, Cmd.none )
+
+        SetAddingFeed isAdding ->
+            ( { model | isAddingFeed = isAdding }
+            , if isAdding then
+                Task.attempt (\_ -> Noop) (Dom.focus "add-feed-url")
+              else
+                Cmd.none
+            )
+
+        SetDraftFeedUrl url ->
+            ( { model | draftFeedUrl = url }, Cmd.none )
+
+        AddFeed ->
+            let
+                feeds =
+                    model.feeds ++ [ Feed 123 model.draftFeedUrl ]
+            in
+                ( { model | feeds = feeds, isAddingFeed = False }, Cmd.none )
 
 
 
