@@ -4,5 +4,6 @@ Rails.application.routes.draw do
 
   get '/auth/twitter/callback', to: 'auth#twitter_callback'
 
-  root to: 'root#index'
+  get '/feeds', to: 'pages#feeds'
+  root to: 'pages#index'
 end
