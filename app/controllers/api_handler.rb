@@ -6,27 +6,27 @@ class ApiHandler
   end
 
   def get_user_info(_req, env)
-    if env[:user]
-      { username: env[:user]['username'],
-        name: env[:user]['name'] }
-    else
-      Twirp::Error.unauthenticated 'You are not logged in'
+    require_user env do |user|
+      { username: user['username'],
+        name: user['name'] }
     end
   end
 
   def get_posts(_req, env)
-    if env[:user]
-      forward posts_client(env).get_user_posts(user_id: env[:user]['id'])
-    else
-      Twirp::Error.unauthenticated 'You are not logged in'
+    require_user env do |user|
+      forward posts_client(env).get_user_posts(user_id: user['id'])
     end
   end
 
   def cancel_tweet(req, env)
-    if env[:user]
+    require_user env do |_user|
       forward posts_client(env).cancel_tweet(req)
-    else
-      Twirp::Error.unauthenticated 'You are not logged in'
+    end
+  end
+
+  def get_feeds(_req, env)
+    require_user env do |user|
+      forward feeds_client(env).get_user_feeds(user_id: user['id'])
     end
   end
 
@@ -55,6 +55,14 @@ class ApiHandler
 
   private
 
+  def require_user(env)
+    if env[:user]
+      yield env[:user]
+    else
+      Twirp::Error.unauthenticated 'You are not logged in'
+    end
+  end
+
   def forward(resp)
     resp.data || resp.error
   end
@@ -65,5 +73,9 @@ class ApiHandler
 
   def posts_client(env)
     Courier::PostsClient.connect(token: env[:user_token])
+  end
+
+  def feeds_client(env)
+    Courier::FeedsClient.connect(token: env[:user_token])
   end
 end

@@ -9,6 +9,7 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Events.Extra exposing (onClickPreventDefault)
 import Http
 import Request.User
+import Request.Feed
 import Task
 import Views.Page as Page
 
@@ -30,16 +31,13 @@ type alias Model =
 
 init : ( Model, Cmd Message )
 init =
-    initialModel ! [ loadUserInfo ]
+    initialModel ! [ loadUserInfo, loadFeeds ]
 
 
 initialModel : Model
 initialModel =
     { user = Nothing
-    , feeds =
-        [ Feed 1 "https://example.com/feed.json"
-        , Feed 2 "https://example.org/feed/json"
-        ]
+    , feeds = []
     , isAddingFeed = False
     , draftFeedUrl = ""
     }
@@ -48,6 +46,11 @@ initialModel =
 loadUserInfo : Cmd Message
 loadUserInfo =
     Http.send UserInfoLoaded Request.User.getUserInfo
+
+
+loadFeeds : Cmd Message
+loadFeeds =
+    Http.send FeedsLoaded Request.Feed.feeds
 
 
 
@@ -163,6 +166,7 @@ addFeedForm =
 type Message
     = Noop
     | UserInfoLoaded (Result Http.Error User)
+    | FeedsLoaded (Result Http.Error (List Feed))
     | SetAddingFeed Bool
     | SetDraftFeedUrl String
     | AddFeed
@@ -182,6 +186,12 @@ update message model =
             ( { model | user = Just user }, Cmd.none )
 
         UserInfoLoaded (Err _) ->
+            ( model, Cmd.none )
+
+        FeedsLoaded (Ok feeds) ->
+            ( { model | feeds = feeds }, Cmd.none )
+
+        FeedsLoaded (Err _) ->
             ( model, Cmd.none )
 
         SetAddingFeed isAdding ->

@@ -10,6 +10,7 @@ module Courier
     rpc :GetUserInfo, UserInfoRequest, UserInfo, :ruby_method => :get_user_info
     rpc :GetPosts, PostsRequest, PostList, :ruby_method => :get_posts
     rpc :CancelTweet, CancelTweetRequest, PostTweet, :ruby_method => :cancel_tweet
+    rpc :GetFeeds, FeedsRequest, FeedList, :ruby_method => :get_feeds
   end
 
   class ApiClient < Twirp::Client

@@ -3,6 +3,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.5.1'
 
+gem 'courier-feeds', github: 'mjm/courier-feeds', glob: 'client/*.gemspec'
 gem 'courier-posts', github: 'mjm/courier-posts', glob: 'client/*.gemspec'
 gem 'courier-translator', github: 'mjm/courier-translator', glob: 'client/*.gemspec'
 gem 'courier-tweeter', github: 'mjm/courier-tweeter', glob: 'client/*.gemspec'

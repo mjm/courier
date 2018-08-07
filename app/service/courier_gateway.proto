@@ -1,6 +1,7 @@
 syntax = "proto3";
 package courier;
 
+import "courier/feeds/service.proto";
 import "courier/posts/service.proto";
 import "courier/translator/service.proto";
 
@@ -9,12 +10,16 @@ service Api {
   rpc GetUserInfo(UserInfoRequest) returns (UserInfo);
   rpc GetPosts(PostsRequest) returns (PostList);
   rpc CancelTweet(CancelTweetRequest) returns (PostTweet);
+  rpc GetFeeds(FeedsRequest) returns (FeedList);
 }
 
 message UserInfoRequest {
 }
 
 message PostsRequest {
+}
+
+message FeedsRequest {
 }
 
 message UserInfo {

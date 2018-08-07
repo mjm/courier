@@ -1,4 +1,14 @@
 GIT
+  remote: https://github.com/mjm/courier-feeds.git
+  revision: 7d7dc6e5e1ae424ab7c2dcf8bf75defc13469a05
+  glob: client/*.gemspec
+  specs:
+    courier-feeds (0.0.1)
+      jwt
+      twirp
+      typhoeus
+
+GIT
   remote: https://github.com/mjm/courier-posts.git
   revision: 1a17940be6c6a8fbcd1a87577a082e38ac9ac373
   glob: client/*.gemspec
@@ -221,6 +231,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap (>= 1.1.0)
   byebug
+  courier-feeds!
   courier-posts!
   courier-translator!
   courier-tweeter!
