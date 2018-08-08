@@ -11,8 +11,9 @@ import Http
 import Request.User
 import Request.Feed
 import Task
-import Views.Page as Page
 import Views.Error as Error
+import Views.Icon exposing (..)
+import Views.Page as Page
 
 
 -- MODEL
@@ -123,7 +124,7 @@ addFeedButton =
             [ class "button is-rounded is-primary is-large"
             , onClick (SetAddingFeed True)
             ]
-            [ span [ class "icon" ] [ i [ class "fas fa-plus-circle" ] [] ]
+            [ icon Solid "plus-circle"
             , span [] [ text "Add Feed" ]
             ]
         ]

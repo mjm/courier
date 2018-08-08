@@ -7,6 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Json.Encode
+import Views.Icon exposing (..)
 
 
 type alias PostActions msg =
@@ -93,17 +94,11 @@ draftActions actions tweet =
         [ onClick <| actions.cancelTweet tweet
         , class "card-footer-item has-background-danger has-text-white"
         ]
-        [ span [ class "icon" ] [ i [ class "fas fa-ban" ] [] ]
-        , span [] [ text "Don't Post" ]
-        ]
+        [ icon Solid "ban", span [] [ text "Don't Post" ] ]
     , a [ class "card-footer-item has-background-primary has-text-white" ]
-        [ span [ class "icon" ] [ i [ class "fas fa-pencil-alt" ] [] ]
-        , span [] [ text "Edit Tweet" ]
-        ]
+        [ icon Solid "pencil-alt", span [] [ text "Edit Tweet" ] ]
     , a [ class "card-footer-item has-background-link has-text-white" ]
-        [ span [ class "icon" ] [ i [ class "fas fa-share" ] [] ]
-        , span [] [ text "Post Now" ]
-        ]
+        [ icon Solid "share", span [] [ text "Post Now" ] ]
     ]
 
 

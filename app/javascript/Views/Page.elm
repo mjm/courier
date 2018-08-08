@@ -3,6 +3,7 @@ module Views.Page exposing (..)
 import Data.User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Views.Icon exposing (..)
 
 
 navbar : Maybe User -> Html msg
@@ -38,8 +39,7 @@ profileNavbarItem user =
         [ case user of
             Just user ->
                 span []
-                    [ span [ class "icon" ]
-                        [ i [ class "fab fa-twitter" ] [] ]
+                    [ icon Brand "twitter"
                     , span [ class "has-text-weight-semibold" ]
                         [ text user.name ]
                     ]
