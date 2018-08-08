@@ -12,6 +12,7 @@ import Request.User
 import Request.Feed
 import Task
 import Views.Page as Page
+import Views.Error as Error
 
 
 -- MODEL
@@ -22,6 +23,7 @@ type alias Model =
     , feeds : List Feed
     , isAddingFeed : Bool
     , draftFeedUrl : String
+    , errors : List String
     }
 
 
@@ -40,6 +42,7 @@ initialModel =
     , feeds = []
     , isAddingFeed = False
     , draftFeedUrl = ""
+    , errors = []
     }
 
 
@@ -60,6 +63,7 @@ loadFeeds =
 view : Model -> Html Message
 view model =
     [ Page.navbar model.user
+    , Error.errors DismissError model.errors
     , pageContent model
     , Page.footer
     ]
@@ -165,6 +169,7 @@ addFeedForm =
 
 type Message
     = Noop
+    | DismissError String
     | UserInfoLoaded (Result Http.Error User)
     | FeedsLoaded (Result Http.Error (List Feed))
     | SetAddingFeed Bool
@@ -183,17 +188,20 @@ update message model =
         Noop ->
             ( model, Cmd.none )
 
+        DismissError err ->
+            ( removeError model err, Cmd.none )
+
         UserInfoLoaded (Ok user) ->
             ( { model | user = Just user }, Cmd.none )
 
         UserInfoLoaded (Err _) ->
-            ( model, Cmd.none )
+            ( addError model "Could not your user profile. Please try again later.", Cmd.none )
 
         FeedsLoaded (Ok feeds) ->
             ( { model | feeds = feeds }, Cmd.none )
 
         FeedsLoaded (Err _) ->
-            ( model, Cmd.none )
+            ( addError model "Could not load your feeds right now. Please try again later.", Cmd.none )
 
         SetAddingFeed isAdding ->
             ( { model | isAddingFeed = isAdding }
@@ -219,7 +227,25 @@ update message model =
                 ( { model | feeds = feeds }, Cmd.none )
 
         FeedAdded (Err _) ->
-            ( model, Cmd.none )
+            ( addError model "Could not add the feed right now. Please try again later.", Cmd.none )
+
+
+addError : Model -> String -> Model
+addError model err =
+    let
+        errors =
+            err :: model.errors
+    in
+        { model | errors = errors }
+
+
+removeError : Model -> String -> Model
+removeError model err =
+    let
+        errors =
+            List.filter (\e -> not (e == err)) model.errors
+    in
+        { model | errors = errors }
 
 
 
