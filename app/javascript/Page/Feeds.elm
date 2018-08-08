@@ -1,6 +1,6 @@
 module Page.Feeds exposing (main)
 
-import Data.Feed exposing (Feed)
+import Data.Feed exposing (Feed, DraftFeed)
 import Data.User exposing (User)
 import Dom
 import Html exposing (..)
@@ -22,8 +22,7 @@ import Views.Page as Page
 type alias Model =
     { user : Maybe User
     , feeds : List Feed
-    , isAddingFeed : Bool
-    , draftFeedUrl : String
+    , draftFeed : Maybe DraftFeed
     , errors : List String
     }
 
@@ -41,8 +40,7 @@ initialModel : Model
 initialModel =
     { user = Nothing
     , feeds = []
-    , isAddingFeed = False
-    , draftFeedUrl = ""
+    , draftFeed = Nothing
     , errors = []
     }
 
@@ -111,10 +109,12 @@ feedRow feed =
 
 addFeed : Model -> Html Message
 addFeed model =
-    if model.isAddingFeed then
-        addFeedForm
-    else
-        addFeedButton
+    case model.draftFeed of
+        Just feed ->
+            addFeedForm feed
+
+        Nothing ->
+            addFeedButton
 
 
 addFeedButton : Html Message
@@ -130,8 +130,8 @@ addFeedButton =
         ]
 
 
-addFeedForm : Html Message
-addFeedForm =
+addFeedForm : DraftFeed -> Html Message
+addFeedForm feed =
     Html.form
         [ action "javascript:void(0);"
         , onSubmit AddFeed
@@ -205,20 +205,25 @@ update message model =
             ( addError model "Could not load your feeds right now. Please try again later.", Cmd.none )
 
         SetAddingFeed isAdding ->
-            ( { model | isAddingFeed = isAdding }
-            , if isAdding then
-                Task.attempt (\_ -> Noop) (Dom.focus "add-feed-url")
-              else
-                Cmd.none
-            )
+            if isAdding then
+                ( { model | draftFeed = Just (DraftFeed "") }
+                , Task.attempt (\_ -> Noop) (Dom.focus "add-feed-url")
+                )
+            else
+                ( { model | draftFeed = Nothing }, Cmd.none )
 
         SetDraftFeedUrl url ->
-            ( { model | draftFeedUrl = url }, Cmd.none )
+            ( { model | draftFeed = updateFeedUrl model.draftFeed url }, Cmd.none )
 
         AddFeed ->
-            ( { model | draftFeedUrl = "", isAddingFeed = False }
-            , Http.send FeedAdded (Request.Feed.register { url = model.draftFeedUrl })
-            )
+            case model.draftFeed of
+                Just feed ->
+                    ( { model | draftFeed = Nothing }
+                    , Http.send FeedAdded (Request.Feed.register feed)
+                    )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
         FeedAdded (Ok feed) ->
             let
@@ -229,6 +234,16 @@ update message model =
 
         FeedAdded (Err _) ->
             ( addError model "Could not add the feed right now. Please try again later.", Cmd.none )
+
+
+updateFeedUrl : Maybe DraftFeed -> String -> Maybe DraftFeed
+updateFeedUrl feed url =
+    case feed of
+        Just draftFeed ->
+            Just { draftFeed | url = url }
+
+        Nothing ->
+            Just (DraftFeed url)
 
 
 addError : Model -> String -> Model
