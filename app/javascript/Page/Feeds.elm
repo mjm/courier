@@ -101,16 +101,41 @@ feeds fs =
                 [ text "You don't have any feeds registered." ]
 
         Loaded fs ->
-            List.map feedRow fs |> ul []
+            table [ class "table is-fullwidth" ]
+                [ List.map feedRow fs |> tbody [] ]
 
 
 feedRow : Feed -> Html Message
 feedRow feed =
-    li [ class "box" ]
-        [ button [ class "delete is-pulled-right" ] []
-        , span [ class "icon is-medium has-text-link" ]
-            [ i [ class "fas fa-rss fa-lg" ] [] ]
-        , span [ class "is-size-5" ] [ text feed.url ]
+    tr []
+        [ td []
+            [ span [ class "icon is-medium has-text-link" ]
+                [ i [ class "fas fa-rss fa-lg" ] [] ]
+            , span [ class "is-size-5" ] [ text feed.url ]
+            ]
+        , td [] [ feedDropdown feed ]
+        ]
+
+
+feedDropdown : Feed -> Html Message
+feedDropdown feed =
+    div [ class "dropdown is-hoverable" ]
+        [ div [ class "dropdown-trigger" ]
+            [ button [ class "button is-white" ]
+                [ icon Solid "bars" ]
+            ]
+        , div [ class "dropdown-menu" ]
+            [ div [ class "dropdown-content" ]
+                [ a [ class "dropdown-item" ]
+                    [ icon Solid "sync-alt"
+                    , span [] [ text "Refresh Posts" ]
+                    ]
+                , a [ class "dropdown-item has-text-danger" ]
+                    [ icon Solid "trash"
+                    , span [] [ text "Delete Feed" ]
+                    ]
+                ]
+            ]
         ]
 
 
