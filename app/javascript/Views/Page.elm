@@ -17,7 +17,10 @@ navbar user =
 navbarBrand : Html msg
 navbarBrand =
     div [ class "navbar-brand" ]
-        [ a [ class "navbar-item has-text-weight-bold is-size-5" ]
+        [ a
+            [ class "navbar-item has-text-weight-bold is-size-5"
+            , href "/"
+            ]
             [ span [ class "icon is-medium" ]
                 [ i [ class "fas fa-paper-plane" ] [] ]
             , span [] [ text "Courier" ]
@@ -35,18 +38,27 @@ navbarMenu user =
 
 profileNavbarItem : Maybe User -> Html msg
 profileNavbarItem user =
-    div [ class "navbar-item" ]
-        [ case user of
+    div [ class "navbar-item has-dropdown is-hoverable" ] <|
+        case user of
             Just user ->
-                span []
+                [ a [ class "navbar-link" ]
                     [ icon Brand "twitter"
                     , span [ class "has-text-weight-semibold" ]
                         [ text user.name ]
                     ]
+                , div [ class "navbar-dropdown" ]
+                    [ a
+                        [ class "navbar-item"
+                        , href "/feeds"
+                        ]
+                        [ icon Solid "rss"
+                        , span [] [ text "Your Feeds" ]
+                        ]
+                    ]
+                ]
 
             Nothing ->
-                text ""
-        ]
+                [ text "" ]
 
 
 footer : Html msg
