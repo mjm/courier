@@ -14,6 +14,7 @@ import Task
 import Views.Error as Error
 import Views.Icon exposing (..)
 import Views.Page as Page
+import Util exposing (Loadable(..))
 
 
 -- MODEL
@@ -21,7 +22,7 @@ import Views.Page as Page
 
 type alias Model =
     { user : Maybe User
-    , feeds : List Feed
+    , feeds : Loadable (List Feed)
     , draftFeed : Maybe DraftFeed
     , errors : List String
     }
@@ -39,7 +40,7 @@ init =
 initialModel : Model
 initialModel =
     { user = Nothing
-    , feeds = []
+    , feeds = Loading
     , draftFeed = Nothing
     , errors = []
     }
@@ -86,14 +87,20 @@ pageContent model =
         ]
 
 
-feeds : List Feed -> Html Message
+feeds : Loadable (List Feed) -> Html Message
 feeds fs =
     case fs of
-        [] ->
+        Loading ->
+            p [ class "has-text-centered is-size-5" ]
+                [ span [ class "rotating icon is-medium" ] [ i [ class "fas fa-spinner" ] [] ]
+                , span [] [ text "Loading feeds..." ]
+                ]
+
+        Loaded [] ->
             p [ class "has-text-centered" ]
                 [ text "You don't have any feeds registered." ]
 
-        fs ->
+        Loaded fs ->
             List.map feedRow fs |> ul []
 
 
@@ -144,6 +151,7 @@ addFeedForm feed =
                     , class "input is-medium"
                     , placeholder "Feed URL"
                     , onInput SetDraftFeedUrl
+                    , value feed.url
                     ]
                     []
                 ]
@@ -199,7 +207,7 @@ update message model =
             ( addError model "Could not your user profile. Please try again later.", Cmd.none )
 
         FeedsLoaded (Ok feeds) ->
-            ( { model | feeds = feeds }, Cmd.none )
+            ( { model | feeds = Loaded feeds }, Cmd.none )
 
         FeedsLoaded (Err _) ->
             ( addError model "Could not load your feeds right now. Please try again later.", Cmd.none )
@@ -226,11 +234,16 @@ update message model =
                     ( model, Cmd.none )
 
         FeedAdded (Ok feed) ->
-            let
-                feeds =
-                    model.feeds ++ [ feed ]
-            in
-                ( { model | feeds = feeds }, Cmd.none )
+            case model.feeds of
+                Loaded fs ->
+                    let
+                        feeds =
+                            fs ++ [ feed ]
+                    in
+                        ( { model | feeds = Loaded feeds }, Cmd.none )
+
+                Loading ->
+                    ( model, Cmd.none )
 
         FeedAdded (Err _) ->
             ( addError model "Could not add the feed right now. Please try again later.", Cmd.none )
