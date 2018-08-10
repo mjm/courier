@@ -75,6 +75,7 @@ pageContent model =
     section [ class "section" ]
         [ div [ class "container" ]
             [ h1 [ class "title has-text-centered" ] [ text "Your Feeds" ]
+            , p [ class "has-text-centered" ] [ text "Your Courier will periodically check these feeds for new posts to send to Twitter." ]
             , hr [] []
             , div [ class "columns" ]
                 [ div [ class "column is-8 is-offset-2" ]
