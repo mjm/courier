@@ -80,8 +80,6 @@ draftActions : PostActions msg -> Tweet -> List (Html msg)
 draftActions actions tweet =
     [ a
         [ onClick <| actions.cancelTweet tweet
-
-        {- , class "card-footer-item has-background-danger has-text-white" -}
         , class "card-footer-item has-text-danger"
         ]
         [ icon Solid "ban", span [] [ text "Don't Post" ] ]
