@@ -94,6 +94,7 @@ feeds fs =
             p [ class "has-text-centered is-size-5" ]
                 [ span [ class "rotating icon is-medium" ] [ i [ class "fas fa-spinner" ] [] ]
                 , span [] [ text "Loading feeds..." ]
+                , p [] [ text " " ]
                 ]
 
         Loaded [] ->
