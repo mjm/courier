@@ -80,7 +80,6 @@ pageContent model =
             , div [ class "columns" ]
                 [ div [ class "column is-8 is-offset-2" ]
                     [ feeds model.feeds
-                    , p [] [ text " " ]
                     , addFeed model
                     ]
                 ]
