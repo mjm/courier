@@ -10,13 +10,14 @@ import Request.Post
 import Request.User
 import Views.Page as Page
 import Views.Post exposing (PostActions, postList)
+import Util exposing (Loadable(..))
 
 
 -- MODEL
 
 
 type alias Model =
-    { posts : List Post
+    { posts : Loadable (List Post)
     , user : Maybe User
     }
 
@@ -32,7 +33,7 @@ init =
 
 initialModel : Model
 initialModel =
-    { posts = []
+    { posts = Loading
     , user = Nothing
     }
 
@@ -98,7 +99,7 @@ update message model =
             ( model, Cmd.none )
 
         PostsLoaded (Ok posts) ->
-            ( { model | posts = posts }, Cmd.none )
+            ( { model | posts = Loaded posts }, Cmd.none )
 
         PostsLoaded (Err _) ->
             ( model, Cmd.none )
@@ -115,12 +116,16 @@ update message model =
 
 updateTweet : Tweet -> Model -> Model
 updateTweet tweet model =
-    let
-        posts =
-            List.map (updatePostTweet tweet)
-                model.posts
-    in
-        { model | posts = posts }
+    case model.posts of
+        Loading ->
+            model
+
+        Loaded posts ->
+            let
+                updatedPosts =
+                    List.map (updatePostTweet tweet) posts
+            in
+                { model | posts = Loaded updatedPosts }
 
 
 updatePostTweet : Tweet -> Post -> Post
