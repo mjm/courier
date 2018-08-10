@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Data.Post as Post exposing (Post)
+import Data.PostTweet as PostTweet exposing (PostTweet)
 import Data.Tweet as Tweet exposing (Tweet)
 import Data.User as User exposing (User)
 import Html exposing (..)
@@ -10,14 +11,14 @@ import Request.Post
 import Request.User
 import Views.Page as Page
 import Views.Post exposing (PostActions, postList)
-import Util exposing (Loadable(..))
+import Util exposing (Loadable(..), Editable(..))
 
 
 -- MODEL
 
 
 type alias Model =
-    { posts : Loadable (List Post)
+    { tweets : Loadable (List (Editable PostTweet))
     , user : Maybe User
     }
 
@@ -33,7 +34,7 @@ init =
 
 initialModel : Model
 initialModel =
-    { posts = Loading
+    { tweets = Loading
     , user = Nothing
     }
 
@@ -63,14 +64,16 @@ view model =
 
 postActions : PostActions Message
 postActions =
-    { cancelTweet = CancelTweet }
+    { cancelTweet = CancelTweet
+    , editTweet = EditTweet
+    }
 
 
 pageContent : Model -> Html Message
 pageContent model =
     section [ class "section" ]
         [ div [ class "container" ]
-            [ postList postActions model.user model.posts ]
+            [ postList postActions model.user model.tweets ]
         ]
 
 
@@ -83,6 +86,7 @@ type Message
     | PostsLoaded (Result Http.Error (List Post))
     | CancelTweet Tweet
     | CanceledTweet (Result Http.Error Tweet)
+    | EditTweet Tweet
 
 
 
@@ -99,7 +103,7 @@ update message model =
             ( model, Cmd.none )
 
         PostsLoaded (Ok posts) ->
-            ( { model | posts = Loaded posts }, Cmd.none )
+            ( { model | tweets = Loaded (tweetsFromPosts posts) }, Cmd.none )
 
         PostsLoaded (Err _) ->
             ( model, Cmd.none )
@@ -113,35 +117,38 @@ update message model =
         CanceledTweet (Err _) ->
             ( model, Cmd.none )
 
+        EditTweet tweet ->
+            ( model, Cmd.none )
+
+
+tweetsFromPosts : List Post -> List (Editable PostTweet)
+tweetsFromPosts posts =
+    List.concatMap (PostTweet.fromPost) posts
+        |> List.map Viewing
+
 
 updateTweet : Tweet -> Model -> Model
 updateTweet tweet model =
-    case model.posts of
+    case model.tweets of
         Loading ->
             model
 
-        Loaded posts ->
+        Loaded tweets ->
             let
-                updatedPosts =
-                    List.map (updatePostTweet tweet) posts
+                updatedTweets =
+                    List.map (updatePostTweet tweet) tweets
             in
-                { model | posts = Loaded updatedPosts }
+                { model | tweets = Loaded updatedTweets }
 
 
-updatePostTweet : Tweet -> Post -> Post
-updatePostTweet tweet post =
-    let
-        tweets =
-            List.map
-                (\postTweet ->
-                    if tweet.id == postTweet.id then
-                        tweet
-                    else
-                        postTweet
-                )
-                post.tweets
-    in
-        { post | tweets = tweets }
+updatePostTweet : Tweet -> Editable PostTweet -> Editable PostTweet
+updatePostTweet tweet postTweet =
+    case postTweet of
+        Viewing t ->
+            Viewing (PostTweet.updateTweet t tweet)
+
+        Editing orig edit ->
+            Editing (PostTweet.updateTweet orig tweet) edit
 
 
 

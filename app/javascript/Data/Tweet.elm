@@ -12,6 +12,7 @@ type Status
 
 type alias Tweet =
     { id : Int
+    , postId : Int
     , body : String
     , status : Status
     }
@@ -21,6 +22,7 @@ decoder : Decoder Tweet
 decoder =
     decode Tweet
         |> required "id" int
+        |> required "postId" int
         |> required "body" string
         |> optional "status" (Decode.map statusFromString string) Draft
 
