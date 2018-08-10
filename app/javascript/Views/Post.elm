@@ -2,7 +2,7 @@ module Views.Post exposing (..)
 
 import Data.Post exposing (Post)
 import Data.Tweet exposing (Tweet, Status(..))
-import Data.User exposing (User)
+import Data.User as User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -17,16 +17,8 @@ type alias PostActions msg =
 postList : PostActions msg -> Maybe User -> List Post -> Html msg
 postList actions user posts =
     div []
-        [ div [ class "columns" ]
-            [ div [ class "column has-text-centered" ]
-                [ h2 [ class "title is-size-4" ] [ text "Posts" ]
-                , hr [] []
-                ]
-            , div [ class "column has-text-centered" ]
-                [ h2 [ class "title is-size-4" ] [ text "Tweets" ]
-                , hr [] []
-                ]
-            ]
+        [ h2 [ class "title has-text-centered" ] [ text "Your Tweets" ]
+        , hr [] []
         , List.map (postEntry actions user) posts
             |> div []
         ]
@@ -36,13 +28,9 @@ postEntry : PostActions msg -> Maybe User -> Post -> Html msg
 postEntry actions user post =
     div []
         [ div [ class "columns" ]
-            [ div [ class "column" ]
-                [ postTitle post
-                , postContent post
-                ]
-            , div [ class "column" ] [ postTweets actions user post ]
+            [ div [ class "column is-two-thirds is-offset-2" ]
+                [ postTweets actions user post ]
             ]
-        , hr [] []
         ]
 
 
@@ -92,12 +80,15 @@ draftActions : PostActions msg -> Tweet -> List (Html msg)
 draftActions actions tweet =
     [ a
         [ onClick <| actions.cancelTweet tweet
-        , class "card-footer-item has-background-danger has-text-white"
+
+        {- , class "card-footer-item has-background-danger has-text-white" -}
+        , class "card-footer-item has-text-danger"
         ]
         [ icon Solid "ban", span [] [ text "Don't Post" ] ]
-    , a [ class "card-footer-item has-background-primary has-text-white" ]
+    , a
+        [ class "card-footer-item has-text-primary" ]
         [ icon Solid "pencil-alt", span [] [ text "Edit Tweet" ] ]
-    , a [ class "card-footer-item has-background-link has-text-white" ]
+    , a [ class "card-footer-item" ]
         [ icon Solid "share", span [] [ text "Post Now" ] ]
     ]
 
@@ -116,7 +107,11 @@ tweetUserInfo user =
     case user of
         Just user ->
             header [ class "media" ]
-                [ div [ class "media-content" ]
+                [ div [ class "media-left" ]
+                    [ figure [ class "image is-48x48" ]
+                        [ img [ src (User.avatarUrl user), class "is-rounded" ] [] ]
+                    ]
+                , div [ class "media-content" ]
                     [ h1 [ class "title is-5" ] [ text user.name ]
                     , h2 [ class "subtitle is-6 has-text-grey" ] [ text <| "@" ++ user.username ]
                     ]
