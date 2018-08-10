@@ -82,11 +82,14 @@ tweetCard actions user tweet =
             ]
         , footer [ class "card-footer" ] <|
             case tweet.status of
+                Draft ->
+                    draftActions actions tweet
+
                 Canceled ->
                     canceledActions tweet
 
-                _ ->
-                    draftActions actions tweet
+                Posted ->
+                    postedActions tweet
         ]
 
 
@@ -110,6 +113,16 @@ canceledActions tweet =
     [ div [ class "card-footer-item" ]
         [ span [] [ text "Canceled. " ]
         , a [] [ text "Undo?" ]
+        ]
+    ]
+
+
+postedActions : Tweet -> List (Html msg)
+postedActions tweet =
+    [ div [ class "card-footer-item" ]
+        [ icon Solid "check-circle"
+        , span [] [ text "Posted. " ]
+        , a [] [ text "View on Twitter" ]
         ]
     ]
 
