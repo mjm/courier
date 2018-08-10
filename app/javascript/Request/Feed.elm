@@ -26,3 +26,15 @@ register feed =
         |> withJsonBody (Feed.encode feed)
         |> withExpect (Http.expectJson Feed.decoder)
         |> toRequest
+
+
+refresh : Feed -> Http.Request ()
+refresh feed =
+    let
+        body =
+            Encode.object [ ( "feed_id", Encode.int feed.id ) ]
+    in
+        apiBuilder "RefreshFeed"
+            |> withJsonBody body
+            |> withExpect (Http.expectJson (Decode.succeed ()))
+            |> toRequest

@@ -37,6 +37,12 @@ class ApiHandler
     end
   end
 
+  def refresh_feed(req, env)
+    require_user env do |user|
+      forward feeds_client(env).refresh_feed(req)
+    end
+  end
+
   class << self
     def service
       handler = new

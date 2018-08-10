@@ -126,7 +126,10 @@ feedDropdown feed =
             ]
         , div [ class "dropdown-menu" ]
             [ div [ class "dropdown-content" ]
-                [ a [ class "dropdown-item" ]
+                [ a
+                    [ class "dropdown-item"
+                    , onClick (RefreshFeed feed)
+                    ]
                     [ icon Solid "sync-alt"
                     , span [] [ text "Refresh Posts" ]
                     ]
@@ -210,6 +213,8 @@ type Message
     | SetDraftFeedUrl String
     | AddFeed
     | FeedAdded (Result Http.Error Feed)
+    | RefreshFeed Feed
+    | FeedRefreshed (Result Http.Error ())
 
 
 
@@ -272,6 +277,15 @@ update message model =
 
         FeedAdded (Err _) ->
             ( addError model "Could not add the feed right now. Please try again later.", Cmd.none )
+
+        RefreshFeed feed ->
+            ( model, Http.send FeedRefreshed (Request.Feed.refresh feed) )
+
+        FeedRefreshed (Ok _) ->
+            ( model, Cmd.none )
+
+        FeedRefreshed (Err _) ->
+            ( addError model "Could not refresh the feed right now. Please try again later.", Cmd.none )
 
 
 updateFeedUrl : Maybe DraftFeed -> String -> Maybe DraftFeed
