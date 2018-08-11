@@ -11,7 +11,6 @@ import Page.Posts.Update exposing (Message(..))
 import Views.Icon exposing (..)
 import Views.Page as Page
 import Util.Editable exposing (Editable(..))
-import Util.Loadable exposing (Loadable(..))
 
 
 view : Model -> Html Message
@@ -31,26 +30,12 @@ pageContent model =
         ]
 
 
-postList : User -> Loadable (List (Editable PostTweet)) -> Html Message
+postList : User -> List (Editable PostTweet) -> Html Message
 postList user tweets =
     div []
         [ h2 [ class "title has-text-centered" ] [ text "Your Tweets" ]
         , hr [] []
-        , case tweets of
-            Loading ->
-                loadingPosts
-
-            Loaded tweets ->
-                List.map (postEntry user) tweets |> div []
-        ]
-
-
-loadingPosts : Html msg
-loadingPosts =
-    p [ class "has-text-centered is-size-5" ]
-        [ span [ class "rotating icon is-medium" ] [ i [ class "fas fa-spinner" ] [] ]
-        , span [] [ text "Loading posts..." ]
-        , p [] [ text " " ]
+        , List.map (postEntry user) tweets |> div []
         ]
 
 

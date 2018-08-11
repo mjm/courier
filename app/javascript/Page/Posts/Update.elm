@@ -8,7 +8,6 @@ import Page.Posts.Model exposing (Model)
 import Http
 import Request.Post
 import Util.Editable as Editable exposing (Editable(..))
-import Util.Loadable as Loadable exposing (Loadable(..))
 
 
 type Message
@@ -32,7 +31,7 @@ update message model =
             ( model, Cmd.none )
 
         PostsLoaded (Ok posts) ->
-            ( { model | tweets = Loaded (tweetsFromPosts posts) }, Cmd.none )
+            ( { model | tweets = tweetsFromPosts posts }, Cmd.none )
 
         PostsLoaded (Err _) ->
             ( model, Cmd.none )
@@ -47,20 +46,20 @@ update message model =
             ( model, Cmd.none )
 
         EditTweet tweet ->
-            ( { model | tweets = Loadable.map (editTweet tweet) model.tweets }, Cmd.none )
+            ( { model | tweets = editTweet tweet model.tweets }, Cmd.none )
 
         SetTweetBody tweet body ->
             let
                 updater =
                     \x -> { x | body = body }
             in
-                ( { model | tweets = Loadable.map (updateDraftTweet updater tweet) model.tweets }, Cmd.none )
+                ( { model | tweets = updateDraftTweet updater tweet model.tweets }, Cmd.none )
 
         CancelEditTweet tweet ->
-            ( { model | tweets = Loadable.map (cancelEditTweet tweet) model.tweets }, Cmd.none )
+            ( { model | tweets = cancelEditTweet tweet model.tweets }, Cmd.none )
 
         SaveTweet tweet ->
-            ( { model | tweets = Loadable.map (saveTweet tweet) model.tweets }, Cmd.none )
+            ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
 
 
 tweetsFromPosts : List Post -> List (Editable PostTweet)
@@ -71,16 +70,11 @@ tweetsFromPosts posts =
 
 updateTweet : Tweet -> Model -> Model
 updateTweet tweet model =
-    case model.tweets of
-        Loading ->
-            model
-
-        Loaded tweets ->
-            let
-                updatedTweets =
-                    List.map (updatePostTweet tweet) tweets
-            in
-                { model | tweets = Loaded updatedTweets }
+    let
+        updatedTweets =
+            List.map (updatePostTweet tweet) model.tweets
+    in
+        { model | tweets = updatedTweets }
 
 
 updatePostTweet : Tweet -> Editable PostTweet -> Editable PostTweet

@@ -11,12 +11,11 @@ import Page.Posts.Update exposing (Message(..), update)
 import Page.Posts.View exposing (view)
 import Unwrap
 import Util.Editable exposing (Editable(..))
-import Util.Loadable exposing (Loadable(..))
 
 
 init : Flags -> ( Model, Cmd Message )
 init flags =
-    { tweets = Loaded (tweetsFromFlags flags)
+    { tweets = tweetsFromFlags flags
     , user = userFromFlags flags
     }
         ! []
