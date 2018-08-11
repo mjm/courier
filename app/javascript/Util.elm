@@ -10,6 +10,16 @@ type Loadable a
     | Loaded a
 
 
+map : (a -> a) -> Loadable a -> Loadable a
+map f l =
+    case l of
+        Loading ->
+            Loading
+
+        Loaded x ->
+            Loaded (f x)
+
+
 {-| When viewing, this simply holds a value.
 
 When editing, we hold an original and the version with the edits.

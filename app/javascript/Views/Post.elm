@@ -1,13 +1,11 @@
 module Views.Post exposing (..)
 
-import Data.Post exposing (Post)
 import Data.PostTweet exposing (PostTweet)
 import Data.Tweet exposing (Tweet, Status(..))
 import Data.User as User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
-import Json.Encode
 import Views.Icon exposing (..)
 import Util exposing (Loadable(..), Editable(..))
 
@@ -15,6 +13,7 @@ import Util exposing (Loadable(..), Editable(..))
 type alias PostActions msg =
     { cancelTweet : Tweet -> msg
     , editTweet : Tweet -> msg
+    , cancelEditTweet : Tweet -> msg
     }
 
 
@@ -51,59 +50,55 @@ postEntry actions user tweet =
         ]
 
 
-postTitle : Post -> Html msg
-postTitle post =
-    if String.isEmpty post.title then
-        h2 [ class "subtitle" ] [ text post.title ]
-    else
-        text ""
-
-
-postContent : Post -> Html msg
-postContent post =
-    if String.isEmpty post.contentHtml then
-        article [] [ text post.contentText ]
-    else
-        article
-            [ class "content"
-            , property "innerHTML" (Json.Encode.string post.contentHtml)
-            ]
-            []
-
-
-
--- postTweets : PostActions msg -> Maybe User -> Post -> Html msg
--- postTweets actions user post =
---     div [] <| List.map (tweetCard actions user) post.tweets
-
-
 tweetCard : PostActions msg -> Maybe User -> Editable PostTweet -> Html msg
 tweetCard actions user postTweet =
-    let
-        tweet =
-            case postTweet of
-                Viewing t ->
-                    t
+    case postTweet of
+        Viewing tweet ->
+            viewTweetCard actions user tweet
 
-                Editing _ t ->
-                    t
-    in
-        article [ class "card" ]
+        Editing _ tweet ->
+            editTweetCard actions user tweet
+
+
+viewTweetCard : PostActions msg -> Maybe User -> PostTweet -> Html msg
+viewTweetCard actions user tweet =
+    article [ class "card" ]
+        [ div [ class "card-content" ]
+            [ tweetUserInfo user
+            , p [] [ text tweet.tweet.body ]
+            ]
+        , footer [ class "card-footer" ] <|
+            case tweet.tweet.status of
+                Draft ->
+                    draftActions actions tweet.tweet
+
+                Canceled ->
+                    canceledActions tweet.tweet
+
+                Posted ->
+                    postedActions tweet.tweet
+        ]
+
+
+editTweetCard : PostActions msg -> Maybe User -> PostTweet -> Html msg
+editTweetCard actions user tweet =
+    Html.form [ action "javascript:void(0);" ]
+        [ article [ class "card" ]
             [ div [ class "card-content" ]
                 [ tweetUserInfo user
-                , p [] [ text tweet.tweet.body ]
+                , div [ class "field" ]
+                    [ div [ class "control" ]
+                        [ textarea
+                            [ class "textarea"
+                            , autofocus True
+                            ]
+                            [ text tweet.tweet.body ]
+                        ]
+                    ]
                 ]
-            , footer [ class "card-footer" ] <|
-                case tweet.tweet.status of
-                    Draft ->
-                        draftActions actions tweet.tweet
-
-                    Canceled ->
-                        canceledActions tweet.tweet
-
-                    Posted ->
-                        postedActions tweet.tweet
+            , footer [ class "card-footer" ] <| editActions actions tweet.tweet
             ]
+        ]
 
 
 draftActions : PostActions msg -> Tweet -> List (Html msg)
@@ -139,6 +134,20 @@ postedActions tweet =
         , span [] [ text "Posted. " ]
         , a [] [ text "View on Twitter" ]
         ]
+    ]
+
+
+editActions : PostActions msg -> Tweet -> List (Html msg)
+editActions actions tweet =
+    [ a
+        [ class "card-footer-item has-text-danger"
+        , onClick (actions.cancelEditTweet tweet)
+        ]
+        [ icon Solid "ban", span [] [ text "Cancel" ] ]
+    , a [ class "card-footer-item" ]
+        [ span [] [ text "Save Draft" ] ]
+    , a [ class "card-footer-item" ]
+        [ span [] [ text "Post Now " ] ]
     ]
 
 

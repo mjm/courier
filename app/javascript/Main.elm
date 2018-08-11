@@ -66,6 +66,7 @@ postActions : PostActions Message
 postActions =
     { cancelTweet = CancelTweet
     , editTweet = EditTweet
+    , cancelEditTweet = CancelEditTweet
     }
 
 
@@ -87,6 +88,7 @@ type Message
     | CancelTweet Tweet
     | CanceledTweet (Result Http.Error Tweet)
     | EditTweet Tweet
+    | CancelEditTweet Tweet
 
 
 
@@ -118,7 +120,10 @@ update message model =
             ( model, Cmd.none )
 
         EditTweet tweet ->
-            ( model, Cmd.none )
+            ( { model | tweets = Util.map (editTweet tweet) model.tweets }, Cmd.none )
+
+        CancelEditTweet tweet ->
+            ( { model | tweets = Util.map (cancelEditTweet tweet) model.tweets }, Cmd.none )
 
 
 tweetsFromPosts : List Post -> List (Editable PostTweet)
@@ -149,6 +154,38 @@ updatePostTweet tweet postTweet =
 
         Editing orig edit ->
             Editing (PostTweet.updateTweet orig tweet) edit
+
+
+editTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
+editTweet t =
+    List.map
+        (\tweet ->
+            case tweet of
+                Viewing tweet ->
+                    if tweet.tweet.id == t.id then
+                        Editing tweet tweet
+                    else
+                        Viewing tweet
+
+                (Editing _ _) as e ->
+                    e
+        )
+
+
+cancelEditTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
+cancelEditTweet t =
+    List.map
+        (\tweet ->
+            case tweet of
+                Viewing tweet ->
+                    Viewing tweet
+
+                (Editing orig _) as e ->
+                    if orig.tweet.id == t.id then
+                        Viewing orig
+                    else
+                        e
+        )
 
 
 
