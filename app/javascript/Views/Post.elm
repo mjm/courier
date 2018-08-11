@@ -5,7 +5,7 @@ import Data.Tweet exposing (Tweet, Status(..))
 import Data.User as User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Views.Icon exposing (..)
 import Util.Editable exposing (Editable(..))
 import Util.Loadable exposing (Loadable(..))
@@ -14,7 +14,10 @@ import Util.Loadable exposing (Loadable(..))
 type alias PostActions msg =
     { cancelTweet : Tweet -> msg
     , editTweet : Tweet -> msg
+    , setTweetBody : Tweet -> String -> msg
     , cancelEditTweet : Tweet -> msg
+    , saveTweet : Tweet -> msg
+    , saveAndPostTweet : Tweet -> msg
     }
 
 
@@ -92,8 +95,10 @@ editTweetCard actions user tweet =
                         [ textarea
                             [ class "textarea"
                             , autofocus True
+                            , onInput (actions.setTweetBody tweet.tweet)
+                            , value tweet.tweet.body
                             ]
-                            [ text tweet.tweet.body ]
+                            []
                         ]
                     ]
                 ]
@@ -145,9 +150,15 @@ editActions actions tweet =
         , onClick (actions.cancelEditTweet tweet)
         ]
         [ icon Solid "ban", span [] [ text "Cancel" ] ]
-    , a [ class "card-footer-item" ]
+    , a
+        [ class "card-footer-item"
+        , onClick (actions.saveTweet tweet)
+        ]
         [ span [] [ text "Save Draft" ] ]
-    , a [ class "card-footer-item" ]
+    , a
+        [ class "card-footer-item"
+        , onClick (actions.saveAndPostTweet tweet)
+        ]
         [ span [] [ text "Post Now " ] ]
     ]
 

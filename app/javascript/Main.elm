@@ -67,7 +67,10 @@ postActions : PostActions Message
 postActions =
     { cancelTweet = CancelTweet
     , editTweet = EditTweet
+    , setTweetBody = SetTweetBody
     , cancelEditTweet = CancelEditTweet
+    , saveTweet = SaveTweet
+    , saveAndPostTweet = SaveTweet
     }
 
 
@@ -89,7 +92,9 @@ type Message
     | CancelTweet Tweet
     | CanceledTweet (Result Http.Error Tweet)
     | EditTweet Tweet
+    | SetTweetBody Tweet String
     | CancelEditTweet Tweet
+    | SaveTweet Tweet
 
 
 
@@ -123,8 +128,18 @@ update message model =
         EditTweet tweet ->
             ( { model | tweets = Loadable.map (editTweet tweet) model.tweets }, Cmd.none )
 
+        SetTweetBody tweet body ->
+            let
+                updater =
+                    \x -> { x | body = body }
+            in
+                ( { model | tweets = Loadable.map (updateDraftTweet updater tweet) model.tweets }, Cmd.none )
+
         CancelEditTweet tweet ->
             ( { model | tweets = Loadable.map (cancelEditTweet tweet) model.tweets }, Cmd.none )
+
+        SaveTweet tweet ->
+            ( { model | tweets = Loadable.map (saveTweet tweet) model.tweets }, Cmd.none )
 
 
 tweetsFromPosts : List Post -> List (Editable PostTweet)
@@ -162,9 +177,23 @@ editTweet t =
     Editable.edit (\x -> x.tweet.id == t.id)
 
 
+updateDraftTweet : (Tweet -> Tweet) -> Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
+updateDraftTweet f t =
+    Editable.updateDraft
+        (\x -> x.tweet.id == t.id)
+        (\x -> { x | tweet = f x.tweet })
+
+
 cancelEditTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
 cancelEditTweet t =
     Editable.cancel (\x -> x.tweet.id == t.id)
+
+
+saveTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
+saveTweet t =
+    Editable.save
+        (\x -> x.tweet.id == t.id)
+        (\x -> { x | tweet = t })
 
 
 

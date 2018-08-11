@@ -1,4 +1,4 @@
-module Util.Editable exposing (Editable(..), edit, cancel)
+module Util.Editable exposing (Editable(..), edit, updateDraft, cancel, save)
 
 {-| When viewing, this simply holds a value.
 
@@ -38,6 +38,18 @@ edit f =
         Editing
 
 
+updateDraft : (a -> Bool) -> (a -> a) -> List (Editable a) -> List (Editable a)
+updateDraft f t =
+    transform
+        Viewing
+        (\x y ->
+            if f x then
+                Editing x (t y)
+            else
+                Editing x y
+        )
+
+
 cancel : (a -> Bool) -> List (Editable a) -> List (Editable a)
 cancel f =
     transform
@@ -45,6 +57,23 @@ cancel f =
         (\x y ->
             if f x then
                 Viewing x
+            else
+                Editing x y
+        )
+
+
+save : (a -> Bool) -> (a -> a) -> List (Editable a) -> List (Editable a)
+save f t =
+    transform
+        (\x ->
+            if f x then
+                Viewing (t x)
+            else
+                Viewing x
+        )
+        (\x y ->
+            if f x then
+                Viewing (t x)
             else
                 Editing x y
         )
