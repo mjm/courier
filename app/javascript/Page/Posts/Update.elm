@@ -1,93 +1,18 @@
-module Main exposing (..)
+module Page.Posts.Update exposing (Message(..), update)
 
-import Data.Post as Post exposing (Post)
+import Data.Post exposing (Post)
 import Data.PostTweet as PostTweet exposing (PostTweet)
-import Data.Tweet as Tweet exposing (Tweet)
-import Data.User as User exposing (User)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Data.Tweet exposing (Tweet)
+import Data.User exposing (User)
+import Page.Posts.Model exposing (Model)
 import Http
 import Request.Post
-import Request.User
-import Views.Page as Page
-import Views.Post exposing (PostActions, postList)
 import Util.Editable as Editable exposing (Editable(..))
 import Util.Loadable as Loadable exposing (Loadable(..))
 
 
--- MODEL
-
-
-type alias Model =
-    { tweets : Loadable (List (Editable PostTweet))
-    , user : Maybe User
-    }
-
-
-
--- INIT
-
-
-init : ( Model, Cmd Message )
-init =
-    initialModel ! [ loadUserInfo, loadPosts ]
-
-
-initialModel : Model
-initialModel =
-    { tweets = Loading
-    , user = Nothing
-    }
-
-
-loadUserInfo : Cmd Message
-loadUserInfo =
-    Http.send UserInfoResp Request.User.getUserInfo
-
-
-loadPosts : Cmd Message
-loadPosts =
-    Http.send PostsLoaded Request.Post.posts
-
-
-
--- VIEW
-
-
-view : Model -> Html Message
-view model =
-    [ Page.navbar model.user
-    , pageContent model
-    , Page.footer
-    ]
-        |> div []
-
-
-postActions : PostActions Message
-postActions =
-    { cancelTweet = CancelTweet
-    , editTweet = EditTweet
-    , setTweetBody = SetTweetBody
-    , cancelEditTweet = CancelEditTweet
-    , saveTweet = SaveTweet
-    , saveAndPostTweet = SaveTweet
-    }
-
-
-pageContent : Model -> Html Message
-pageContent model =
-    section [ class "section" ]
-        [ div [ class "container" ]
-            [ postList postActions model.user model.tweets ]
-        ]
-
-
-
--- MESSAGE
-
-
 type Message
-    = UserInfoResp (Result Http.Error User)
+    = UserLoaded (Result Http.Error User)
     | PostsLoaded (Result Http.Error (List Post))
     | CancelTweet Tweet
     | CanceledTweet (Result Http.Error Tweet)
@@ -97,17 +22,13 @@ type Message
     | SaveTweet Tweet
 
 
-
--- UPDATE
-
-
 update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
-        UserInfoResp (Ok user) ->
+        UserLoaded (Ok user) ->
             ( { model | user = Just user }, Cmd.none )
 
-        UserInfoResp (Err _) ->
+        UserLoaded (Err _) ->
             ( model, Cmd.none )
 
         PostsLoaded (Ok posts) ->
@@ -194,26 +115,3 @@ saveTweet t =
     Editable.save
         (\x -> x.tweet.id == t.id)
         (\x -> { x | tweet = t })
-
-
-
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Message
-subscriptions model =
-    Sub.none
-
-
-
--- MAIN
-
-
-main : Program Never Model Message
-main =
-    Html.program
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }

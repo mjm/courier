@@ -1,4 +1,4 @@
-module Views.Post exposing (..)
+module Page.Posts.View exposing (view)
 
 import Data.PostTweet exposing (PostTweet)
 import Data.Tweet exposing (Tweet, Status(..))
@@ -6,23 +6,33 @@ import Data.User as User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Page.Posts.Model exposing (Model)
+import Page.Posts.Update exposing (Message(..))
 import Views.Icon exposing (..)
+import Views.Page as Page
 import Util.Editable exposing (Editable(..))
 import Util.Loadable exposing (Loadable(..))
 
 
-type alias PostActions msg =
-    { cancelTweet : Tweet -> msg
-    , editTweet : Tweet -> msg
-    , setTweetBody : Tweet -> String -> msg
-    , cancelEditTweet : Tweet -> msg
-    , saveTweet : Tweet -> msg
-    , saveAndPostTweet : Tweet -> msg
-    }
+view : Model -> Html Message
+view model =
+    [ Page.navbar model.user
+    , pageContent model
+    , Page.footer
+    ]
+        |> div []
 
 
-postList : PostActions msg -> Maybe User -> Loadable (List (Editable PostTweet)) -> Html msg
-postList actions user tweets =
+pageContent : Model -> Html Message
+pageContent model =
+    section [ class "section" ]
+        [ div [ class "container" ]
+            [ postList model.user model.tweets ]
+        ]
+
+
+postList : Maybe User -> Loadable (List (Editable PostTweet)) -> Html Message
+postList user tweets =
     div []
         [ h2 [ class "title has-text-centered" ] [ text "Your Tweets" ]
         , hr [] []
@@ -31,7 +41,7 @@ postList actions user tweets =
                 loadingPosts
 
             Loaded tweets ->
-                List.map (postEntry actions user) tweets |> div []
+                List.map (postEntry user) tweets |> div []
         ]
 
 
@@ -44,28 +54,28 @@ loadingPosts =
         ]
 
 
-postEntry : PostActions msg -> Maybe User -> Editable PostTweet -> Html msg
-postEntry actions user tweet =
+postEntry : Maybe User -> Editable PostTweet -> Html Message
+postEntry user tweet =
     div []
         [ div [ class "columns" ]
             [ div [ class "column is-two-thirds is-offset-2" ]
-                [ tweetCard actions user tweet ]
+                [ tweetCard user tweet ]
             ]
         ]
 
 
-tweetCard : PostActions msg -> Maybe User -> Editable PostTweet -> Html msg
-tweetCard actions user postTweet =
+tweetCard : Maybe User -> Editable PostTweet -> Html Message
+tweetCard user postTweet =
     case postTweet of
         Viewing tweet ->
-            viewTweetCard actions user tweet
+            viewTweetCard user tweet
 
         Editing _ tweet ->
-            editTweetCard actions user tweet
+            editTweetCard user tweet
 
 
-viewTweetCard : PostActions msg -> Maybe User -> PostTweet -> Html msg
-viewTweetCard actions user tweet =
+viewTweetCard : Maybe User -> PostTweet -> Html Message
+viewTweetCard user tweet =
     article [ class "card" ]
         [ div [ class "card-content" ]
             [ tweetUserInfo user
@@ -74,7 +84,7 @@ viewTweetCard actions user tweet =
         , footer [ class "card-footer" ] <|
             case tweet.tweet.status of
                 Draft ->
-                    draftActions actions tweet.tweet
+                    draftActions tweet.tweet
 
                 Canceled ->
                     canceledActions tweet.tweet
@@ -84,8 +94,8 @@ viewTweetCard actions user tweet =
         ]
 
 
-editTweetCard : PostActions msg -> Maybe User -> PostTweet -> Html msg
-editTweetCard actions user tweet =
+editTweetCard : Maybe User -> PostTweet -> Html Message
+editTweetCard user tweet =
     Html.form [ action "javascript:void(0);" ]
         [ article [ class "card" ]
             [ div [ class "card-content" ]
@@ -95,27 +105,27 @@ editTweetCard actions user tweet =
                         [ textarea
                             [ class "textarea"
                             , autofocus True
-                            , onInput (actions.setTweetBody tweet.tweet)
+                            , onInput (SetTweetBody tweet.tweet)
                             , value tweet.tweet.body
                             ]
                             []
                         ]
                     ]
                 ]
-            , footer [ class "card-footer" ] <| editActions actions tweet.tweet
+            , footer [ class "card-footer" ] <| editActions tweet.tweet
             ]
         ]
 
 
-draftActions : PostActions msg -> Tweet -> List (Html msg)
-draftActions actions tweet =
+draftActions : Tweet -> List (Html Message)
+draftActions tweet =
     [ a
-        [ onClick <| actions.cancelTweet tweet
+        [ onClick <| CancelTweet tweet
         , class "card-footer-item has-text-danger"
         ]
         [ icon Solid "ban", span [] [ text "Don't Post" ] ]
     , a
-        [ onClick <| actions.editTweet tweet
+        [ onClick <| EditTweet tweet
         , class "card-footer-item has-text-primary"
         ]
         [ icon Solid "pencil-alt", span [] [ text "Edit Tweet" ] ]
@@ -143,21 +153,21 @@ postedActions tweet =
     ]
 
 
-editActions : PostActions msg -> Tweet -> List (Html msg)
-editActions actions tweet =
+editActions : Tweet -> List (Html Message)
+editActions tweet =
     [ a
         [ class "card-footer-item has-text-danger"
-        , onClick (actions.cancelEditTweet tweet)
+        , onClick (CancelEditTweet tweet)
         ]
         [ icon Solid "ban", span [] [ text "Cancel" ] ]
     , a
         [ class "card-footer-item"
-        , onClick (actions.saveTweet tweet)
+        , onClick (SaveTweet tweet)
         ]
         [ span [] [ text "Save Draft" ] ]
     , a
         [ class "card-footer-item"
-        , onClick (actions.saveAndPostTweet tweet)
+        , onClick (SaveTweet tweet)
         ]
         [ span [] [ text "Post Now " ] ]
     ]
