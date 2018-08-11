@@ -1,20 +1,39 @@
 module Page.Posts.Main exposing (main)
 
+import Data.Post as Post
+import Data.PostTweet as PostTweet exposing (PostTweet)
+import Data.User as User exposing (User)
 import Html
-import Http
+import Json.Decode exposing (decodeValue)
+import Page.Posts.Flags exposing (Flags)
 import Page.Posts.Model as Model exposing (Model)
 import Page.Posts.Update exposing (Message(..), update)
 import Page.Posts.View exposing (view)
-import Request.Post
-import Request.User
+import Unwrap
+import Util.Editable exposing (Editable(..))
+import Util.Loadable exposing (Loadable(..))
 
 
-init : ( Model, Cmd Message )
-init =
-    Model.initial
-        ! [ Http.send UserLoaded Request.User.getUserInfo
-          , Http.send PostsLoaded Request.Post.posts
-          ]
+init : Flags -> ( Model, Cmd Message )
+init flags =
+    { tweets = Loaded (tweetsFromFlags flags)
+    , user = Just (userFromFlags flags)
+    }
+        ! []
+
+
+tweetsFromFlags : Flags -> List (Editable PostTweet)
+tweetsFromFlags flags =
+    decodeValue Post.listDecoder flags.posts
+        |> Unwrap.result
+        |> List.concatMap (PostTweet.fromPost)
+        |> List.map Viewing
+
+
+userFromFlags : Flags -> User
+userFromFlags flags =
+    decodeValue User.decoder flags.user
+        |> Unwrap.result
 
 
 subscriptions : Model -> Sub Message
@@ -22,9 +41,9 @@ subscriptions model =
     Sub.none
 
 
-main : Program Never Model Message
+main : Program Flags Model Message
 main =
-    Html.program
+    Html.programWithFlags
         { init = init
         , view = view
         , update = update
