@@ -26,7 +26,7 @@ update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
         UserLoaded (Ok user) ->
-            ( { model | user = Just user }, Cmd.none )
+            ( { model | user = user }, Cmd.none )
 
         UserLoaded (Err _) ->
             ( model, Cmd.none )

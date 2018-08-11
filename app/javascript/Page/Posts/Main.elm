@@ -17,7 +17,7 @@ import Util.Loadable exposing (Loadable(..))
 init : Flags -> ( Model, Cmd Message )
 init flags =
     { tweets = Loaded (tweetsFromFlags flags)
-    , user = Just (userFromFlags flags)
+    , user = userFromFlags flags
     }
         ! []
 

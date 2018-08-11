@@ -16,7 +16,7 @@ import Util.Loadable exposing (Loadable(..))
 
 view : Model -> Html Message
 view model =
-    [ Page.navbar model.user
+    [ Page.navbar (Just model.user)
     , pageContent model
     , Page.footer
     ]
@@ -31,7 +31,7 @@ pageContent model =
         ]
 
 
-postList : Maybe User -> Loadable (List (Editable PostTweet)) -> Html Message
+postList : User -> Loadable (List (Editable PostTweet)) -> Html Message
 postList user tweets =
     div []
         [ h2 [ class "title has-text-centered" ] [ text "Your Tweets" ]
@@ -54,7 +54,7 @@ loadingPosts =
         ]
 
 
-postEntry : Maybe User -> Editable PostTweet -> Html Message
+postEntry : User -> Editable PostTweet -> Html Message
 postEntry user tweet =
     div []
         [ div [ class "columns" ]
@@ -64,7 +64,7 @@ postEntry user tweet =
         ]
 
 
-tweetCard : Maybe User -> Editable PostTweet -> Html Message
+tweetCard : User -> Editable PostTweet -> Html Message
 tweetCard user postTweet =
     case postTweet of
         Viewing tweet ->
@@ -74,7 +74,7 @@ tweetCard user postTweet =
             editTweetCard user tweet
 
 
-viewTweetCard : Maybe User -> PostTweet -> Html Message
+viewTweetCard : User -> PostTweet -> Html Message
 viewTweetCard user tweet =
     article [ class "card" ]
         [ div [ class "card-content" ]
@@ -94,7 +94,7 @@ viewTweetCard user tweet =
         ]
 
 
-editTweetCard : Maybe User -> PostTweet -> Html Message
+editTweetCard : User -> PostTweet -> Html Message
 editTweetCard user tweet =
     Html.form [ action "javascript:void(0);" ]
         [ article [ class "card" ]
@@ -173,20 +173,15 @@ editActions tweet =
     ]
 
 
-tweetUserInfo : Maybe User -> Html msg
+tweetUserInfo : User -> Html msg
 tweetUserInfo user =
-    case user of
-        Just user ->
-            header [ class "media" ]
-                [ div [ class "media-left" ]
-                    [ figure [ class "image is-48x48" ]
-                        [ img [ src (User.avatarUrl user), class "is-rounded" ] [] ]
-                    ]
-                , div [ class "media-content" ]
-                    [ h1 [ class "title is-5" ] [ text user.name ]
-                    , h2 [ class "subtitle is-6 has-text-grey" ] [ text <| "@" ++ user.username ]
-                    ]
-                ]
-
-        Nothing ->
-            text ""
+    header [ class "media" ]
+        [ div [ class "media-left" ]
+            [ figure [ class "image is-48x48" ]
+                [ img [ src (User.avatarUrl user), class "is-rounded" ] [] ]
+            ]
+        , div [ class "media-content" ]
+            [ h1 [ class "title is-5" ] [ text user.name ]
+            , h2 [ class "subtitle is-6 has-text-grey" ] [ text <| "@" ++ user.username ]
+            ]
+        ]
