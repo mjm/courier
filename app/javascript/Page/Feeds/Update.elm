@@ -98,11 +98,7 @@ updateFeedUrl feed url =
 
 addError : Model -> String -> Model
 addError model err =
-    let
-        errors =
-            err :: model.errors
-    in
-        { model | errors = errors }
+    { model | errors = (err :: model.errors) }
 
 
 removeError : Model -> String -> Model
