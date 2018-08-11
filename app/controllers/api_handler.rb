@@ -1,10 +1,6 @@
 require Rails.root / 'app/service/courier_gateway_twirp'
 
 class ApiHandler
-  def translate(req, _env)
-    forward translator.translate(req)
-  end
-
   def get_user_info(_req, env)
     require_user env do |user|
       { username: user['username'],

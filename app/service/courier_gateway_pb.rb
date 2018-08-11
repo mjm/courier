@@ -5,7 +5,6 @@ require 'google/protobuf'
 
 require 'courier/feeds/service_pb'
 require 'courier/posts/service_pb'
-require 'courier/translator/service_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "courier.UserInfoRequest" do
   end
