@@ -14,7 +14,7 @@ module ApiClients
   end
 
   def feeds_client
-    Courier::PostsClient.connect(token: user_token)
+    Courier::FeedsClient.connect(token: user_token)
   end
 
   private

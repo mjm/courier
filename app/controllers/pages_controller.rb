@@ -6,11 +6,14 @@ class PagesController < ApplicationController
 
   def index
     @posts_json = Courier::PostList.encode_json(
-      posts_client.get_user_posts(user_id: session[:user]['id']).data
+      posts_client.get_user_posts(user_id: user_id).data
     )
   end
 
   def feeds
+    @feeds_json = Courier::FeedList.encode_json(
+      feeds_client.get_user_feeds(user_id: user_id).data
+    )
   end
 
   private
@@ -24,5 +27,9 @@ class PagesController < ApplicationController
       username: session[:user]['username'],
       name: session[:user]['name']
     }.to_json
+  end
+
+  def user_id
+    session[:user]['id']
   end
 end
