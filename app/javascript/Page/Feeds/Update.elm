@@ -7,7 +7,6 @@ import Http
 import Page.Feeds.Model exposing (Model)
 import Request.Feed
 import Task
-import Util.Loadable as Loadable exposing (Loadable(..))
 
 
 type Message
@@ -33,13 +32,13 @@ update message model =
             ( removeError model err, Cmd.none )
 
         UserLoaded (Ok user) ->
-            ( { model | user = Just user }, Cmd.none )
+            ( { model | user = user }, Cmd.none )
 
         UserLoaded (Err _) ->
             ( addError model "Could not your user profile. Please try again later.", Cmd.none )
 
         FeedsLoaded (Ok feeds) ->
-            ( { model | feeds = Loaded feeds }, Cmd.none )
+            ( { model | feeds = feeds }, Cmd.none )
 
         FeedsLoaded (Err _) ->
             ( addError model "Could not load your feeds right now. Please try again later.", Cmd.none )
@@ -66,7 +65,7 @@ update message model =
                     ( model, Cmd.none )
 
         FeedAdded (Ok feed) ->
-            ( { model | feeds = Loadable.map (addFeed feed) model.feeds }, Cmd.none )
+            ( { model | feeds = addFeed feed model.feeds }, Cmd.none )
 
         FeedAdded (Err _) ->
             ( addError model "Could not add the feed right now. Please try again later.", Cmd.none )

@@ -9,13 +9,12 @@ import Page.Feeds.Model as Model exposing (Model)
 import Page.Feeds.Update exposing (Message(..), update)
 import Page.Feeds.View exposing (view)
 import Unwrap
-import Util.Loadable exposing (Loadable(Loaded))
 
 
 init : Flags -> ( Model, Cmd Message )
 init flags =
-    { user = Just (userFromFlags flags)
-    , feeds = Loaded (feedsFromFlags flags)
+    { user = userFromFlags flags
+    , feeds = feedsFromFlags flags
     , draftFeed = Nothing
     , errors = []
     }

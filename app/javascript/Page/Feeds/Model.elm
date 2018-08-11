@@ -1,22 +1,12 @@
-module Page.Feeds.Model exposing (Model, initial)
+module Page.Feeds.Model exposing (Model)
 
 import Data.Feed exposing (Feed, DraftFeed)
 import Data.User exposing (User)
-import Util.Loadable exposing (Loadable(..))
 
 
 type alias Model =
-    { user : Maybe User
-    , feeds : Loadable (List Feed)
+    { user : User
+    , feeds : List Feed
     , draftFeed : Maybe DraftFeed
     , errors : List String
-    }
-
-
-initial : Model
-initial =
-    { user = Nothing
-    , feeds = Loading
-    , draftFeed = Nothing
-    , errors = []
     }

@@ -10,12 +10,11 @@ import Page.Feeds.Update exposing (Message(..))
 import Views.Error as Error
 import Views.Icon exposing (..)
 import Views.Page as Page
-import Util.Loadable exposing (Loadable(..))
 
 
 view : Model -> Html Message
 view model =
-    [ Page.navbar model.user
+    [ Page.navbar (Just model.user)
     , Error.errors DismissError model.errors
     , pageContent model
     , Page.footer
@@ -40,21 +39,14 @@ pageContent model =
         ]
 
 
-feeds : Loadable (List Feed) -> Html Message
+feeds : List Feed -> Html Message
 feeds fs =
     case fs of
-        Loading ->
-            p [ class "has-text-centered is-size-5" ]
-                [ span [ class "rotating icon is-medium" ] [ i [ class "fas fa-spinner" ] [] ]
-                , span [] [ text "Loading feeds..." ]
-                , p [] [ text " " ]
-                ]
-
-        Loaded [] ->
+        [] ->
             p [ class "has-text-centered" ]
                 [ text "You don't have any feeds registered." ]
 
-        Loaded fs ->
+        fs ->
             table [ class "table is-fullwidth" ]
                 [ List.map feedRow fs |> tbody [] ]
 
