@@ -11,7 +11,8 @@ import Request.Post
 import Request.User
 import Views.Page as Page
 import Views.Post exposing (PostActions, postList)
-import Util exposing (Loadable(..), Editable(..))
+import Util.Editable as Editable exposing (Editable(..))
+import Util.Loadable as Loadable exposing (Loadable(..))
 
 
 -- MODEL
@@ -120,10 +121,10 @@ update message model =
             ( model, Cmd.none )
 
         EditTweet tweet ->
-            ( { model | tweets = Util.map (editTweet tweet) model.tweets }, Cmd.none )
+            ( { model | tweets = Loadable.map (editTweet tweet) model.tweets }, Cmd.none )
 
         CancelEditTweet tweet ->
-            ( { model | tweets = Util.map (cancelEditTweet tweet) model.tweets }, Cmd.none )
+            ( { model | tweets = Loadable.map (cancelEditTweet tweet) model.tweets }, Cmd.none )
 
 
 tweetsFromPosts : List Post -> List (Editable PostTweet)
@@ -158,34 +159,12 @@ updatePostTweet tweet postTweet =
 
 editTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
 editTweet t =
-    List.map
-        (\tweet ->
-            case tweet of
-                Viewing tweet ->
-                    if tweet.tweet.id == t.id then
-                        Editing tweet tweet
-                    else
-                        Viewing tweet
-
-                (Editing _ _) as e ->
-                    e
-        )
+    Editable.edit (\x -> x.tweet.id == t.id)
 
 
 cancelEditTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
 cancelEditTweet t =
-    List.map
-        (\tweet ->
-            case tweet of
-                Viewing tweet ->
-                    Viewing tweet
-
-                (Editing orig _) as e ->
-                    if orig.tweet.id == t.id then
-                        Viewing orig
-                    else
-                        e
-        )
+    Editable.cancel (\x -> x.tweet.id == t.id)
 
 
 

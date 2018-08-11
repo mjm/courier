@@ -7,7 +7,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Views.Icon exposing (..)
-import Util exposing (Loadable(..), Editable(..))
+import Util.Editable exposing (Editable(..))
+import Util.Loadable exposing (Loadable(..))
 
 
 type alias PostActions msg =

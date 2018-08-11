@@ -14,7 +14,7 @@ import Task
 import Views.Error as Error
 import Views.Icon exposing (..)
 import Views.Page as Page
-import Util exposing (Loadable(..))
+import Util.Loadable as Loadable exposing (Loadable(..))
 
 
 -- MODEL
@@ -80,7 +80,7 @@ pageContent model =
             , div [ class "columns" ]
                 [ div [ class "column is-8 is-offset-2" ]
                     [ feeds model.feeds
-                    , addFeed model
+                    , addFeedView model
                     ]
                 ]
             ]
@@ -143,8 +143,8 @@ feedDropdown feed =
         ]
 
 
-addFeed : Model -> Html Message
-addFeed model =
+addFeedView : Model -> Html Message
+addFeedView model =
     case model.draftFeed of
         Just feed ->
             addFeedForm feed
@@ -265,16 +265,7 @@ update message model =
                     ( model, Cmd.none )
 
         FeedAdded (Ok feed) ->
-            case model.feeds of
-                Loaded fs ->
-                    let
-                        feeds =
-                            fs ++ [ feed ]
-                    in
-                        ( { model | feeds = Loaded feeds }, Cmd.none )
-
-                Loading ->
-                    ( model, Cmd.none )
+            ( { model | feeds = Loadable.map (addFeed feed) model.feeds }, Cmd.none )
 
         FeedAdded (Err _) ->
             ( addError model "Could not add the feed right now. Please try again later.", Cmd.none )
@@ -287,6 +278,11 @@ update message model =
 
         FeedRefreshed (Err _) ->
             ( addError model "Could not refresh the feed right now. Please try again later.", Cmd.none )
+
+
+addFeed : Feed -> List Feed -> List Feed
+addFeed feed fs =
+    fs ++ [ feed ]
 
 
 updateFeedUrl : Maybe DraftFeed -> String -> Maybe DraftFeed
