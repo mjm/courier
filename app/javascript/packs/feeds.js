@@ -1,8 +1,8 @@
 import 'csrf-xhr'
 import 'style/application.scss'
-import Elm from '../Page/Feeds'
+import Elm from '../Page/Feeds/Main'
 
 document.addEventListener('DOMContentLoaded', () => {
   const target = document.getElementById('elm-container')
-  Elm.Page.Feeds.embed(target)
+  Elm.Page.Feeds.Main.embed(target)
 })

@@ -1,19 +1,19 @@
-module Page.Posts.Main exposing (main)
+module Page.Feeds.Main exposing (main)
 
 import Html
 import Http
-import Page.Posts.Model as Model exposing (Model)
-import Page.Posts.Update exposing (Message(..), update)
-import Page.Posts.View exposing (view)
-import Request.Post
+import Page.Feeds.Model as Model exposing (Model)
+import Page.Feeds.Update exposing (Message(..), update)
+import Page.Feeds.View exposing (view)
 import Request.User
+import Request.Feed
 
 
 init : ( Model, Cmd Message )
 init =
     Model.initial
         ! [ Http.send UserLoaded Request.User.getUserInfo
-          , Http.send PostsLoaded Request.Post.posts
+          , Http.send FeedsLoaded Request.Feed.feeds
           ]
 
 

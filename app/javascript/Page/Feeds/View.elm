@@ -1,63 +1,16 @@
-module Page.Feeds exposing (main)
+module Page.Feeds.View exposing (view)
 
 import Data.Feed exposing (Feed, DraftFeed)
-import Data.User exposing (User)
-import Dom
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Events.Extra exposing (onClickPreventDefault)
-import Http
-import Request.User
-import Request.Feed
-import Task
+import Page.Feeds.Model exposing (Model)
+import Page.Feeds.Update exposing (Message(..))
 import Views.Error as Error
 import Views.Icon exposing (..)
 import Views.Page as Page
-import Util.Loadable as Loadable exposing (Loadable(..))
-
-
--- MODEL
-
-
-type alias Model =
-    { user : Maybe User
-    , feeds : Loadable (List Feed)
-    , draftFeed : Maybe DraftFeed
-    , errors : List String
-    }
-
-
-
--- INIT
-
-
-init : ( Model, Cmd Message )
-init =
-    initialModel ! [ loadUserInfo, loadFeeds ]
-
-
-initialModel : Model
-initialModel =
-    { user = Nothing
-    , feeds = Loading
-    , draftFeed = Nothing
-    , errors = []
-    }
-
-
-loadUserInfo : Cmd Message
-loadUserInfo =
-    Http.send UserInfoLoaded Request.User.getUserInfo
-
-
-loadFeeds : Cmd Message
-loadFeeds =
-    Http.send FeedsLoaded Request.Feed.feeds
-
-
-
--- VIEW
+import Util.Loadable exposing (Loadable(..))
 
 
 view : Model -> Html Message
@@ -199,138 +152,3 @@ addFeedForm feed =
                 ]
             ]
         ]
-
-
-
--- MESSAGE
-
-
-type Message
-    = Noop
-    | DismissError String
-    | UserInfoLoaded (Result Http.Error User)
-    | FeedsLoaded (Result Http.Error (List Feed))
-    | SetAddingFeed Bool
-    | SetDraftFeedUrl String
-    | AddFeed
-    | FeedAdded (Result Http.Error Feed)
-    | RefreshFeed Feed
-    | FeedRefreshed (Result Http.Error ())
-
-
-
--- UPDATE
-
-
-update : Message -> Model -> ( Model, Cmd Message )
-update message model =
-    case message of
-        Noop ->
-            ( model, Cmd.none )
-
-        DismissError err ->
-            ( removeError model err, Cmd.none )
-
-        UserInfoLoaded (Ok user) ->
-            ( { model | user = Just user }, Cmd.none )
-
-        UserInfoLoaded (Err _) ->
-            ( addError model "Could not your user profile. Please try again later.", Cmd.none )
-
-        FeedsLoaded (Ok feeds) ->
-            ( { model | feeds = Loaded feeds }, Cmd.none )
-
-        FeedsLoaded (Err _) ->
-            ( addError model "Could not load your feeds right now. Please try again later.", Cmd.none )
-
-        SetAddingFeed isAdding ->
-            if isAdding then
-                ( { model | draftFeed = Just (DraftFeed "") }
-                , Task.attempt (\_ -> Noop) (Dom.focus "add-feed-url")
-                )
-            else
-                ( { model | draftFeed = Nothing }, Cmd.none )
-
-        SetDraftFeedUrl url ->
-            ( { model | draftFeed = updateFeedUrl model.draftFeed url }, Cmd.none )
-
-        AddFeed ->
-            case model.draftFeed of
-                Just feed ->
-                    ( { model | draftFeed = Nothing }
-                    , Http.send FeedAdded (Request.Feed.register feed)
-                    )
-
-                Nothing ->
-                    ( model, Cmd.none )
-
-        FeedAdded (Ok feed) ->
-            ( { model | feeds = Loadable.map (addFeed feed) model.feeds }, Cmd.none )
-
-        FeedAdded (Err _) ->
-            ( addError model "Could not add the feed right now. Please try again later.", Cmd.none )
-
-        RefreshFeed feed ->
-            ( model, Http.send FeedRefreshed (Request.Feed.refresh feed) )
-
-        FeedRefreshed (Ok _) ->
-            ( model, Cmd.none )
-
-        FeedRefreshed (Err _) ->
-            ( addError model "Could not refresh the feed right now. Please try again later.", Cmd.none )
-
-
-addFeed : Feed -> List Feed -> List Feed
-addFeed feed fs =
-    fs ++ [ feed ]
-
-
-updateFeedUrl : Maybe DraftFeed -> String -> Maybe DraftFeed
-updateFeedUrl feed url =
-    case feed of
-        Just draftFeed ->
-            Just { draftFeed | url = url }
-
-        Nothing ->
-            Just (DraftFeed url)
-
-
-addError : Model -> String -> Model
-addError model err =
-    let
-        errors =
-            err :: model.errors
-    in
-        { model | errors = errors }
-
-
-removeError : Model -> String -> Model
-removeError model err =
-    let
-        errors =
-            List.filter (\e -> not (e == err)) model.errors
-    in
-        { model | errors = errors }
-
-
-
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Message
-subscriptions model =
-    Sub.none
-
-
-
--- MAIN
-
-
-main : Program Never Model Message
-main =
-    Html.program
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
