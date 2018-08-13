@@ -6,7 +6,7 @@ import Data.Tweet exposing (Tweet)
 import Data.User exposing (User)
 import Page.Posts.Model exposing (Model)
 import Http
-import Request.Post
+import Request.Tweet
 import Util.Editable as Editable exposing (Editable(..))
 
 
@@ -19,6 +19,7 @@ type Message
     | SetTweetBody Tweet String
     | CancelEditTweet Tweet
     | SaveTweet Tweet
+    | TweetSaved (Result Http.Error Tweet)
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -37,7 +38,7 @@ update message model =
             ( model, Cmd.none )
 
         CancelTweet tweet ->
-            ( model, Http.send CanceledTweet <| Request.Post.cancelTweet tweet )
+            ( model, Http.send CanceledTweet <| Request.Tweet.cancel tweet )
 
         CanceledTweet (Ok tweet) ->
             ( updateTweet tweet model, Cmd.none )
@@ -59,7 +60,13 @@ update message model =
             ( { model | tweets = cancelEditTweet tweet model.tweets }, Cmd.none )
 
         SaveTweet tweet ->
+            ( { model | tweets = savingTweet tweet model.tweets }, Http.send TweetSaved (Request.Tweet.update tweet) )
+
+        TweetSaved (Ok tweet) ->
             ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
+
+        TweetSaved (Err _) ->
+            ( model, Cmd.none )
 
 
 tweetsFromPosts : List Post -> List (Editable PostTweet)
@@ -86,6 +93,9 @@ updatePostTweet tweet postTweet =
         Editing orig edit ->
             Editing (PostTweet.updateTweet orig tweet) edit
 
+        Saving orig edit ->
+            Saving (PostTweet.updateTweet orig tweet) edit
+
 
 editTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
 editTweet t =
@@ -102,6 +112,11 @@ updateDraftTweet f t =
 cancelEditTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
 cancelEditTweet t =
     Editable.cancel (\x -> x.tweet.id == t.id)
+
+
+savingTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
+savingTweet t =
+    Editable.saving (\x -> x.tweet.id == t.id)
 
 
 saveTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)

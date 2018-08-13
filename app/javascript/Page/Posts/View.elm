@@ -59,6 +59,9 @@ tweetCard user postTweet =
         Editing _ tweet ->
             editTweetCard user tweet
 
+        Saving _ tweet ->
+            savingTweetCard user tweet.post
+
 
 viewTweetCard : User -> PostTweet -> Html Message
 viewTweetCard user tweet =
@@ -99,6 +102,19 @@ editTweetCard user tweet =
                     ]
                 ]
             , footer [ class "card-footer" ] <| editActions tweet.tweet
+            ]
+        ]
+
+
+savingTweetCard : User -> Post -> Html Message
+savingTweetCard user post =
+    article [ class "card" ]
+        [ div [ class "card-content" ]
+            [ tweetUserInfo user post
+            , p [ class "is-size-5 has-text-centered" ]
+                [ span [ class "icon is-medium rotating" ] [ i [ class "fas fa-spinner" ] [] ]
+                , span [] [ text "Saving changes..." ]
+                ]
             ]
         ]
 

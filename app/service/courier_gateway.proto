@@ -8,6 +8,7 @@ service Api {
   rpc GetUserInfo(UserInfoRequest) returns (UserInfo);
   rpc GetPosts(PostsRequest) returns (PostList);
   rpc CancelTweet(CancelTweetRequest) returns (PostTweet);
+  rpc UpdateTweet(UpdateTweetRequest) returns (PostTweet);
   rpc GetFeeds(FeedsRequest) returns (FeedList);
   rpc RegisterFeed(RegisterFeedRequest) returns (Feed);
   rpc RefreshFeed(RefreshFeedRequest) returns (JobStatus);

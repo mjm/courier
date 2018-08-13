@@ -20,6 +20,12 @@ class ApiHandler
     end
   end
 
+  def update_tweet(req, env)
+    require_user env do |_user|
+      forward posts_client(env).update_tweet(req)
+    end
+  end
+
   def get_feeds(_req, env)
     require_user env do |user|
       forward feeds_client(env).get_user_feeds(user_id: user['id'])

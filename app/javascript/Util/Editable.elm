@@ -1,4 +1,4 @@
-module Util.Editable exposing (Editable(..), edit, updateDraft, cancel, save)
+module Util.Editable exposing (Editable(..), edit, updateDraft, cancel, saving, save)
 
 {-| When viewing, this simply holds a value.
 
@@ -11,10 +11,11 @@ This way, we can revert back to the original if the operation is canceled.
 type Editable a
     = Viewing a
     | Editing a a
+    | Saving a a
 
 
-transform : (a -> Editable a) -> (a -> a -> Editable a) -> List (Editable a) -> List (Editable a)
-transform viewFn editFn =
+transform : (a -> Editable a) -> (a -> a -> Editable a) -> (a -> a -> Editable a) -> List (Editable a) -> List (Editable a)
+transform viewFn editFn saveFn =
     List.map
         (\x ->
             case x of
@@ -23,6 +24,9 @@ transform viewFn editFn =
 
                 Editing o d ->
                     editFn o d
+
+                Saving o d ->
+                    saveFn o d
         )
 
 
@@ -36,6 +40,7 @@ edit f =
                 Viewing x
         )
         Editing
+        Saving
 
 
 updateDraft : (a -> Bool) -> (a -> a) -> List (Editable a) -> List (Editable a)
@@ -48,6 +53,7 @@ updateDraft f t =
             else
                 Editing x y
         )
+        Saving
 
 
 cancel : (a -> Bool) -> List (Editable a) -> List (Editable a)
@@ -60,6 +66,25 @@ cancel f =
             else
                 Editing x y
         )
+        (\x y ->
+            if f x then
+                Viewing x
+            else
+                Saving x y
+        )
+
+
+saving : (a -> Bool) -> List (Editable a) -> List (Editable a)
+saving f =
+    transform
+        Viewing
+        (\x y ->
+            if f x then
+                Saving x y
+            else
+                Editing x y
+        )
+        Saving
 
 
 save : (a -> Bool) -> (a -> a) -> List (Editable a) -> List (Editable a)
@@ -76,4 +101,10 @@ save f t =
                 Viewing (t x)
             else
                 Editing x y
+        )
+        (\x y ->
+            if f x then
+                Viewing (t x)
+            else
+                Saving x y
         )
