@@ -1,5 +1,6 @@
 module Page.Posts.View exposing (view)
 
+import Data.Post exposing (Post)
 import Data.PostTweet exposing (PostTweet)
 import Data.Tweet exposing (Tweet, Status(..))
 import Data.User as User exposing (User)
@@ -63,7 +64,7 @@ viewTweetCard : User -> PostTweet -> Html Message
 viewTweetCard user tweet =
     article [ class "card" ]
         [ div [ class "card-content" ]
-            [ tweetUserInfo user
+            [ tweetUserInfo user tweet.post
             , p [] [ text tweet.tweet.body ]
             ]
         , footer [ class "card-footer" ] <|
@@ -84,7 +85,7 @@ editTweetCard user tweet =
     Html.form [ action "javascript:void(0);" ]
         [ article [ class "card" ]
             [ div [ class "card-content" ]
-                [ tweetUserInfo user
+                [ tweetUserInfo user tweet.post
                 , div [ class "field" ]
                     [ div [ class "control" ]
                         [ textarea
@@ -158,8 +159,8 @@ editActions tweet =
     ]
 
 
-tweetUserInfo : User -> Html msg
-tweetUserInfo user =
+tweetUserInfo : User -> Post -> Html Message
+tweetUserInfo user post =
     header [ class "media" ]
         [ div [ class "media-left" ]
             [ figure [ class "image is-48x48" ]
@@ -169,4 +170,6 @@ tweetUserInfo user =
             [ h1 [ class "title is-5" ] [ text user.name ]
             , h2 [ class "subtitle is-6 has-text-grey" ] [ text <| "@" ++ user.username ]
             ]
+        , div [ class "media-right" ]
+            [ a [ href post.url ] [ icon Solid "external-link-alt" ] ]
         ]
