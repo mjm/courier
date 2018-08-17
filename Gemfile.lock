@@ -10,7 +10,7 @@ GIT
 
 GIT
   remote: https://github.com/mjm/courier-posts.git
-  revision: 9f90f15329362e80467205aecf3ba8e4775be0e3
+  revision: ce935453c3c7ce5da8dc76f585a709f5a62c26ca
   glob: client/*.gemspec
   specs:
     courier-posts (0.0.1)

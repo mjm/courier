@@ -4,6 +4,8 @@ import Data.Post exposing (Post)
 import Data.PostTweet exposing (PostTweet)
 import Data.Tweet exposing (Tweet, Status(..))
 import Data.User as User exposing (User)
+import Date exposing (Date)
+import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -11,7 +13,7 @@ import Page.Posts.Model exposing (Model)
 import Page.Posts.Update exposing (Message(..))
 import Views.Icon exposing (..)
 import Views.Page as Page
-import Util.Editable exposing (Editable(..))
+import Util.Editable as Editable exposing (Editable(..))
 
 
 view : Model -> Html Message
@@ -27,27 +29,58 @@ pageContent : Model -> Html Message
 pageContent model =
     section [ class "section" ]
         [ div [ class "container" ]
-            [ postList model.user model.tweets ]
+            [ postList model ]
         ]
 
 
-postList : User -> List (Editable PostTweet) -> Html Message
-postList user tweets =
+postList : Model -> Html Message
+postList model =
     div []
         [ h2 [ class "title has-text-centered" ] [ text "Your Tweets" ]
         , hr [] []
-        , List.map (postEntry user) tweets |> div []
+        , List.map (postEntry model.user model.now) model.tweets |> div []
         ]
 
 
-postEntry : User -> Editable PostTweet -> Html Message
-postEntry user tweet =
+postEntry : User -> Date -> Editable PostTweet -> Html Message
+postEntry user now tweet =
     div []
         [ div [ class "columns" ]
-            [ div [ class "column is-two-thirds is-offset-2" ]
+            [ div [ class "column is-two-thirds" ]
                 [ tweetCard user tweet ]
+            , div [ class "column is-one-third" ]
+                [ postDetails tweet now ]
             ]
         ]
+
+
+postDetails : Editable PostTweet -> Date -> Html Message
+postDetails tweet now =
+    let
+        t =
+            Editable.value tweet
+
+        published =
+            Maybe.map (relativeTime now) t.post.publishedAt
+                |> Maybe.withDefault "never"
+
+        modified =
+            if t.post.publishedAt == t.post.modifiedAt then
+                Nothing
+            else
+                Maybe.map (relativeTime now) t.post.modifiedAt
+    in
+        p []
+            [ h2 [ class "has-text-grey is-uppercase has-text-weight-bold is-size-7" ] [ text "Details" ]
+            , text ("Published " ++ published)
+            , br [] []
+            , case modified of
+                Nothing ->
+                    text ""
+
+                Just m ->
+                    text ("Updated " ++ m)
+            ]
 
 
 tweetCard : User -> Editable PostTweet -> Html Message

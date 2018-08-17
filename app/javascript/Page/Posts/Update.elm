@@ -4,15 +4,18 @@ import Data.Post exposing (Post)
 import Data.PostTweet as PostTweet exposing (PostTweet)
 import Data.Tweet exposing (Tweet)
 import Data.User exposing (User)
+import Date exposing (Date)
 import Page.Posts.Model exposing (Model)
 import Http
 import Request.Tweet
+import Time exposing (Time)
 import Util.Editable as Editable exposing (Editable(..))
 
 
 type Message
     = UserLoaded (Result Http.Error User)
     | PostsLoaded (Result Http.Error (List Post))
+    | Tick Time
     | CancelTweet Tweet
     | CanceledTweet (Result Http.Error Tweet)
     | EditTweet Tweet
@@ -36,6 +39,9 @@ update message model =
 
         PostsLoaded (Err _) ->
             ( model, Cmd.none )
+
+        Tick time ->
+            ( { model | now = Date.fromTime time }, Cmd.none )
 
         CancelTweet tweet ->
             ( model, Http.send CanceledTweet <| Request.Tweet.cancel tweet )

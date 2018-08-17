@@ -1,4 +1,4 @@
-module Util.Editable exposing (Editable(..), edit, updateDraft, cancel, saving, save)
+module Util.Editable exposing (Editable(..), value, edit, updateDraft, cancel, saving, save)
 
 {-| When viewing, this simply holds a value.
 
@@ -12,6 +12,19 @@ type Editable a
     = Viewing a
     | Editing a a
     | Saving a a
+
+
+value : Editable a -> a
+value x =
+    case x of
+        Viewing x ->
+            x
+
+        Editing x _ ->
+            x
+
+        Saving x _ ->
+            x
 
 
 transform : (a -> Editable a) -> (a -> a -> Editable a) -> (a -> a -> Editable a) -> List (Editable a) -> List (Editable a)
