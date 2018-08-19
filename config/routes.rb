@@ -2,6 +2,8 @@ Rails.application.routes.draw do
   api_service = ApiHandler.service
   mount api_service, at: api_service.full_name
 
+  mount PingService, at: '/ping'
+
   get '/auth/twitter/callback', to: 'auth#twitter_callback'
 
   get '/feeds', to: 'pages#feeds'

@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/mjm/courier-feeds.git
-  revision: ee636c9e74f4ca1620eeebe35261939c437e7ce6
+  revision: c7ee1ece0b59ad35845469285fbaf3cb2880ea68
   glob: client/*.gemspec
   specs:
     courier-feeds (0.0.1)
@@ -224,6 +224,9 @@ GEM
     websocket-driver (0.7.0)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.3)
+    xmlrpc (0.3.0)
+    xmlrpc-rack_server (0.0.2)
+      rack
 
 PLATFORMS
   ruby
@@ -250,6 +253,8 @@ DEPENDENCIES
   uglifier (>= 1.3.0)
   web-console (>= 3.3.0)
   webpacker
+  xmlrpc
+  xmlrpc-rack_server
 
 RUBY VERSION
    ruby 2.5.1p57
