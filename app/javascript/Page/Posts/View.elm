@@ -71,15 +71,29 @@ postDetails tweet now =
                 Maybe.map (relativeTime now) t.post.modifiedAt
     in
         p []
-            [ h2 [ class "has-text-grey is-uppercase has-text-weight-bold is-size-7" ] [ text "Details" ]
-            , text ("Published " ++ published)
-            , br [] []
-            , case modified of
-                Nothing ->
-                    text ""
+            [ ul [ class "fa-ul" ]
+                [ li []
+                    [ span [ class "fa-li" ]
+                        [ i [ class "fas fa-calendar-alt" ] [] ]
+                    , text ("Published " ++ published)
+                    ]
+                , case modified of
+                    Nothing ->
+                        text ""
 
-                Just m ->
-                    text ("Updated " ++ m)
+                    Just m ->
+                        li []
+                            [ span [ class "fa-li" ]
+                                [ i [ class "fas fa-calendar-plus" ] [] ]
+                            , text ("Updated " ++ m)
+                            ]
+                , li []
+                    [ span [ class "fa-li" ]
+                        [ i [ class "fas fa-external-link-square-alt" ] [] ]
+                    , a [ href t.post.url, rel "noopener", target "_blank" ]
+                        [ text "View on your site" ]
+                    ]
+                ]
             ]
 
 
@@ -219,6 +233,4 @@ tweetUserInfo user post =
             [ h1 [ class "title is-5" ] [ text user.name ]
             , h2 [ class "subtitle is-6 has-text-grey" ] [ text <| "@" ++ user.username ]
             ]
-        , div [ class "media-right" ]
-            [ a [ href post.url ] [ icon Solid "external-link-alt" ] ]
         ]
