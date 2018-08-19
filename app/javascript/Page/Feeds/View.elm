@@ -1,6 +1,6 @@
 module Page.Feeds.View exposing (view)
 
-import Data.Feed exposing (Feed, DraftFeed)
+import Data.Feed as Feed exposing (Feed, DraftFeed)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -52,7 +52,7 @@ feedRow feed =
         [ td []
             [ span [ class "icon is-medium has-text-link" ]
                 [ i [ class "fas fa-rss fa-lg" ] [] ]
-            , span [ class "is-size-5" ] [ text feed.url ]
+            , span [ class "is-size-5" ] [ text (Feed.displayName feed) ]
             ]
         , td [] [ feedDropdown feed ]
         ]
@@ -68,6 +68,15 @@ feedDropdown feed =
         , div [ class "dropdown-menu" ]
             [ div [ class "dropdown-content" ]
                 [ a
+                    [ class "dropdown-item"
+                    , href feed.homePageUrl
+                    , rel "noopener"
+                    , target "_blank"
+                    ]
+                    [ icon Solid "external-link-square-alt"
+                    , span [] [ text "Open Home Page" ]
+                    ]
+                , a
                     [ class "dropdown-item"
                     , onClick (RefreshFeed feed)
                     ]
