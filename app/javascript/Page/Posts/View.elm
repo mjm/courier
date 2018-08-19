@@ -19,27 +19,18 @@ import Util.Editable as Editable exposing (Editable(..))
 view : Model -> Html Message
 view model =
     [ Page.navbar (Just model.user)
-    , pageContent model
+    , section [ class "section" ]
+        [ div [ class "container" ]
+            [ div []
+                [ h2 [ class "title has-text-centered" ] [ text "Your Tweets" ]
+                , hr [] []
+                , List.map (postEntry model.user model.now) model.tweets |> div []
+                ]
+            ]
+        ]
     , Page.footer
     ]
         |> div []
-
-
-pageContent : Model -> Html Message
-pageContent model =
-    section [ class "section" ]
-        [ div [ class "container" ]
-            [ postList model ]
-        ]
-
-
-postList : Model -> Html Message
-postList model =
-    div []
-        [ h2 [ class "title has-text-centered" ] [ text "Your Tweets" ]
-        , hr [] []
-        , List.map (postEntry model.user model.now) model.tweets |> div []
-        ]
 
 
 postEntry : User -> Date -> Editable PostTweet -> Html Message
