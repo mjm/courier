@@ -10,6 +10,7 @@ module Courier
     rpc :GetPosts, PostsRequest, PostList, :ruby_method => :get_posts
     rpc :CancelTweet, CancelTweetRequest, PostTweet, :ruby_method => :cancel_tweet
     rpc :UpdateTweet, UpdateTweetOptionsRequest, PostTweet, :ruby_method => :update_tweet
+    rpc :SubmitTweet, SubmitTweetRequest, PostTweet, :ruby_method => :submit_tweet
     rpc :GetFeeds, FeedsRequest, FeedList, :ruby_method => :get_feeds
     rpc :RegisterFeed, RegisterFeedRequest, Feed, :ruby_method => :register_feed
     rpc :RefreshFeed, RefreshFeedRequest, JobStatus, :ruby_method => :refresh_feed

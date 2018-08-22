@@ -169,7 +169,10 @@ draftActions tweet =
         , class "card-footer-item has-text-primary"
         ]
         [ icon Solid "pencil-alt", span [] [ text "Edit Tweet" ] ]
-    , a [ class "card-footer-item" ]
+    , a
+        [ onClick <| SubmitTweet tweet
+        , class "card-footer-item"
+        ]
         [ icon Solid "share", span [] [ text "Post Now" ] ]
     ]
 

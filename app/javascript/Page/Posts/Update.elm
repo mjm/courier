@@ -23,6 +23,8 @@ type Message
     | CancelEditTweet Tweet
     | SaveTweet Tweet Bool
     | TweetSaved (Result Http.Error Tweet)
+    | SubmitTweet Tweet
+    | TweetSubmitted (Result Http.Error Tweet)
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -72,6 +74,15 @@ update message model =
             ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
 
         TweetSaved (Err _) ->
+            ( model, Cmd.none )
+
+        SubmitTweet tweet ->
+            ( { model | tweets = savingTweet tweet model.tweets }, Http.send TweetSubmitted (Request.Tweet.post tweet) )
+
+        TweetSubmitted (Ok tweet) ->
+            ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
+
+        TweetSubmitted (Err _) ->
             ( model, Cmd.none )
 
 

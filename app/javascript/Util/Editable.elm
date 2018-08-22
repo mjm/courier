@@ -90,7 +90,12 @@ cancel f =
 saving : (a -> Bool) -> List (Editable a) -> List (Editable a)
 saving f =
     transform
-        Viewing
+        (\x ->
+            if f x then
+                Saving x x
+            else
+                Viewing x
+        )
         (\x y ->
             if f x then
                 Saving x y

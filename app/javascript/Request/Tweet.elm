@@ -33,3 +33,15 @@ update tweet shouldPost =
             |> withJsonBody body
             |> withExpect (Http.expectJson Tweet.decoder)
             |> toRequest
+
+
+post : Tweet -> Http.Request Tweet
+post tweet =
+    let
+        body =
+            Encode.object [ ( "id", Encode.int tweet.id ) ]
+    in
+        apiBuilder "SubmitTweet"
+            |> withJsonBody body
+            |> withExpect (Http.expectJson Tweet.decoder)
+            |> toRequest

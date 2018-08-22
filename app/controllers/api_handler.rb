@@ -34,6 +34,10 @@ class ApiHandler
     end
   end
 
+  def submit_tweet(req, env)
+    forward posts_client(env).submit_tweet(req)
+  end
+
   def get_feeds(_req, env)
     require_user env do |user|
       forward feeds_client(env).get_user_feeds(user_id: user['id'])
@@ -48,7 +52,7 @@ class ApiHandler
   end
 
   def refresh_feed(req, env)
-    require_user env do |user|
+    require_user env do |_user|
       forward feeds_client(env).refresh_feed(req)
     end
   end
