@@ -54,7 +54,7 @@ feedRow feed =
                 [ i [ class "fas fa-rss fa-lg" ] [] ]
             , span [ class "is-size-5" ] [ text (Feed.displayName feed) ]
             ]
-        , td [] [ feedDropdown feed ]
+        , td [ class "has-text-right" ] [ feedDropdown feed ]
         ]
 
 
@@ -65,7 +65,7 @@ feedDropdown feed =
             [ button [ class "button is-white" ]
                 [ icon Solid "bars" ]
             ]
-        , div [ class "dropdown-menu" ]
+        , div [ class "dropdown-menu has-text-left" ]
             [ div [ class "dropdown-content" ]
                 [ a
                     [ class "dropdown-item"

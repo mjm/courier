@@ -19,13 +19,14 @@ cancel tweet =
             |> toRequest
 
 
-update : Tweet -> Http.Request Tweet
-update tweet =
+update : Tweet -> Bool -> Http.Request Tweet
+update tweet shouldPost =
     let
         body =
             Encode.object
                 [ ( "id", Encode.int tweet.id )
                 , ( "body", Encode.string tweet.body )
+                , ( "shouldPost", Encode.bool shouldPost )
                 ]
     in
         apiBuilder "UpdateTweet"

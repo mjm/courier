@@ -8,7 +8,7 @@ service Api {
   rpc GetUserInfo(UserInfoRequest) returns (UserInfo);
   rpc GetPosts(PostsRequest) returns (PostList);
   rpc CancelTweet(CancelTweetRequest) returns (PostTweet);
-  rpc UpdateTweet(UpdateTweetRequest) returns (PostTweet);
+  rpc UpdateTweet(UpdateTweetOptionsRequest) returns (PostTweet);
   rpc GetFeeds(FeedsRequest) returns (FeedList);
   rpc RegisterFeed(RegisterFeedRequest) returns (Feed);
   rpc RefreshFeed(RefreshFeedRequest) returns (JobStatus);
@@ -18,6 +18,12 @@ message UserInfoRequest {
 }
 
 message PostsRequest {
+}
+
+message UpdateTweetOptionsRequest {
+  int64 id = 1;
+  string body = 2;
+  bool should_post = 3;
 }
 
 message FeedsRequest {

@@ -202,12 +202,12 @@ editActions tweet =
         [ icon Solid "ban", span [] [ text "Cancel" ] ]
     , a
         [ class "card-footer-item"
-        , onClick (SaveTweet tweet)
+        , onClick (SaveTweet tweet False)
         ]
         [ span [] [ text "Save Draft" ] ]
     , a
         [ class "card-footer-item"
-        , onClick (SaveTweet tweet)
+        , onClick (SaveTweet tweet True)
         ]
         [ span [] [ text "Post Now " ] ]
     ]

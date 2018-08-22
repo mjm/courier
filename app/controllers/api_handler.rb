@@ -22,7 +22,15 @@ class ApiHandler
 
   def update_tweet(req, env)
     require_user env do |_user|
-      forward posts_client(env).update_tweet(req)
+      update_req = { id: req.id, body: req.body }
+      response = posts_client(env).update_tweet(update_req)
+      return response.error if response.error
+
+      if req.should_post
+        forward posts_client(env).submit_tweet(id: req.id)
+      else
+        response.data
+      end
     end
   end
 

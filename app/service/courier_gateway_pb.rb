@@ -10,6 +10,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "courier.PostsRequest" do
   end
+  add_message "courier.UpdateTweetOptionsRequest" do
+    optional :id, :int64, 1
+    optional :body, :string, 2
+    optional :should_post, :bool, 3
+  end
   add_message "courier.FeedsRequest" do
   end
   add_message "courier.UserInfo" do
@@ -21,6 +26,7 @@ end
 module Courier
   UserInfoRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("courier.UserInfoRequest").msgclass
   PostsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("courier.PostsRequest").msgclass
+  UpdateTweetOptionsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("courier.UpdateTweetOptionsRequest").msgclass
   FeedsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("courier.FeedsRequest").msgclass
   UserInfo = Google::Protobuf::DescriptorPool.generated_pool.lookup("courier.UserInfo").msgclass
 end

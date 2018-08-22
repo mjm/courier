@@ -21,7 +21,7 @@ type Message
     | EditTweet Tweet
     | SetTweetBody Tweet String
     | CancelEditTweet Tweet
-    | SaveTweet Tweet
+    | SaveTweet Tweet Bool
     | TweetSaved (Result Http.Error Tweet)
 
 
@@ -65,8 +65,8 @@ update message model =
         CancelEditTweet tweet ->
             ( { model | tweets = cancelEditTweet tweet model.tweets }, Cmd.none )
 
-        SaveTweet tweet ->
-            ( { model | tweets = savingTweet tweet model.tweets }, Http.send TweetSaved (Request.Tweet.update tweet) )
+        SaveTweet tweet shouldPost ->
+            ( { model | tweets = savingTweet tweet model.tweets }, Http.send TweetSaved (Request.Tweet.update tweet shouldPost) )
 
         TweetSaved (Ok tweet) ->
             ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
