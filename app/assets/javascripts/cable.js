@@ -8,6 +8,7 @@
 (function() {
   this.App || (this.App = {});
 
-  App.cable = ActionCable.createConsumer();
+  var url = ActionCable.getConfig('url');
+  App.cableUrl = ActionCable.createWebSocketURL(url);
 
 }).call(this);

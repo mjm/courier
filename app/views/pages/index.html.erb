@@ -2,7 +2,8 @@
 <script type="text/javascript">
   window.elmFlags = Object.assign({},
     <%= raw @posts_json %>,
-    { user: <%= raw @user_json %> }
+    { user: <%= raw @user_json %> },
+    { cableUrl: App.cableUrl }
   );
 </script>
 <%= javascript_pack_tag 'main' %>

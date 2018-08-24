@@ -1,35 +1,36 @@
-module Page.Posts.Update exposing (Message(..), update)
+module Page.Posts.Update exposing (update)
 
+import ActionCable
+import ActionCable.Identifier as ID
 import Data.Post exposing (Post)
 import Data.PostTweet as PostTweet exposing (PostTweet)
-import Data.Tweet exposing (Tweet)
-import Data.User exposing (User)
+import Data.Tweet as Tweet exposing (Tweet)
 import Date exposing (Date)
-import Page.Posts.Model exposing (Model)
+import Page.Posts.Model exposing (Model, Message(..))
 import Http
+import Json.Decode as Decode
 import Request.Tweet
-import Time exposing (Time)
 import Util.Editable as Editable exposing (Editable(..))
-
-
-type Message
-    = UserLoaded (Result Http.Error User)
-    | PostsLoaded (Result Http.Error (List Post))
-    | Tick Time
-    | CancelTweet Tweet
-    | CanceledTweet (Result Http.Error Tweet)
-    | EditTweet Tweet
-    | SetTweetBody Tweet String
-    | CancelEditTweet Tweet
-    | SaveTweet Tweet Bool
-    | TweetSaved (Result Http.Error Tweet)
-    | SubmitTweet Tweet
-    | TweetSubmitted (Result Http.Error Tweet)
 
 
 update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
+        CableMsg msg ->
+            ActionCable.update msg model.cable
+                |> (\( cable, cmd ) -> { model | cable = cable } ! [ cmd ])
+
+        Subscribe () ->
+            subscribeTo model
+
+        HandleSocketData id value ->
+            case Decode.decodeValue Tweet.decoder value of
+                Ok tweet ->
+                    ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
         UserLoaded (Ok user) ->
             ( { model | user = user }, Cmd.none )
 
@@ -83,6 +84,16 @@ update message model =
             ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
 
         TweetSubmitted (Err _) ->
+            ( model, Cmd.none )
+
+
+subscribeTo : Model -> ( Model, Cmd Message )
+subscribeTo model =
+    case ActionCable.subscribeTo (ID.newIdentifier "PostsChannel" []) model.cable of
+        Ok ( cable, cmd ) ->
+            ( { model | cable = cable }, cmd )
+
+        Err err ->
             ( model, Cmd.none )
 
 

@@ -1,5 +1,6 @@
 module Page.Posts.Main exposing (main)
 
+import ActionCable
 import Data.Post as Post
 import Data.PostTweet as PostTweet exposing (PostTweet)
 import Data.User as User exposing (User)
@@ -7,8 +8,8 @@ import Date
 import Html
 import Json.Decode exposing (decodeValue)
 import Page.Posts.Flags exposing (Flags)
-import Page.Posts.Model as Model exposing (Model)
-import Page.Posts.Update exposing (Message(..), update)
+import Page.Posts.Model as Model exposing (Model, Message(..))
+import Page.Posts.Update exposing (update)
 import Page.Posts.View exposing (view)
 import Task
 import Time
@@ -21,6 +22,10 @@ init flags =
     { tweets = tweetsFromFlags flags
     , user = userFromFlags flags
     , now = Date.fromTime 0
+    , cable =
+        ActionCable.initCable flags.cableUrl
+            |> ActionCable.onWelcome (Just Subscribe)
+            |> ActionCable.onDidReceiveData (Just HandleSocketData)
     }
         ! [ Task.perform Tick Time.now ]
 
@@ -41,7 +46,10 @@ userFromFlags flags =
 
 subscriptions : Model -> Sub Message
 subscriptions model =
-    Time.every (10 * Time.second) Tick
+    Sub.batch
+        [ Time.every (10 * Time.second) Tick
+        , ActionCable.listen CableMsg model.cable
+        ]
 
 
 main : Program Flags Model Message
