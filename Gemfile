@@ -12,6 +12,7 @@ gem 'bunny'
 gem 'jwt'
 gem 'omniauth'
 gem 'omniauth-twitter'
+gem 'redis'
 gem 'xmlrpc'
 gem 'xmlrpc-rack_server'
 
