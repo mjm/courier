@@ -10,7 +10,8 @@ def listen_for_messages
   q = ch.queue('', exclusive: true).bind(x)
   q.subscribe do |_delivery_info, _properties, payload|
     tweet = Courier::PostTweet.decode(payload)
-    ActionCable.server.broadcast('posts', JSON.parse(Courier::PostTweet.encode_json(tweet)))
+    tweet_json = JSON.parse(Courier::PostTweet.encode_json(tweet))
+    ActionCable.server.broadcast("posts:#{tweet.user_id}", tweet_json)
   end
 end
 

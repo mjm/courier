@@ -2,6 +2,7 @@ class AuthController < ApplicationController
   def twitter_callback
     user = tweeter.register_user(user_attrs).data
     session[:user] = user
+    cookies.encrypted[:user_id] = user.id # for the ActionCable connection
     redirect_to root_url
   end
 
