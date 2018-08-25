@@ -1,6 +1,7 @@
 module Page.Posts.Update exposing (update)
 
 import ActionCable
+import ActionCable.Msg as ACMsg
 import ActionCable.Identifier as ID
 import Data.Post exposing (Post)
 import Data.PostTweet as PostTweet exposing (PostTweet)
@@ -17,19 +18,13 @@ update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
         CableMsg msg ->
-            ActionCable.update msg model.cable
-                |> (\( cable, cmd ) -> { model | cable = cable } ! [ cmd ])
+            handleCableMessage msg model
 
         Subscribe () ->
-            subscribeTo model
+            subscribe model
 
         HandleSocketData id value ->
-            case Decode.decodeValue Tweet.decoder value of
-                Ok tweet ->
-                    ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
-
-                Err _ ->
-                    ( model, Cmd.none )
+            handleSocketData id value model
 
         UserLoaded (Ok user) ->
             ( { model | user = user }, Cmd.none )
@@ -87,13 +82,29 @@ update message model =
             ( model, Cmd.none )
 
 
-subscribeTo : Model -> ( Model, Cmd Message )
-subscribeTo model =
+handleCableMessage : ACMsg.Msg -> Model -> ( Model, Cmd Message )
+handleCableMessage msg model =
+    ActionCable.update msg model.cable
+        |> (\( cable, cmd ) -> { model | cable = cable } ! [ cmd ])
+
+
+subscribe : Model -> ( Model, Cmd Message )
+subscribe model =
     case ActionCable.subscribeTo (ID.newIdentifier "PostsChannel" []) model.cable of
         Ok ( cable, cmd ) ->
             ( { model | cable = cable }, cmd )
 
         Err err ->
+            ( model, Cmd.none )
+
+
+handleSocketData : ID.Identifier -> Decode.Value -> Model -> ( Model, Cmd Message )
+handleSocketData id value model =
+    case Decode.decodeValue Tweet.decoder value of
+        Ok tweet ->
+            ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
+
+        Err _ ->
             ( model, Cmd.none )
 
 
