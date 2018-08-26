@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/mjm/courier-feeds.git
-  revision: c7ee1ece0b59ad35845469285fbaf3cb2880ea68
+  revision: f9d354c237b3ec2efe9ab218aef8ce8522ff6698
   glob: client/*.gemspec
   specs:
     courier-feeds (0.0.1)

@@ -57,6 +57,13 @@ class ApiHandler
     end
   end
 
+  def update_feed_settings(req, env)
+    require_user env do |user|
+      req.user_id = user['id']
+      forward feeds_client(env).update_feed_settings(req)
+    end
+  end
+
   class << self
     def service
       handler = new

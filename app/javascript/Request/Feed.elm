@@ -1,6 +1,6 @@
 module Request.Feed exposing (..)
 
-import Data.Feed as Feed exposing (Feed, DraftFeed)
+import Data.Feed as Feed exposing (Feed, DraftFeed, SettingsChanges)
 import Http
 import HttpBuilder exposing (withExpect, withJsonBody, toRequest)
 import Json.Decode as Decode
@@ -37,4 +37,19 @@ refresh feed =
         apiBuilder "RefreshFeed"
             |> withJsonBody body
             |> withExpect (Http.expectJson (Decode.succeed ()))
+            |> toRequest
+
+
+updateSettings : Feed -> SettingsChanges -> Http.Request Feed
+updateSettings feed settings =
+    let
+        body =
+            Encode.object
+                [ ( "feed_id", Encode.int feed.id )
+                , ( "settings", Feed.encodeSettings settings )
+                ]
+    in
+        apiBuilder "UpdateFeedSettings"
+            |> withJsonBody body
+            |> withExpect (Http.expectJson Feed.decoder)
             |> toRequest

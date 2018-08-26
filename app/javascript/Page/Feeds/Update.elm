@@ -20,6 +20,8 @@ type Message
     | FeedAdded (Result Http.Error Feed)
     | RefreshFeed Feed
     | FeedRefreshed (Result Http.Error ())
+    | UpdateAutoposting Feed Bool
+    | SettingsUpdated (Result Http.Error Feed)
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -79,10 +81,31 @@ update message model =
         FeedRefreshed (Err _) ->
             ( addError model "Could not refresh the feed right now. Please try again later.", Cmd.none )
 
+        UpdateAutoposting feed enabled ->
+            ( model, Http.send SettingsUpdated (Request.Feed.updateSettings feed { autopost = Just enabled }) )
+
+        SettingsUpdated (Ok feed) ->
+            ( { model | feeds = updateFeed feed model.feeds }, Cmd.none )
+
+        SettingsUpdated (Err _) ->
+            ( addError model "Could not update the feed settings right now. Please try again later.", Cmd.none )
+
 
 addFeed : Feed -> List Feed -> List Feed
 addFeed feed fs =
     fs ++ [ feed ]
+
+
+updateFeed : Feed -> List Feed -> List Feed
+updateFeed feed fs =
+    List.map
+        (\f ->
+            if f.id == feed.id then
+                feed
+            else
+                f
+        )
+        fs
 
 
 updateFeedUrl : Maybe DraftFeed -> String -> Maybe DraftFeed

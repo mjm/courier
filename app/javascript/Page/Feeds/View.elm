@@ -60,36 +60,59 @@ feedRow feed =
 
 feedDropdown : Feed -> Html Message
 feedDropdown feed =
-    div [ class "dropdown is-hoverable" ]
-        [ div [ class "dropdown-trigger" ]
-            [ button [ class "button is-white" ]
-                [ icon Solid "bars" ]
-            ]
-        , div [ class "dropdown-menu has-text-left" ]
-            [ div [ class "dropdown-content" ]
-                [ a
-                    [ class "dropdown-item"
-                    , href feed.homePageUrl
-                    , rel "noopener"
-                    , target "_blank"
-                    ]
-                    [ icon Solid "external-link-square-alt"
-                    , span [] [ text "Open Home Page" ]
-                    ]
-                , a
-                    [ class "dropdown-item"
-                    , onClick (RefreshFeed feed)
-                    ]
-                    [ icon Solid "sync-alt"
-                    , span [] [ text "Refresh Posts" ]
-                    ]
-                , a [ class "dropdown-item has-text-danger" ]
-                    [ icon Solid "trash"
-                    , span [] [ text "Delete Feed" ]
+    let
+        autopost =
+            feed.settings.autopost
+    in
+        div [ class "dropdown is-hoverable" ]
+            [ div [ class "dropdown-trigger" ]
+                [ button [ class "button is-white" ]
+                    [ icon Solid "bars" ]
+                ]
+            , div [ class "dropdown-menu has-text-left" ]
+                [ div [ class "dropdown-content" ]
+                    [ a
+                        [ class "dropdown-item"
+                        , href feed.homePageUrl
+                        , rel "noopener"
+                        , target "_blank"
+                        ]
+                        [ icon Solid "external-link-square-alt"
+                        , span [] [ text "Open Home Page" ]
+                        ]
+                    , a
+                        [ class "dropdown-item"
+                        , onClick (RefreshFeed feed)
+                        ]
+                        [ icon Solid "sync-alt"
+                        , span [] [ text "Refresh Posts" ]
+                        ]
+                    , a
+                        [ class "dropdown-item"
+                        , onClick (UpdateAutoposting feed (not autopost))
+                        ]
+                        [ span []
+                            [ icon Solid
+                                (if autopost then
+                                    "comment-slash"
+                                 else
+                                    "comment"
+                                )
+                            , text
+                                (if autopost then
+                                    "Turn Off Autoposting"
+                                 else
+                                    "Turn On Autoposting"
+                                )
+                            ]
+                        ]
+                    , a [ class "dropdown-item has-text-danger" ]
+                        [ icon Solid "trash"
+                        , span [] [ text "Delete Feed" ]
+                        ]
                     ]
                 ]
             ]
-        ]
 
 
 addFeedView : Model -> Html Message
