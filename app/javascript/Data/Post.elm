@@ -5,6 +5,7 @@ import Date exposing (Date)
 import Date.Extra as Date
 import Json.Decode as Decode exposing (Decoder, string, list)
 import Json.Decode.Pipeline exposing (decode, required, optional)
+import Util.Date
 
 
 type alias Post =
@@ -25,15 +26,9 @@ decoder =
         |> optional "url" string ""
         |> optional "contentText" string ""
         |> optional "contentHtml" string ""
-        |> optional "publishedAt" dateDecoder Nothing
-        |> optional "modifiedAt" dateDecoder Nothing
+        |> optional "publishedAt" Util.Date.decoder Nothing
+        |> optional "modifiedAt" Util.Date.decoder Nothing
         |> optional "tweets" (list Tweet.decoder) []
-
-
-dateDecoder : Decoder (Maybe Date)
-dateDecoder =
-    Decode.map Date.fromIsoString string
-        |> Decode.map Result.toMaybe
 
 
 listDecoder : Decoder (List Post)

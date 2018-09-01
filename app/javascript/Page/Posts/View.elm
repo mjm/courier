@@ -37,7 +37,7 @@ postEntry user now tweet =
     div []
         [ div [ class "columns" ]
             [ div [ class "column is-two-thirds" ]
-                [ tweetCard user tweet ]
+                [ tweetCard user tweet now ]
             , div [ class "column is-one-third" ]
                 [ postDetails tweet now ]
             ]
@@ -87,11 +87,11 @@ postDetails tweet now =
             ]
 
 
-tweetCard : User -> Editable PostTweet -> Html Message
-tweetCard user postTweet =
+tweetCard : User -> Editable PostTweet -> Date -> Html Message
+tweetCard user postTweet now =
     case postTweet of
         Viewing tweet ->
-            viewTweetCard user tweet
+            viewTweetCard user tweet now
 
         Editing _ tweet ->
             editTweetCard user tweet
@@ -100,12 +100,12 @@ tweetCard user postTweet =
             savingTweetCard user tweet.post
 
 
-viewTweetCard : User -> PostTweet -> Html Message
-viewTweetCard user tweet =
+viewTweetCard : User -> PostTweet -> Date -> Html Message
+viewTweetCard user tweet now =
     article [ class "card" ]
         [ div [ class "card-content" ]
             [ tweetUserInfo user tweet.post
-            , p [] [ text tweet.tweet.body ]
+            , p [ style [ ( "white-space", "pre-line" ) ] ] [ text tweet.tweet.body ]
             ]
         , footer [ class "card-footer" ] <|
             case tweet.tweet.status of
@@ -116,7 +116,7 @@ viewTweetCard user tweet =
                     canceledActions tweet.tweet
 
                 Posted ->
-                    postedActions tweet.tweet
+                    postedActions tweet.tweet now
         ]
 
 
@@ -185,12 +185,30 @@ canceledActions tweet =
     ]
 
 
-postedActions : Tweet -> List (Html msg)
-postedActions tweet =
+postedActions : Tweet -> Date -> List (Html msg)
+postedActions tweet now =
     [ div [ class "card-footer-item" ]
         [ icon Solid "check-circle"
-        , span [] [ text "Posted. " ]
-        , a [] [ text "View on Twitter" ]
+        , span []
+            [ text "Posted"
+            , case tweet.postedAt of
+                Just date ->
+                    text (" " ++ (relativeTime now date))
+
+                Nothing ->
+                    text ""
+            , text ". "
+            ]
+        , case tweet.tweetId of
+            Just tweetId ->
+                a
+                    [ href ("https://twitter.com/user/status/" ++ tweetId)
+                    , target "_blank"
+                    ]
+                    [ text "View on Twitter" ]
+
+            Nothing ->
+                text ""
         ]
     ]
 
