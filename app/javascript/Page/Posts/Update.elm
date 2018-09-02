@@ -38,6 +38,9 @@ update message model =
         PostsLoaded (Err _) ->
             ( model, Cmd.none )
 
+        DismissError error ->
+            ( removeError model error, Cmd.none )
+
         Tick time ->
             ( { model | now = Date.fromTime time }, Cmd.none )
 
@@ -48,7 +51,7 @@ update message model =
             ( updateTweet tweet model, Cmd.none )
 
         CanceledTweet (Err _) ->
-            ( model, Cmd.none )
+            ( addError model "Could not cancel posting the tweet right now. Please try again later.", Cmd.none )
 
         EditTweet tweet ->
             ( { model | tweets = editTweet tweet model.tweets }, Cmd.none )
@@ -70,7 +73,7 @@ update message model =
             ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
 
         TweetSaved (Err _) ->
-            ( model, Cmd.none )
+            ( addError model "Could not save the tweet right now. Please try again later.", Cmd.none )
 
         SubmitTweet tweet ->
             ( { model | tweets = savingTweet tweet model.tweets }, Http.send TweetSubmitted (Request.Tweet.post tweet) )
@@ -79,7 +82,7 @@ update message model =
             ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
 
         TweetSubmitted (Err _) ->
-            ( model, Cmd.none )
+            ( addError model "Could not post the tweet right now. Please try again later.", Cmd.none )
 
 
 handleCableMessage : ACMsg.Msg -> Model -> ( Model, Cmd Message )
@@ -163,3 +166,17 @@ saveTweet t =
     Editable.save
         (\x -> x.tweet.id == t.id)
         (\x -> { x | tweet = t })
+
+
+addError : Model -> String -> Model
+addError model err =
+    { model | errors = (err :: model.errors) }
+
+
+removeError : Model -> String -> Model
+removeError model err =
+    let
+        errors =
+            List.filter (\e -> not (e == err)) model.errors
+    in
+        { model | errors = errors }

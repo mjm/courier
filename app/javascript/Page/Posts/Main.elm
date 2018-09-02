@@ -21,6 +21,7 @@ init : Flags -> ( Model, Cmd Message )
 init flags =
     { tweets = tweetsFromFlags flags
     , user = userFromFlags flags
+    , errors = []
     , now = Date.fromTime 0
     , cable =
         ActionCable.initCable flags.cableUrl

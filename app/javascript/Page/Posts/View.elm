@@ -10,6 +10,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Page.Posts.Model exposing (Model, Message(..))
+import Views.Error as Error
 import Views.Icon exposing (..)
 import Views.Page as Page
 import Util.Editable as Editable exposing (Editable(..))
@@ -18,6 +19,7 @@ import Util.Editable as Editable exposing (Editable(..))
 view : Model -> Html Message
 view model =
     [ Page.navbar (Just model.user)
+    , Error.errors DismissError model.errors
     , section [ class "section" ]
         [ div [ class "container" ]
             [ div []

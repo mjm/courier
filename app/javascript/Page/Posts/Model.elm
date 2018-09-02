@@ -17,6 +17,7 @@ import Util.Editable exposing (Editable(..))
 type alias Model =
     { tweets : List (Editable PostTweet)
     , user : User
+    , errors : List String
     , now : Date
     , cable : ActionCable Message
     }
@@ -28,6 +29,7 @@ type Message
     | HandleSocketData ID.Identifier Decode.Value
     | UserLoaded (Result Http.Error User)
     | PostsLoaded (Result Http.Error (List Post))
+    | DismissError String
     | Tick Time
     | CancelTweet Tweet
     | CanceledTweet (Result Http.Error Tweet)
