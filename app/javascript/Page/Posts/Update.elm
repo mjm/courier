@@ -26,12 +26,6 @@ update message model =
         HandleSocketData id value ->
             handleSocketData id value model
 
-        UserLoaded (Ok user) ->
-            ( { model | user = user }, Cmd.none )
-
-        UserLoaded (Err _) ->
-            ( model, Cmd.none )
-
         PostsLoaded (Ok posts) ->
             ( { model | tweets = tweetsFromPosts posts }, Cmd.none )
 

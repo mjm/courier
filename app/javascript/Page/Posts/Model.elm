@@ -27,7 +27,6 @@ type Message
     = CableMsg ACMsg.Msg
     | Subscribe ()
     | HandleSocketData ID.Identifier Decode.Value
-    | UserLoaded (Result Http.Error User)
     | PostsLoaded (Result Http.Error (List Post))
     | DismissError String
     | Tick Time
