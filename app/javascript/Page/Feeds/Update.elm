@@ -1,7 +1,6 @@
 module Page.Feeds.Update exposing (Message(..), update)
 
 import Data.Feed exposing (Feed, DraftFeed)
-import Data.User exposing (User)
 import Dom
 import Http
 import Page.Feeds.Model exposing (Model)
@@ -12,7 +11,6 @@ import Task
 type Message
     = Noop
     | DismissError String
-    | UserLoaded (Result Http.Error User)
     | FeedsLoaded (Result Http.Error (List Feed))
     | SetAddingFeed Bool
     | SetDraftFeedUrl String
@@ -32,12 +30,6 @@ update message model =
 
         DismissError err ->
             ( removeError model err, Cmd.none )
-
-        UserLoaded (Ok user) ->
-            ( { model | user = user }, Cmd.none )
-
-        UserLoaded (Err _) ->
-            ( addError model "Could not your user profile. Please try again later.", Cmd.none )
 
         FeedsLoaded (Ok feeds) ->
             ( { model | feeds = feeds }, Cmd.none )
