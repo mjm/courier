@@ -7,9 +7,7 @@ class RefreshFeedWorker
 
   def perform(feed_id)
     @feed = Feed.find(feed_id)
-    feed_posts.each do |post|
-      import_post post
-    end
+    feed_posts.each { |post| import_post post }
     update_feed
   end
 
@@ -30,23 +28,11 @@ class RefreshFeedWorker
   end
 
   def feed_posts
-    []
-    # @feed_posts ||= (downloaded_feed&.posts || []).each do |post|
-    #   post.feed_id = feed.id
-    # end
+    @feed_posts ||= downloaded_feed&.posts || []
   end
 
   def import_post(post)
-    feed.feed_subscriptions.each do |subscription|
-      import_post_for_subscription post, subscription
-    end
-  end
-
-  def import_post_for_subscription(post, subscription)
-    logger.info "would import post for #{subscription.user.username}"
-    # posts_client.import_post(user_id: user_id,
-    #                          post: post,
-    #                          autopost_delay: autopost_delay(user_id))
+    feed.posts.import(post)
   end
 
   def autopost_delay(subscription)

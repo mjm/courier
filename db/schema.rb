@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_09_215727) do
+ActiveRecord::Schema.define(version: 2018_09_09_225704) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,6 +36,21 @@ ActiveRecord::Schema.define(version: 2018_09_09_215727) do
     t.string "etag"
     t.string "last_modified_at"
     t.index ["url"], name: "index_feeds_on_url", unique: true
+  end
+
+  create_table "posts", force: :cascade do |t|
+    t.bigint "feed_id", null: false
+    t.string "item_id", null: false
+    t.text "content_html", default: "", null: false
+    t.text "content_text", default: "", null: false
+    t.string "title", default: "", null: false
+    t.string "url", default: "", null: false
+    t.datetime "published_at"
+    t.datetime "modified_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["feed_id", "item_id"], name: "index_posts_on_feed_id_and_item_id", unique: true
+    t.index ["feed_id"], name: "index_posts_on_feed_id"
   end
 
   create_table "users", force: :cascade do |t|

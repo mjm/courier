@@ -52,16 +52,20 @@ class FeedDownloader
 
   def parse_posts(posts)
     posts.map do |item|
-      Courier::Post.new(
+      {
         item_id: item.fetch('id').to_s,
         title: item.fetch('title', ''),
         url: item.fetch('url', ''),
         content_text: item.fetch('content_text', ''),
         content_html: item.fetch('content_html', ''),
-        published_at: item.fetch('date_published', ''),
-        modified_at: item.fetch('date_modified', '')
-      )
+        published_at: parse_timestamp(item.fetch('date_published', '')),
+        modified_at: parse_timestamp(item.fetch('date_modified', ''))
+      }
     end
+  end
+
+  def parse_timestamp(time)
+    Time.iso8601(time) rescue nil
   end
 
   class NotFoundError < StandardError
