@@ -28,16 +28,6 @@ GIT
       twirp
       typhoeus
 
-GIT
-  remote: https://github.com/mjm/courier-tweeter.git
-  revision: 9a5b7f1176f232756ce6dee7fbb654a7f2c6f588
-  glob: client/*.gemspec
-  specs:
-    courier-tweeter (0.0.1)
-      jwt
-      twirp
-      typhoeus
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -274,7 +264,6 @@ DEPENDENCIES
   courier-feeds!
   courier-posts!
   courier-translator!
-  courier-tweeter!
   devise
   jbuilder (~> 2.5)
   jwt
