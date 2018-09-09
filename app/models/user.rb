@@ -16,4 +16,8 @@ class User < ApplicationRecord
       user.save
     end
   end
+
+  def register_feed(attrs)
+    Feed.register(self, attrs)
+  end
 end

@@ -7,13 +7,18 @@ import Json.Encode as Encode
 import Request.Helpers exposing (apiBuilder)
 
 
+tweetsBuilder : String -> HttpBuilder.RequestBuilder ()
+tweetsBuilder =
+    apiBuilder "Tweets"
+
+
 cancel : Tweet -> Http.Request Tweet
 cancel tweet =
     let
         body =
             Encode.object [ ( "id", Encode.int tweet.id ) ]
     in
-        apiBuilder "CancelTweet"
+        tweetsBuilder "CancelTweet"
             |> withJsonBody body
             |> withExpect (Http.expectJson Tweet.decoder)
             |> toRequest
@@ -29,7 +34,7 @@ update tweet shouldPost =
                 , ( "shouldPost", Encode.bool shouldPost )
                 ]
     in
-        apiBuilder "UpdateTweet"
+        tweetsBuilder "UpdateTweet"
             |> withJsonBody body
             |> withExpect (Http.expectJson Tweet.decoder)
             |> toRequest
@@ -41,7 +46,7 @@ post tweet =
         body =
             Encode.object [ ( "id", Encode.int tweet.id ) ]
     in
-        apiBuilder "SubmitTweet"
+        tweetsBuilder "SubmitTweet"
             |> withJsonBody body
             |> withExpect (Http.expectJson Tweet.decoder)
             |> toRequest

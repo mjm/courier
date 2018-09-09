@@ -8,13 +8,18 @@ import Json.Encode as Encode
 import Request.Helpers exposing (apiBuilder)
 
 
+feedsBuilder : String -> HttpBuilder.RequestBuilder ()
+feedsBuilder =
+    apiBuilder "Feeds"
+
+
 feeds : Http.Request (List Feed)
 feeds =
     let
         decoder =
             Decode.field "feeds" Feed.listDecoder
     in
-        apiBuilder "GetFeeds"
+        feedsBuilder "GetFeeds"
             |> withJsonBody (Encode.object [])
             |> withExpect (Http.expectJson decoder)
             |> toRequest
@@ -22,10 +27,14 @@ feeds =
 
 register : DraftFeed -> Http.Request Feed
 register feed =
-    apiBuilder "RegisterFeed"
-        |> withJsonBody (Feed.encode feed)
-        |> withExpect (Http.expectJson Feed.decoder)
-        |> toRequest
+    let
+        decoder =
+            Decode.field "feed" Feed.decoder
+    in
+        feedsBuilder "RegisterFeed"
+            |> withJsonBody (Feed.encode feed)
+            |> withExpect (Http.expectJson decoder)
+            |> toRequest
 
 
 refresh : Feed -> Http.Request ()
@@ -34,7 +43,7 @@ refresh feed =
         body =
             Encode.object [ ( "feed_id", Encode.int feed.id ) ]
     in
-        apiBuilder "RefreshFeed"
+        feedsBuilder "RefreshFeed"
             |> withJsonBody body
             |> withExpect (Http.expectJson (Decode.succeed ()))
             |> toRequest
@@ -49,7 +58,7 @@ updateSettings feed settings =
                 , ( "settings", Feed.encodeSettings settings )
                 ]
     in
-        apiBuilder "UpdateFeedSettings"
+        feedsBuilder "UpdateFeedSettings"
             |> withJsonBody body
             |> withExpect (Http.expectJson Feed.decoder)
             |> toRequest
