@@ -1,4 +1,6 @@
 class ServiceController
+  include ServiceHelper
+
   class << self
     def service
       @service ||= create_service
@@ -13,7 +15,8 @@ class ServiceController
     def create_service
       service_class.new(new).tap do |service|
         service.before do |rack_env, env|
-          # TODO: add auth info to the env
+          env[:warden] = rack_env['warden']
+          env[:user] = env[:warden].user
         end
       end
     end
