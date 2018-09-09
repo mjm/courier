@@ -9,9 +9,11 @@ gem 'courier-translator', github: 'mjm/courier-translator', glob: 'client/*.gems
 gem 'courier-tweeter', github: 'mjm/courier-tweeter', glob: 'client/*.gemspec'
 
 gem 'bunny'
+gem 'devise'
 gem 'jwt'
 gem 'omniauth'
 gem 'omniauth-twitter'
+gem 'pg'
 gem 'redis'
 gem 'xmlrpc'
 gem 'xmlrpc-rack_server'
