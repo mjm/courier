@@ -2,7 +2,6 @@ module Data.Post exposing (Post, decoder, listDecoder)
 
 import Data.Tweet as Tweet exposing (Tweet)
 import Date exposing (Date)
-import Date.Extra as Date
 import Json.Decode as Decode exposing (Decoder, string, list)
 import Json.Decode.Pipeline exposing (decode, required, optional)
 import Util.Date

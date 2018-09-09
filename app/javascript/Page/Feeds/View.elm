@@ -1,6 +1,8 @@
 module Page.Feeds.View exposing (view)
 
 import Data.Feed as Feed exposing (Feed, DraftFeed)
+import Date exposing (Date)
+import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -10,6 +12,7 @@ import Page.Feeds.Update exposing (Message(..))
 import Views.Error as Error
 import Views.Icon exposing (..)
 import Views.Page as Page
+import Util.URL as URL
 
 
 view : Model -> Html Message
@@ -23,7 +26,7 @@ view model =
             , hr [] []
             , div [ class "columns" ]
                 [ div [ class "column is-8 is-offset-2" ]
-                    [ feeds model.feeds
+                    [ feeds model.feeds model.now
                     , addFeedView model
                     ]
                 ]
@@ -34,8 +37,8 @@ view model =
         |> div []
 
 
-feeds : List Feed -> Html Message
-feeds fs =
+feeds : List Feed -> Date -> Html Message
+feeds fs now =
     case fs of
         [] ->
             p [ class "has-text-centered" ]
@@ -43,18 +46,52 @@ feeds fs =
 
         fs ->
             table [ class "table is-fullwidth" ]
-                [ List.map feedRow fs |> tbody [] ]
+                [ List.map (feedRow now) fs |> tbody [] ]
 
 
-feedRow : Feed -> Html Message
-feedRow feed =
+feedRow : Date -> Feed -> Html Message
+feedRow now feed =
     tr []
-        [ td []
+        [ td
+            [ style
+                [ ( "width", "1rem" )
+                , ( "padding-right", "0" )
+                ]
+            ]
             [ span [ class "icon is-medium has-text-link" ]
                 [ i [ class "fas fa-rss fa-lg" ] [] ]
-            , span [ class "is-size-5" ] [ text (Feed.displayName feed) ]
             ]
-        , td [ class "has-text-right" ] [ feedDropdown feed ]
+        , td []
+            [ h1 [ class "title is-4" ]
+                [ span [] [ text (Feed.displayName feed) ]
+                ]
+            , h2 [ class "subtitle is-6" ]
+                [ a
+                    [ href feed.homePageUrl
+                    , rel "noopener"
+                    , target "_blank"
+                    ]
+                    [ span [ class "icon has-text-grey-light" ] [ i [ class "fas fa-home" ] [] ]
+                    , span [ class "has-text-grey" ] [ text (URL.displayUrl feed.homePageUrl) ]
+                    ]
+                ]
+            ]
+        , td
+            [ class "has-text-right has-text-grey is-size-7"
+            , style [ ( "vertical-align", "middle" ) ]
+            ]
+            [ case feed.refreshedAt of
+                Just date ->
+                    text ("last checked " ++ (relativeTime now date))
+
+                Nothing ->
+                    text ""
+            ]
+        , td
+            [ class "has-text-right"
+            , style [ ( "vertical-align", "middle" ) ]
+            ]
+            [ feedDropdown feed ]
         ]
 
 
@@ -72,15 +109,6 @@ feedDropdown feed =
             , div [ class "dropdown-menu has-text-left" ]
                 [ div [ class "dropdown-content" ]
                     [ a
-                        [ class "dropdown-item"
-                        , href feed.homePageUrl
-                        , rel "noopener"
-                        , target "_blank"
-                        ]
-                        [ icon Solid "external-link-square-alt"
-                        , span [] [ text "Open Home Page" ]
-                        ]
-                    , a
                         [ class "dropdown-item"
                         , onClick (RefreshFeed feed)
                         ]

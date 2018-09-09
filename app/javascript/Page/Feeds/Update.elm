@@ -1,16 +1,19 @@
 module Page.Feeds.Update exposing (Message(..), update)
 
 import Data.Feed exposing (Feed, DraftFeed)
+import Date
 import Dom
 import Http
 import Page.Feeds.Model exposing (Model)
 import Request.Feed
 import Task
+import Time exposing (Time)
 
 
 type Message
     = Noop
     | DismissError String
+    | Tick Time
     | FeedsLoaded (Result Http.Error (List Feed))
     | SetAddingFeed Bool
     | SetDraftFeedUrl String
@@ -30,6 +33,9 @@ update message model =
 
         DismissError err ->
             ( removeError model err, Cmd.none )
+
+        Tick time ->
+            ( { model | now = Date.fromTime time }, Cmd.none )
 
         FeedsLoaded (Ok feeds) ->
             ( { model | feeds = feeds }, Cmd.none )

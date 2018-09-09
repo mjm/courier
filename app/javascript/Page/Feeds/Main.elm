@@ -2,12 +2,15 @@ module Page.Feeds.Main exposing (main)
 
 import Data.Feed as Feed exposing (Feed)
 import Data.User as User exposing (User)
+import Date
 import Html
 import Json.Decode exposing (decodeValue)
 import Page.Feeds.Flags exposing (Flags)
 import Page.Feeds.Model as Model exposing (Model)
 import Page.Feeds.Update exposing (Message(..), update)
 import Page.Feeds.View exposing (view)
+import Task
+import Time
 import Unwrap
 
 
@@ -17,8 +20,9 @@ init flags =
     , feeds = feedsFromFlags flags
     , draftFeed = Nothing
     , errors = []
+    , now = Date.fromTime 0
     }
-        ! []
+        ! [ Task.perform Tick Time.now ]
 
 
 feedsFromFlags : Flags -> List Feed
@@ -35,7 +39,7 @@ userFromFlags flags =
 
 subscriptions : Model -> Sub Message
 subscriptions model =
-    Sub.none
+    Time.every (10 * Time.second) Tick
 
 
 main : Program Flags Model Message

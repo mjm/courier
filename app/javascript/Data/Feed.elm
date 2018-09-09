@@ -1,14 +1,17 @@
 module Data.Feed exposing (Feed, DraftFeed, SettingsChanges, displayName, decoder, listDecoder, encode, encodeSettings)
 
+import Date exposing (Date)
 import Json.Decode as Decode exposing (Decoder, int, string, list, bool)
 import Json.Decode.Pipeline exposing (decode, required, optional)
 import Json.Encode as Encode exposing (Value)
+import Util.Date
 
 
 type alias Feed =
     { id : Int
     , url : String
     , title : String
+    , refreshedAt : Maybe Date
     , homePageUrl : String
     , settings : Settings
     }
@@ -45,6 +48,7 @@ decoder =
         |> required "id" int
         |> required "url" string
         |> optional "title" string ""
+        |> optional "refreshedAt" Util.Date.decoder Nothing
         |> optional "homePageUrl" string ""
         |> optional "settings" settingsDecoder defaultSettings
 
