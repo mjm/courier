@@ -1,4 +1,7 @@
 class Feed < ApplicationRecord
+  has_many :feed_subscriptions
+  has_many :users, through: :feed_subscriptions
+
   def to_message
     FeedMessage.new(
       id: id,

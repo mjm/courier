@@ -4,6 +4,9 @@ class User < ApplicationRecord
   devise :registerable, :rememberable, :omniauthable, :trackable,
          omniauth_providers: %i[twitter]
 
+  has_many :feed_subscriptions
+  has_many :feeds, through: :feed_subscriptions
+
   def self.from_omniauth(auth)
     where(provider: auth.provider, uid: auth.uid).first_or_initialize.tap do |user|
       user.username = auth.info.nickname

@@ -8,7 +8,7 @@ class PagesController < ApplicationController
 
   def feeds
     @feeds_json = GetFeedsResponse.encode_json(
-      GetFeedsResponse.new(feeds: Feed.all.to_message)
+      GetFeedsResponse.new(feeds: current_user.feeds.to_message)
     )
   end
 

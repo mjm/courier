@@ -10,10 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_09_202516) do
+ActiveRecord::Schema.define(version: 2018_09_09_204625) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "feed_subscriptions", force: :cascade do |t|
+    t.bigint "feed_id", null: false
+    t.bigint "user_id", null: false
+    t.boolean "autopost", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["feed_id"], name: "index_feed_subscriptions_on_feed_id"
+    t.index ["user_id"], name: "index_feed_subscriptions_on_user_id"
+  end
 
   create_table "feeds", force: :cascade do |t|
     t.string "url", null: false
@@ -42,4 +52,6 @@ ActiveRecord::Schema.define(version: 2018_09_09_202516) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "feed_subscriptions", "feeds"
+  add_foreign_key "feed_subscriptions", "users"
 end
