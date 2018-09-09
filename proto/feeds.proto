@@ -1,0 +1,27 @@
+syntax = 'proto3';
+
+service Feeds {
+  rpc GetFeeds(GetFeedsRequest) returns (GetFeedsResponse);
+}
+
+message GetFeedsRequest {
+}
+
+message GetFeedsResponse {
+  repeated FeedMessage feeds = 1;
+}
+
+message FeedMessage {
+  int64               id            = 1;
+  string              url           = 2;
+  string              created_at    = 3;
+  string              updated_at    = 4;
+  string              refreshed_at  = 5;
+  string              title         = 6;
+  string              home_page_url = 7;
+  FeedSettingsMessage settings      = 8;
+}
+
+message FeedSettingsMessage {
+  bool  autopost  = 1;
+}

@@ -1,13 +1,4 @@
-require Rails.root / 'app/service/courier_gateway_twirp'
-
 class ApiHandler
-  def get_user_info(_req, env)
-    require_user env do |user|
-      { username: user['username'],
-        name: user['name'] }
-    end
-  end
-
   def get_posts(_req, env)
     require_user env do |user|
       forward posts_client(env).get_user_posts(user_id: user['id'])

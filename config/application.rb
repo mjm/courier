@@ -17,3 +17,5 @@ module CourierGateway
     # the framework and any gems in your application.
   end
 end
+
+Dir[Rails.root / 'app/messages/*.rb'].each { |file| require file }

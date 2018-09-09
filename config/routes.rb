@@ -6,11 +6,13 @@ Rails.application.routes.draw do
     delete 'sign_out', to: 'users/sessions#destroy', as: :destroy_user_session
   end
 
-  api_service = ApiHandler.service
-  mount api_service, at: api_service.full_name
+  # Twirp services
+  mount FeedsController.service, at: FeedsController.path
 
+  # XML-RPC ping service
   mount PingService, at: '/ping'
 
+  # Elm pages
   get '/feeds', to: 'pages#feeds'
   root to: 'pages#index'
 end
