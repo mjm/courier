@@ -15,6 +15,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "RegisterFeedResponse" do
     optional :feed, :message, 1, "FeedMessage"
   end
+  add_message "RefreshFeedRequest" do
+    optional :id, :int64, 1
+  end
+  add_message "RefreshFeedResponse" do
+  end
   add_message "FeedMessage" do
     optional :id, :int64, 1
     optional :url, :string, 2
@@ -34,5 +39,7 @@ GetFeedsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("GetFee
 GetFeedsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("GetFeedsResponse").msgclass
 RegisterFeedRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("RegisterFeedRequest").msgclass
 RegisterFeedResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("RegisterFeedResponse").msgclass
+RefreshFeedRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("RefreshFeedRequest").msgclass
+RefreshFeedResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("RefreshFeedResponse").msgclass
 FeedMessage = Google::Protobuf::DescriptorPool.generated_pool.lookup("FeedMessage").msgclass
 FeedSettingsMessage = Google::Protobuf::DescriptorPool.generated_pool.lookup("FeedSettingsMessage").msgclass

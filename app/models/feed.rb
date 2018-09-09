@@ -12,6 +12,10 @@ class Feed < ApplicationRecord
     end
   end
 
+  def refresh
+    RefreshFeedWorker.perform_async(id)
+  end
+
   def to_message
     FeedMessage.new(
       id: id,

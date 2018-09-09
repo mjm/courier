@@ -6,6 +6,7 @@ class FeedsService < Twirp::Service
   service 'Feeds'
   rpc :GetFeeds, GetFeedsRequest, GetFeedsResponse, :ruby_method => :get_feeds
   rpc :RegisterFeed, RegisterFeedRequest, RegisterFeedResponse, :ruby_method => :register_feed
+  rpc :RefreshFeed, RefreshFeedRequest, RefreshFeedResponse, :ruby_method => :refresh_feed
 end
 
 class FeedsClient < Twirp::Client

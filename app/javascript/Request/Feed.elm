@@ -41,7 +41,7 @@ refresh : Feed -> Http.Request ()
 refresh feed =
     let
         body =
-            Encode.object [ ( "feed_id", Encode.int feed.id ) ]
+            Encode.object [ ( "id", Encode.int feed.id ) ]
     in
         feedsBuilder "RefreshFeed"
             |> withJsonBody body

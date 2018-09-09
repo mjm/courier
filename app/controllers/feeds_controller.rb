@@ -11,4 +11,14 @@ class FeedsController < ServiceController
       RegisterFeedResponse.new(feed: feed.to_message)
     end
   end
+
+  def refresh_feed(req, env)
+    require_user env do |user|
+      feed = user.feeds.find(req.id)
+      return Twirp::Error.not_found unless feed.present?
+
+      feed.refresh
+      RefreshFeedResponse.new
+    end
+  end
 end

@@ -3,6 +3,7 @@ syntax = 'proto3';
 service Feeds {
   rpc GetFeeds(GetFeedsRequest) returns (GetFeedsResponse);
   rpc RegisterFeed(RegisterFeedRequest) returns (RegisterFeedResponse);
+  rpc RefreshFeed(RefreshFeedRequest) returns (RefreshFeedResponse);
 }
 
 message GetFeedsRequest {
@@ -18,6 +19,13 @@ message RegisterFeedRequest {
 
 message RegisterFeedResponse {
   FeedMessage  feed  = 1;
+}
+
+message RefreshFeedRequest {
+  int64  id  = 1;
+}
+
+message RefreshFeedResponse {
 }
 
 message FeedMessage {
