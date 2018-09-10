@@ -6,6 +6,7 @@ class Tweet < ApplicationRecord
   delegate :user, to: :feed_subscription
 
   enum status: %i[draft canceled posted]
+  validate :valid_status_change
 
   def to_message
     TweetMessage.new(
@@ -16,5 +17,13 @@ class Tweet < ApplicationRecord
       posted_at: posted_at ? posted_at.getutc.iso8601 : '',
       posted_tweet_id: posted_tweet_id || ''
     )
+  end
+
+  def valid_status_change
+    if status_was == 'posted' && !posted?
+      errors.add(:status, "can't change once posted")
+    elsif status_was == 'canceled' && posted?
+      errors.add(:status, "can't go from canceled to posted")
+    end
   end
 end
