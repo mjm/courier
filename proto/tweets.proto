@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+service Tweets {
+  rpc GetTweets(GetTweetsRequest) returns (GetTweetsResponse);
+}
+
+message GetTweetsRequest {
+}
+
+message GetTweetsResponse {
+  repeated TweetMessage  tweets  = 1;
+}
+
+message TweetMessage {
+  enum Status {
+    DRAFT     = 0;
+    CANCELED  = 1;
+    POSTED    = 2;
+  }
+
+  int64        id               = 1;
+  string       body             = 2;
+  PostMessage  post             = 3;
+  Status       status           = 4;
+  string       posted_at        = 5;
+  string       posted_tweet_id  = 6;
+}
+
+message PostMessage {
+  int64   id            = 1;
+  string  url           = 2;
+  string  published_at  = 3;
+  string  modified_at   = 4;
+}

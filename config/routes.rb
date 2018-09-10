@@ -8,6 +8,7 @@ Rails.application.routes.draw do
 
   # Twirp services
   mount FeedsController.service, at: FeedsController.path
+  mount TweetsController.service, at: TweetsController.path
 
   # XML-RPC ping service
   mount PingService, at: '/ping'

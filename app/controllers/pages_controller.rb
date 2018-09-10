@@ -3,7 +3,9 @@ class PagesController < ApplicationController
   before_action :set_user_json
 
   def index
-    @posts_json = { posts: [] }.to_json
+    @tweets_json = GetTweetsResponse.encode_json(
+      GetTweetsResponse.new(tweets: current_user.tweets.to_message)
+    )
   end
 
   def feeds
