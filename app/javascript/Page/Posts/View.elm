@@ -1,8 +1,6 @@
 module Page.Posts.View exposing (view)
 
-import Data.Post exposing (Post)
-import Data.PostTweet exposing (PostTweet)
-import Data.Tweet exposing (Tweet, Status(..))
+import Data.Tweet exposing (Tweet, PostInfo, Status(..))
 import Data.User as User exposing (User)
 import Date exposing (Date)
 import DateFormat.Relative exposing (relativeTime)
@@ -34,7 +32,7 @@ view model =
         |> div []
 
 
-postEntry : User -> Date -> Editable PostTweet -> Html Message
+postEntry : User -> Date -> Editable Tweet -> Html Message
 postEntry user now tweet =
     div []
         [ div [ class "columns" ]
@@ -46,7 +44,7 @@ postEntry user now tweet =
         ]
 
 
-postDetails : Editable PostTweet -> Date -> Html Message
+postDetails : Editable Tweet -> Date -> Html Message
 postDetails tweet now =
     let
         t =
@@ -89,7 +87,7 @@ postDetails tweet now =
             ]
 
 
-tweetCard : User -> Editable PostTweet -> Date -> Html Message
+tweetCard : User -> Editable Tweet -> Date -> Html Message
 tweetCard user postTweet now =
     case postTweet of
         Viewing tweet ->
@@ -102,27 +100,27 @@ tweetCard user postTweet now =
             savingTweetCard user tweet.post
 
 
-viewTweetCard : User -> PostTweet -> Date -> Html Message
+viewTweetCard : User -> Tweet -> Date -> Html Message
 viewTweetCard user tweet now =
     article [ class "card" ]
         [ div [ class "card-content" ]
             [ tweetUserInfo user tweet.post
-            , p [ style [ ( "white-space", "pre-line" ) ] ] [ text tweet.tweet.body ]
+            , p [ style [ ( "white-space", "pre-line" ) ] ] [ text tweet.body ]
             ]
         , footer [ class "card-footer" ] <|
-            case tweet.tweet.status of
+            case tweet.status of
                 Draft ->
-                    draftActions tweet.tweet
+                    draftActions tweet
 
                 Canceled ->
-                    canceledActions tweet.tweet
+                    canceledActions tweet
 
                 Posted ->
-                    postedActions tweet.tweet now
+                    postedActions tweet now
         ]
 
 
-editTweetCard : User -> PostTweet -> Html Message
+editTweetCard : User -> Tweet -> Html Message
 editTweetCard user tweet =
     Html.form [ action "javascript:void(0);" ]
         [ article [ class "card" ]
@@ -133,19 +131,19 @@ editTweetCard user tweet =
                         [ textarea
                             [ class "textarea"
                             , autofocus True
-                            , onInput (SetTweetBody tweet.tweet)
-                            , value tweet.tweet.body
+                            , onInput (SetTweetBody tweet)
+                            , value tweet.body
                             ]
                             []
                         ]
                     ]
                 ]
-            , footer [ class "card-footer" ] <| editActions tweet.tweet
+            , footer [ class "card-footer" ] <| editActions tweet
             ]
         ]
 
 
-savingTweetCard : User -> Post -> Html Message
+savingTweetCard : User -> PostInfo -> Html Message
 savingTweetCard user post =
     article [ class "card" ]
         [ div [ class "card-content" ]
@@ -235,7 +233,7 @@ editActions tweet =
     ]
 
 
-tweetUserInfo : User -> Post -> Html Message
+tweetUserInfo : User -> PostInfo -> Html Message
 tweetUserInfo user post =
     header [ class "media" ]
         [ div [ class "media-left" ]

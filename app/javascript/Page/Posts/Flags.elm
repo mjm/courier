@@ -4,7 +4,7 @@ import Json.Decode
 
 
 type alias Flags =
-    { posts : Json.Decode.Value
+    { tweets : Json.Decode.Value
     , user : Json.Decode.Value
     , cableUrl : String
     }

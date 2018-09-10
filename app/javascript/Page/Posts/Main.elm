@@ -1,8 +1,7 @@
 module Page.Posts.Main exposing (main)
 
 import ActionCable
-import Data.Post as Post
-import Data.PostTweet as PostTweet exposing (PostTweet)
+import Data.Tweet as Tweet exposing (Tweet)
 import Data.User as User exposing (User)
 import Date
 import Html
@@ -31,11 +30,10 @@ init flags =
         ! [ Task.perform Tick Time.now ]
 
 
-tweetsFromFlags : Flags -> List (Editable PostTweet)
+tweetsFromFlags : Flags -> List (Editable Tweet)
 tweetsFromFlags flags =
-    decodeValue Post.listDecoder flags.posts
+    decodeValue Tweet.listDecoder flags.tweets
         |> Unwrap.result
-        |> List.concatMap (PostTweet.fromPost)
         |> List.map Viewing
 
 

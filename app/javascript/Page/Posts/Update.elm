@@ -26,12 +26,6 @@ update message model =
         HandleSocketData id value ->
             handleSocketData id value model
 
-        PostsLoaded (Ok posts) ->
-            ( { model | tweets = tweetsFromPosts posts }, Cmd.none )
-
-        PostsLoaded (Err _) ->
-            ( model, Cmd.none )
-
         DismissError error ->
             ( removeError model error, Cmd.none )
 
@@ -120,46 +114,44 @@ updateTweet tweet model =
         { model | tweets = updatedTweets }
 
 
-updatePostTweet : Tweet -> Editable PostTweet -> Editable PostTweet
-updatePostTweet tweet postTweet =
-    case postTweet of
+updatePostTweet : Tweet -> Editable Tweet -> Editable Tweet
+updatePostTweet tweet existing =
+    case existing of
         Viewing t ->
-            Viewing (PostTweet.updateTweet t tweet)
+            Viewing (Tweet.update t tweet)
 
         Editing orig edit ->
-            Editing (PostTweet.updateTweet orig tweet) edit
+            Editing (Tweet.update orig tweet) edit
 
         Saving orig edit ->
-            Saving (PostTweet.updateTweet orig tweet) edit
+            Saving (Tweet.update orig tweet) edit
 
 
-editTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
+editTweet : Tweet -> List (Editable Tweet) -> List (Editable Tweet)
 editTweet t =
-    Editable.edit (\x -> x.tweet.id == t.id)
+    Editable.edit (\x -> x.id == t.id)
 
 
-updateDraftTweet : (Tweet -> Tweet) -> Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
+updateDraftTweet : (Tweet -> Tweet) -> Tweet -> List (Editable Tweet) -> List (Editable Tweet)
 updateDraftTweet f t =
-    Editable.updateDraft
-        (\x -> x.tweet.id == t.id)
-        (\x -> { x | tweet = f x.tweet })
+    Editable.updateDraft (\x -> x.id == t.id) f
 
 
-cancelEditTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
+cancelEditTweet : Tweet -> List (Editable Tweet) -> List (Editable Tweet)
 cancelEditTweet t =
-    Editable.cancel (\x -> x.tweet.id == t.id)
+    Editable.cancel (\x -> x.id == t.id)
 
 
-savingTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
+savingTweet : Tweet -> List (Editable Tweet) -> List (Editable Tweet)
 savingTweet t =
-    Editable.saving (\x -> x.tweet.id == t.id)
+    Editable.saving (\x -> x.id == t.id)
 
 
-saveTweet : Tweet -> List (Editable PostTweet) -> List (Editable PostTweet)
+saveTweet : Tweet -> List (Editable Tweet) -> List (Editable Tweet)
 saveTweet t =
     Editable.save
-        (\x -> x.tweet.id == t.id)
-        (\x -> { x | tweet = t })
+        (\x -> x.id == t.id)
+        (\_ -> t)
 
 
 addError : Model -> String -> Model

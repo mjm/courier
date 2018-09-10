@@ -3,8 +3,6 @@ module Page.Posts.Model exposing (Model, Message(..))
 import ActionCable exposing (ActionCable)
 import ActionCable.Identifier as ID
 import ActionCable.Msg as ACMsg
-import Data.Post exposing (Post)
-import Data.PostTweet exposing (PostTweet)
 import Data.Tweet exposing (Tweet)
 import Data.User exposing (User)
 import Date exposing (Date)
@@ -15,7 +13,7 @@ import Util.Editable exposing (Editable(..))
 
 
 type alias Model =
-    { tweets : List (Editable PostTweet)
+    { tweets : List (Editable Tweet)
     , user : User
     , errors : List String
     , now : Date
@@ -27,7 +25,6 @@ type Message
     = CableMsg ACMsg.Msg
     | Subscribe ()
     | HandleSocketData ID.Identifier Decode.Value
-    | PostsLoaded (Result Http.Error (List Post))
     | DismissError String
     | Tick Time
     | CancelTweet Tweet
