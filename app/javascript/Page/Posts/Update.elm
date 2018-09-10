@@ -3,8 +3,6 @@ module Page.Posts.Update exposing (update)
 import ActionCable
 import ActionCable.Msg as ACMsg
 import ActionCable.Identifier as ID
-import Data.Post exposing (Post)
-import Data.PostTweet as PostTweet exposing (PostTweet)
 import Data.Tweet as Tweet exposing (Tweet)
 import Date exposing (Date)
 import Page.Posts.Model exposing (Model, Message(..))
@@ -97,12 +95,6 @@ handleSocketData id value model =
 
         Err _ ->
             ( model, Cmd.none )
-
-
-tweetsFromPosts : List Post -> List (Editable PostTweet)
-tweetsFromPosts posts =
-    List.concatMap (PostTweet.fromPost) posts
-        |> List.map Viewing
 
 
 updateTweet : Tweet -> Model -> Model
