@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_09_225704) do
+ActiveRecord::Schema.define(version: 2018_09_10_022955) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -51,6 +51,19 @@ ActiveRecord::Schema.define(version: 2018_09_09_225704) do
     t.datetime "updated_at", null: false
     t.index ["feed_id", "item_id"], name: "index_posts_on_feed_id_and_item_id", unique: true
     t.index ["feed_id"], name: "index_posts_on_feed_id"
+  end
+
+  create_table "tweets", force: :cascade do |t|
+    t.bigint "post_id", null: false
+    t.bigint "feed_subscription_id", null: false
+    t.text "body"
+    t.integer "status", default: 0, null: false
+    t.datetime "posted_at"
+    t.string "posted_tweet_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["feed_subscription_id"], name: "index_tweets_on_feed_subscription_id"
+    t.index ["post_id"], name: "index_tweets_on_post_id"
   end
 
   create_table "users", force: :cascade do |t|
