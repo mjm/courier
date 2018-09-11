@@ -12,4 +12,13 @@ class TweetsController < ServiceController
       CancelTweetResponse.new(tweet: tweet.to_message)
     end
   end
+
+  def update_tweet(req, env)
+    require_user env do |user|
+      tweet = user.tweets.find(req.id)
+      tweet.update body: req.body
+      # TODO: support should_post
+      UpdateTweetResponse.new(tweet: tweet.to_message)
+    end
+  end
 end

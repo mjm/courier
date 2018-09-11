@@ -37,10 +37,13 @@ update tweet shouldPost =
                 , ( "body", Encode.string tweet.body )
                 , ( "shouldPost", Encode.bool shouldPost )
                 ]
+
+        decoder =
+            Decode.field "tweet" Tweet.decoder
     in
         tweetsBuilder "UpdateTweet"
             |> withJsonBody body
-            |> withExpect (Http.expectJson Tweet.decoder)
+            |> withExpect (Http.expectJson decoder)
             |> toRequest
 
 

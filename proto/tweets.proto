@@ -3,6 +3,7 @@ syntax = "proto3";
 service Tweets {
   rpc GetTweets(GetTweetsRequest) returns (GetTweetsResponse);
   rpc CancelTweet(CancelTweetRequest) returns (CancelTweetResponse);
+  rpc UpdateTweet(UpdateTweetRequest) returns (UpdateTweetResponse);
 }
 
 message GetTweetsRequest {
@@ -17,6 +18,16 @@ message CancelTweetRequest {
 }
 
 message CancelTweetResponse {
+  TweetMessage  tweet  = 1;
+}
+
+message UpdateTweetRequest {
+  int64   id           = 1;
+  string  body         = 2;
+  bool    should_post  = 3;
+}
+
+message UpdateTweetResponse {
   TweetMessage  tweet  = 1;
 }
 
