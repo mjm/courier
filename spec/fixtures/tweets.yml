@@ -1,0 +1,4 @@
+alice_example_status:
+  post: example_status
+  feed_subscription: alice_example
+  body: This is an example status post.

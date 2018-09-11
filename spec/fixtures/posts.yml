@@ -1,0 +1,7 @@
+example_status:
+  feed: example
+  item_id: abc
+  url: https://example.org/abc
+  content_html: <p>This is an example status post.</p>
+  published_at: <%= Time.utc(2018, 2, 2).to_s(:db) %>
+  modified_at: <%= Time.utc(2018, 2, 3).to_s(:db) %>
