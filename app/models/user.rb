@@ -6,7 +6,7 @@ class User < ApplicationRecord
 
   has_many :feed_subscriptions
   has_many :feeds, through: :feed_subscriptions
-  has_many :tweets, through: :feed_subscriptions
+  has_many :tweets, -> { includes(:post).order('posts.published_at desc') }, through: :feed_subscriptions
 
   def self.from_omniauth(auth)
     where(provider: auth.provider, uid: auth.uid).first_or_initialize.tap do |user|
