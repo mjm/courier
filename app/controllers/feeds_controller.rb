@@ -14,11 +14,10 @@ class FeedsController < ServiceController
 
   def refresh_feed(req, env)
     require_user env do |user|
-      feed = user.feeds.find(req.id)
-      return Twirp::Error.not_found unless feed.present?
-
-      feed.refresh
+      user.feeds.find(req.id).refresh
       RefreshFeedResponse.new
+    rescue ActiveRecord::RecordNotFound
+      Twirp::Error.not_found "Could not find feed #{req.id}"
     end
   end
 end
