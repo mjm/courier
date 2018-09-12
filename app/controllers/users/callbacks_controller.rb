@@ -1,4 +1,4 @@
-class AuthController < Devise::OmniauthCallbacksController
+class Users::CallbacksController < Devise::OmniauthCallbacksController
   def twitter
     @user = User.from_omniauth(request.env['omniauth.auth'])
 
