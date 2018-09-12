@@ -6,14 +6,8 @@ class PingService
     server.call(env)
   end
 
-  def ping(title, url)
-    feeds_client.ping(title: title, url: url)
+  def ping(_title, url)
+    Feed.by_home_page(url).each(&:refresh)
     { flerror: false, message: 'Thanks for the ping!' }
-  end
-
-  private
-
-  def feeds_client
-    Courier::FeedsClient.connect
   end
 end

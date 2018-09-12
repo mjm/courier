@@ -13,6 +13,11 @@ class Feed < ApplicationRecord
     end
   end
 
+  scope :by_home_page, lambda { |url|
+    normalized_url = Addressable::URI.parse(url).normalize.to_s
+    where(home_page_url: normalized_url)
+  }
+
   class << self
     def register(user, url:)
       Feed.where(url: url).first_or_create.tap do |feed|
