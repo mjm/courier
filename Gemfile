@@ -12,6 +12,7 @@ gem 'omniauth'
 gem 'omniauth-twitter'
 gem 'pg'
 gem 'sidekiq'
+gem 'twirp'
 gem 'xmlrpc'
 gem 'xmlrpc-rack_server'
 
