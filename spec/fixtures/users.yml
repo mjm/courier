@@ -1,6 +1,10 @@
 alice:
+  provider: twitter
+  uid: alice123
   username: alice123
   name: Alice
+  twitter_access_token: aslkdjfalksdfj
+  twitter_access_secret: aslkdjfaksdfj
 
 bob:
   username: bob456
