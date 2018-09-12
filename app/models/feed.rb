@@ -7,6 +7,8 @@ class Feed < ApplicationRecord
       where(item_id: attrs.fetch(:item_id)).first_or_initialize.tap do |post|
         post.attributes = attrs
         post.save
+
+        TranslateTweetWorker.perform_async(post.id)
       end
     end
   end

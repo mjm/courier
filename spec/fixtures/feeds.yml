@@ -10,5 +10,5 @@ refreshed_example:
   title: Example.com
   home_page_url: https://example.com/
   refreshed_at: <%= Time.utc(2018, 1, 1).to_s(:db) %>
-  etag: abcdef
+  etag: '"abcdef"'
   last_modified_at: Mon Sep 10 19:12:35 CDT 2018
