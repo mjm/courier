@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Courier</title>
+    <%= csrf_meta_tags %>
+    <%= action_cable_meta_tag %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_pack_tag 'main' %>
+    <%= yield :script %>
+  </head>
+
+  <body>
+    <div id="elm-container"></div>
+    <%# NOTE: this doesn't output the yielded content
+      All page content should be coming from Elm.
+      The yield is needed for the script content to be populated. %>
+    <% yield %>
+  </body>
+</html>

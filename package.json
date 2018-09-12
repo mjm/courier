@@ -4,6 +4,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.2.0",
     "@rails/webpacker": "3.5",
+    "actioncable": "^5.2.1",
     "bulma": "^0.7.1",
     "csrf-xhr": "^1.0.0",
     "elm": "^0.18.0",

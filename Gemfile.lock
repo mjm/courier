@@ -1,33 +1,3 @@
-GIT
-  remote: https://github.com/mjm/courier-feeds.git
-  revision: 73fe8a3ca4c1d8b8e6bf335021a889e747fc0d03
-  glob: client/*.gemspec
-  specs:
-    courier-feeds (0.0.1)
-      jwt
-      twirp
-      typhoeus
-
-GIT
-  remote: https://github.com/mjm/courier-posts.git
-  revision: 6e024287f08b20681154fb10275a863b9dd059a3
-  glob: client/*.gemspec
-  specs:
-    courier-posts (0.0.1)
-      jwt
-      twirp
-      typhoeus
-
-GIT
-  remote: https://github.com/mjm/courier-translator.git
-  revision: 0adaf0ec2dedfaa5932be32ed74ba20ec0e22457
-  glob: client/*.gemspec
-  specs:
-    courier-translator (0.0.1)
-      jwt
-      twirp
-      typhoeus
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -86,6 +56,8 @@ GEM
     byebug (10.0.2)
     concurrent-ruby (1.0.5)
     connection_pool (2.2.2)
+    crack (0.4.3)
+      safe_yaml (~> 1.0.0)
     crass (1.0.4)
     devise (4.5.0)
       bcrypt (~> 3.0)
@@ -95,21 +67,16 @@ GEM
       warden (~> 1.2.3)
     diff-lcs (1.3)
     erubi (1.7.1)
-    ethon (0.11.0)
-      ffi (>= 1.3.0)
     execjs (2.7.0)
     faraday (0.15.2)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.25)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
-    google-protobuf (3.6.1)
+    hashdiff (0.3.7)
     hashie (3.5.7)
     i18n (1.1.0)
       concurrent-ruby (~> 1.0)
-    jbuilder (2.7.0)
-      activesupport (>= 4.2.0)
-      multi_json (>= 1.2)
     jwt (2.1.0)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -128,7 +95,6 @@ GEM
     mini_portile2 (2.3.0)
     minitest (5.11.3)
     msgpack (1.2.4)
-    multi_json (1.13.1)
     multipart-post (2.0.0)
     nio4r (2.3.1)
     nokogiri (1.8.4)
@@ -204,6 +170,7 @@ GEM
       rspec-support (~> 3.8.0)
     rspec-support (3.8.0)
     ruby_dep (1.5.0)
+    safe_yaml (1.0.4)
     sass (3.5.7)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -234,14 +201,6 @@ GEM
     thor (0.20.0)
     thread_safe (0.3.6)
     tilt (2.0.8)
-    turbolinks (5.1.1)
-      turbolinks-source (~> 5.1)
-    turbolinks-source (5.1.0)
-    twirp (1.0.0)
-      faraday (~> 0)
-      google-protobuf (~> 3.0, >= 3.0.0)
-    typhoeus (1.3.0)
-      ethon (>= 0.9.0)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
     uglifier (4.1.18)
@@ -253,6 +212,10 @@ GEM
       activemodel (>= 5.0)
       bindex (>= 0.4.0)
       railties (>= 5.0)
+    webmock (3.4.2)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff
     webpacker (3.5.5)
       activesupport (>= 4.2)
       rack-proxy (>= 0.6.1)
@@ -272,12 +235,8 @@ DEPENDENCIES
   bootsnap (>= 1.1.0)
   bunny
   byebug
-  courier-feeds!
-  courier-posts!
-  courier-translator!
   devise
   faraday
-  jbuilder (~> 2.5)
   jwt
   listen (>= 3.0.5, < 3.2)
   omniauth
@@ -285,16 +244,16 @@ DEPENDENCIES
   pg
   puma (~> 3.11)
   rails (~> 5.2.0)
-  redis
+  redis (~> 4.0)
   rspec-rails (~> 3.8)
   sass-rails (~> 5.0)
   sidekiq
   spring
   spring-watcher-listen (~> 2.0.0)
-  turbolinks (~> 5)
   tzinfo-data
   uglifier (>= 1.3.0)
   web-console (>= 3.3.0)
+  webmock
   webpacker
   xmlrpc
   xmlrpc-rack_server

@@ -1,9 +1,10 @@
-<div id="elm-container"></div>
-<script type="text/javascript">
-  window.elmFlags = Object.assign({},
-    <%= raw @tweets_json %>,
-    { user: <%= raw @user_json %> },
-    { cableUrl: App.cableUrl }
-  );
-</script>
-<%= javascript_pack_tag 'main' %>
+<% content_for :script do %>
+  <script type="text/javascript">
+    window.elmFlags = Object.assign({},
+      <%= raw @tweets_json %>,
+      { user: <%= raw @user_json %> }
+    );
+  </script>
+
+  <%= javascript_pack_tag 'main' %>
+<% end %>

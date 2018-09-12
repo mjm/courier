@@ -3,10 +3,6 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.5.1'
 
-gem 'courier-feeds', github: 'mjm/courier-feeds', glob: 'client/*.gemspec'
-gem 'courier-posts', github: 'mjm/courier-posts', glob: 'client/*.gemspec'
-gem 'courier-translator', github: 'mjm/courier-translator', glob: 'client/*.gemspec'
-
 gem 'addressable'
 gem 'bunny'
 gem 'devise'
@@ -15,7 +11,6 @@ gem 'jwt'
 gem 'omniauth'
 gem 'omniauth-twitter'
 gem 'pg'
-gem 'redis'
 gem 'sidekiq'
 gem 'xmlrpc'
 gem 'xmlrpc-rack_server'
@@ -33,12 +28,8 @@ gem 'webpacker'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'mini_racer', platforms: :ruby
 
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
-gem 'turbolinks', '~> 5'
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.5'
 # Use Redis adapter to run Action Cable in production
-# gem 'redis', '~> 4.0'
+gem 'redis', '~> 4.0'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
@@ -53,6 +44,7 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
 
   gem 'rspec-rails', '~> 3.8'
+  gem 'webmock'
 end
 
 group :development do
