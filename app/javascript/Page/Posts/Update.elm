@@ -3,6 +3,7 @@ module Page.Posts.Update exposing (update)
 import ActionCable
 import ActionCable.Msg as ACMsg
 import ActionCable.Identifier as ID
+import Data.Event as Event exposing (Event(..))
 import Data.Tweet as Tweet exposing (Tweet)
 import Date exposing (Date)
 import Page.Posts.Model exposing (Model, Message(..))
@@ -79,7 +80,7 @@ handleCableMessage msg model =
 
 subscribe : Model -> ( Model, Cmd Message )
 subscribe model =
-    case ActionCable.subscribeTo (ID.newIdentifier "PostsChannel" []) model.cable of
+    case ActionCable.subscribeTo (ID.newIdentifier "EventsChannel" []) model.cable of
         Ok ( cable, cmd ) ->
             ( { model | cable = cable }, cmd )
 
@@ -89,12 +90,19 @@ subscribe model =
 
 handleSocketData : ID.Identifier -> Decode.Value -> Model -> ( Model, Cmd Message )
 handleSocketData id value model =
-    case Decode.decodeValue Tweet.decoder value of
-        Ok tweet ->
-            ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
+    case Decode.decodeValue Event.decoder value of
+        Ok event ->
+            handleEvent event model
 
         Err _ ->
             ( model, Cmd.none )
+
+
+handleEvent : Event -> Model -> ( Model, Cmd Message )
+handleEvent event model =
+    case event of
+        TweetUpdated tweet ->
+            ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
 
 
 updateTweet : Tweet -> Model -> Model

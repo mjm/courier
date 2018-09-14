@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "tweets.proto";
+
+message EventMessage {
+  oneof event {
+    TweetUpdatedEvent  tweet_updated_event  = 1;
+  }
+}
+
+message TweetUpdatedEvent {
+  TweetMessage  tweet  = 1;
+}

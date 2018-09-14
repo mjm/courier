@@ -22,6 +22,8 @@ class PostTweetsWorker
   private
 
   def broadcast(tweet)
+    event = TweetUpdatedEvent.new(tweet: tweet.to_message)
+    EventsChannel.broadcast_event_to(tweet.user, event)
   end
 
   def twitter(user)

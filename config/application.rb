@@ -18,4 +18,5 @@ module CourierGateway
   end
 end
 
+$LOAD_PATH.unshift(Rails.root / 'app/messages')
 Dir[Rails.root / 'app/messages/*.rb'].each { |file| require file }
