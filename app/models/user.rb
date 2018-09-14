@@ -5,7 +5,7 @@ class User < ApplicationRecord
          omniauth_providers: %i[twitter]
 
   has_many :feed_subscriptions
-  has_many :feeds, through: :feed_subscriptions
+  has_many :feeds, -> { order(:title, :url) }, through: :feed_subscriptions
   has_many :tweets, -> { includes(:post).order('posts.published_at desc') }, through: :feed_subscriptions
 
   def self.from_omniauth(auth)

@@ -4,6 +4,9 @@ class Post < ApplicationRecord
 
   has_many :tweets
 
+  default_scope -> { order(published_at: :desc) }
+  scope :recent, -> { limit(10) }
+
   def to_message
     PostMessage.new(
       id: id,
