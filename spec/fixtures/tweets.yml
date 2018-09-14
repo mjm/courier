@@ -2,3 +2,8 @@ alice_example_status:
   post: example_status
   feed_subscription: alice_example
   body: This is an example status post.
+
+alice_example_status2:
+  post: example_status
+  feed_subscription: alice_example
+  body: This is a second tweet for the same post.

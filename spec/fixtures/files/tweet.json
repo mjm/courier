@@ -1,0 +1,178 @@
+{
+   "in_reply_to_user_id_str" : null,
+   "text" : "This is my tweet text",
+   "possibly_sensitive" : false,
+   "source" : "<a href=\"http://itunes.apple.com/us/app/twitter/id409789998?mt=12\" rel=\"nofollow\">Twitter for Mac</a>",
+   "entities" : {
+      "user_mentions" : [
+         {
+            "id_str" : "716351352",
+            "id" : 716351352,
+            "indices" : [
+               20,
+               33
+            ],
+            "screen_name" : "BillBramhall",
+            "name" : "Bill Bramhall"
+         }
+      ],
+      "hashtags" : [],
+      "media" : [
+         {
+            "id_str" : "540897316195299328",
+            "expanded_url" : "http://twitter.com/sferik/status/540897316908331009/photo/1",
+            "type" : "photo",
+            "id" : 540897316195299328,
+            "sizes" : {
+               "medium" : {
+                  "w" : 600,
+                  "h" : 416,
+                  "resize" : "fit"
+               },
+               "small" : {
+                  "w" : 340,
+                  "resize" : "fit",
+                  "h" : 236
+               },
+               "thumb" : {
+                  "w" : 150,
+                  "resize" : "crop",
+                  "h" : 150
+               },
+               "large" : {
+                  "h" : 711,
+                  "resize" : "fit",
+                  "w" : 1024
+               }
+            },
+            "media_url_https" : "https://pbs.twimg.com/media/B4GnPkfIcAAgMOn.jpg",
+            "indices" : [
+               35,
+               57
+            ],
+            "media_url" : "http://pbs.twimg.com/media/B4GnPkfIcAAgMOn.jpg",
+            "display_url" : "pic.twitter.com/IOEbc5QoES",
+            "url" : "http://t.co/IOEbc5QoES"
+         }
+      ],
+      "urls" : [],
+      "symbols" : []
+   },
+   "truncated" : false,
+   "user" : {
+      "profile_image_url_https" : "https://pbs.twimg.com/profile_images/535043330271219712/sPDCl8fv_normal.jpeg",
+      "profile_use_background_image" : true,
+      "profile_background_tile" : false,
+      "profile_text_color" : "333333",
+      "profile_sidebar_border_color" : "000000",
+      "verified" : false,
+      "profile_background_image_url" : "http://pbs.twimg.com/profile_background_images/677717672/bb0b3653dcf0644e344823e0a2eb3382.png",
+      "time_zone" : "Amsterdam",
+      "default_profile_image" : false,
+      "following" : false,
+      "name" : "Erik Michaels-Ober",
+      "favourites_count" : 11883,
+      "profile_link_color" : "FF5D00",
+      "profile_location" : null,
+      "protected" : false,
+      "geo_enabled" : true,
+      "profile_sidebar_fill_color" : "DDEEF6",
+      "id_str" : "7505382",
+      "url" : "https://t.co/RKgIMeuXMc",
+      "notifications" : false,
+      "created_at" : "Mon Jul 16 12:59:01 +0000 2007",
+      "profile_background_color" : "000000",
+      "is_translation_enabled" : false,
+      "id" : 7505382,
+      "entities" : {
+         "description" : {
+            "urls" : []
+         },
+         "url" : {
+            "urls" : [
+               {
+                  "display_url" : "github.com/sferik",
+                  "url" : "https://t.co/RKgIMeuXMc",
+                  "indices" : [
+                     0,
+                     23
+                  ],
+                  "expanded_url" : "https://github.com/sferik"
+               }
+            ]
+         }
+      },
+      "is_translator" : false,
+      "screen_name" : "sferik",
+      "follow_request_sent" : false,
+      "location" : "Berlin",
+      "followers_count" : 5332,
+      "listed_count" : 296,
+      "description" : "Apostrophysicist",
+      "default_profile" : false,
+      "statuses_count" : 15891,
+      "profile_background_image_url_https" : "https://pbs.twimg.com/profile_background_images/677717672/bb0b3653dcf0644e344823e0a2eb3382.png",
+      "profile_image_url" : "http://pbs.twimg.com/profile_images/535043330271219712/sPDCl8fv_normal.jpeg",
+      "contributors_enabled" : false,
+      "profile_banner_url" : "https://pbs.twimg.com/profile_banners/7505382/1416605188",
+      "friends_count" : 627,
+      "utc_offset" : 3600,
+      "lang" : "en"
+   },
+   "in_reply_to_status_id" : null,
+   "extended_entities" : {
+      "media" : [
+         {
+            "sizes" : {
+               "small" : {
+                  "h" : 236,
+                  "resize" : "fit",
+                  "w" : 340
+               },
+               "medium" : {
+                  "h" : 416,
+                  "resize" : "fit",
+                  "w" : 600
+               },
+               "large" : {
+                  "w" : 1024,
+                  "h" : 711,
+                  "resize" : "fit"
+               },
+               "thumb" : {
+                  "w" : 150,
+                  "h" : 150,
+                  "resize" : "crop"
+               }
+            },
+            "type" : "photo",
+            "id" : 540897316195299328,
+            "expanded_url" : "http://twitter.com/sferik/status/540897316908331009/photo/1",
+            "id_str" : "540897316195299328",
+            "indices" : [
+               35,
+               57
+            ],
+            "media_url" : "http://pbs.twimg.com/media/B4GnPkfIcAAgMOn.jpg",
+            "url" : "http://t.co/IOEbc5QoES",
+            "display_url" : "pic.twitter.com/IOEbc5QoES",
+            "media_url_https" : "https://pbs.twimg.com/media/B4GnPkfIcAAgMOn.jpg"
+         }
+      ]
+   },
+   "id" : 540897316908331009,
+   "place" : null,
+   "geo" : null,
+   "created_at" : "Fri Dec 05 15:55:44 +0000 2014",
+   "lang" : "en",
+   "coordinates" : null,
+   "retweeted" : false,
+   "contributors" : null,
+   "favorite_count" : 8,
+   "in_reply_to_screen_name" : null,
+   "retweet_count" : 17,
+   "favorited" : false,
+   "id_str" : "540897316908331009",
+   "in_reply_to_user_id" : null,
+   "in_reply_to_status_id_str" : null
+}
