@@ -17,8 +17,18 @@ class TweetsController < ServiceController
     require_user env do |user|
       tweet = user.tweets.find(req.id)
       tweet.update body: req.body
-      # TODO: support should_post
+
+      tweet.post_to_twitter if req.should_post
+
       UpdateTweetResponse.new(tweet: tweet.to_message)
+    end
+  end
+
+  def post_tweet(req, env)
+    require_user env do |user|
+      tweet = user.tweets.find(req.id)
+      tweet.post_to_twitter
+      PostTweetResponse.new(tweet: tweet.to_message)
     end
   end
 end

@@ -8,6 +8,10 @@ class Tweet < ApplicationRecord
   enum status: %i[draft canceled posted]
   validate :valid_status_change
 
+  def post_to_twitter
+    PostTweetsWorker.perform_async([id])
+  end
+
   def to_message
     TweetMessage.new(
       id: id,

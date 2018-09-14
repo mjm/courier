@@ -4,6 +4,7 @@ service Tweets {
   rpc GetTweets(GetTweetsRequest) returns (GetTweetsResponse);
   rpc CancelTweet(CancelTweetRequest) returns (CancelTweetResponse);
   rpc UpdateTweet(UpdateTweetRequest) returns (UpdateTweetResponse);
+  rpc PostTweet(PostTweetRequest) returns (PostTweetResponse);
 }
 
 message GetTweetsRequest {
@@ -28,6 +29,14 @@ message UpdateTweetRequest {
 }
 
 message UpdateTweetResponse {
+  TweetMessage  tweet  = 1;
+}
+
+message PostTweetRequest {
+  int64  id  = 1;
+}
+
+message PostTweetResponse {
   TweetMessage  tweet  = 1;
 }
 

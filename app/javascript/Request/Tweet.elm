@@ -13,18 +13,20 @@ tweetsBuilder =
     apiBuilder "Tweets"
 
 
+tweetDecoder : Decode.Decoder Tweet
+tweetDecoder =
+    Decode.field "tweet" Tweet.decoder
+
+
 cancel : Tweet -> Http.Request Tweet
 cancel tweet =
     let
         body =
             Encode.object [ ( "id", Encode.int tweet.id ) ]
-
-        decoder =
-            Decode.field "tweet" Tweet.decoder
     in
         tweetsBuilder "CancelTweet"
             |> withJsonBody body
-            |> withExpect (Http.expectJson decoder)
+            |> withExpect (Http.expectJson tweetDecoder)
             |> toRequest
 
 
@@ -37,13 +39,10 @@ update tweet shouldPost =
                 , ( "body", Encode.string tweet.body )
                 , ( "shouldPost", Encode.bool shouldPost )
                 ]
-
-        decoder =
-            Decode.field "tweet" Tweet.decoder
     in
         tweetsBuilder "UpdateTweet"
             |> withJsonBody body
-            |> withExpect (Http.expectJson decoder)
+            |> withExpect (Http.expectJson tweetDecoder)
             |> toRequest
 
 
@@ -53,7 +52,7 @@ post tweet =
         body =
             Encode.object [ ( "id", Encode.int tweet.id ) ]
     in
-        tweetsBuilder "SubmitTweet"
+        tweetsBuilder "PostTweet"
             |> withJsonBody body
-            |> withExpect (Http.expectJson Tweet.decoder)
+            |> withExpect (Http.expectJson tweetDecoder)
             |> toRequest
