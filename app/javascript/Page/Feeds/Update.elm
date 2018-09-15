@@ -23,6 +23,8 @@ type Message
     | FeedRefreshed (Result Http.Error ())
     | UpdateAutoposting Feed Bool
     | SettingsUpdated (Result Http.Error Feed)
+    | DeleteFeed Feed
+    | FeedDeleted Feed (Result Http.Error ())
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -88,6 +90,15 @@ update message model =
         SettingsUpdated (Err _) ->
             ( addError model "Could not update the feed settings right now. Please try again later.", Cmd.none )
 
+        DeleteFeed feed ->
+            ( model, Http.send (FeedDeleted feed) (Request.Feed.delete feed) )
+
+        FeedDeleted feed (Ok _) ->
+            ( { model | feeds = deleteFeed feed model.feeds }, Cmd.none )
+
+        FeedDeleted feed (Err _) ->
+            ( addError model "Could not delete the feed right now. Please try again later.", Cmd.none )
+
 
 addFeed : Feed -> List Feed -> List Feed
 addFeed feed fs =
@@ -104,6 +115,11 @@ updateFeed feed fs =
                 f
         )
         fs
+
+
+deleteFeed : Feed -> List Feed -> List Feed
+deleteFeed feed fs =
+    List.filter (\f -> f.id /= feed.id) fs
 
 
 updateFeedUrl : Maybe DraftFeed -> String -> Maybe DraftFeed

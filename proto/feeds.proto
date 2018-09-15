@@ -5,6 +5,7 @@ service Feeds {
   rpc RegisterFeed(RegisterFeedRequest) returns (RegisterFeedResponse);
   rpc RefreshFeed(RefreshFeedRequest) returns (RefreshFeedResponse);
   rpc UpdateFeedSettings(UpdateFeedSettingsRequest) returns (UpdateFeedSettingsResponse);
+  rpc DeleteFeed(DeleteFeedRequest) returns (DeleteFeedResponse);
 }
 
 message GetFeedsRequest {
@@ -42,6 +43,13 @@ message UpdateFeedSettingsRequest {
 
 message UpdateFeedSettingsResponse {
   FeedMessage  feed  = 1;
+}
+
+message DeleteFeedRequest {
+  int64  id  = 1;
+}
+
+message DeleteFeedResponse {
 }
 
 message FeedMessage {

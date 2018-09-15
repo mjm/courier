@@ -23,7 +23,7 @@ class Feed < ApplicationRecord
       Feed.where(url: url).first_or_create.tap do |feed|
         user.feeds << feed
       rescue ActiveRecord::RecordNotUnique
-        # This is fine
+        user.subscription(feed: feed).undiscard
       end
     end
   end

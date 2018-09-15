@@ -60,3 +60,15 @@ updateSettings feed settings =
             |> withJsonBody body
             |> withExpect (Http.expectJson feedDecoder)
             |> toRequest
+
+
+delete : Feed -> Http.Request ()
+delete feed =
+    let
+        body =
+            Encode.object [ ( "id", Encode.int feed.id ) ]
+    in
+        feedsBuilder "DeleteFeed"
+            |> withJsonBody body
+            |> withExpect (Http.expectJson (Decode.succeed ()))
+            |> toRequest

@@ -8,6 +8,7 @@ class FeedsService < Twirp::Service
   rpc :RegisterFeed, RegisterFeedRequest, RegisterFeedResponse, :ruby_method => :register_feed
   rpc :RefreshFeed, RefreshFeedRequest, RefreshFeedResponse, :ruby_method => :refresh_feed
   rpc :UpdateFeedSettings, UpdateFeedSettingsRequest, UpdateFeedSettingsResponse, :ruby_method => :update_feed_settings
+  rpc :DeleteFeed, DeleteFeedRequest, DeleteFeedResponse, :ruby_method => :delete_feed
 end
 
 class FeedsClient < Twirp::Client

@@ -19,6 +19,11 @@ class User < ApplicationRecord
   end
 
   def register_feed(attrs)
-    Feed.register(self, attrs)
+    feed = Feed.register(self, attrs)
+    subscription(feed: feed)
+  end
+
+  def subscription(feed:)
+    feed_subscriptions.where(feed: feed).first
   end
 end

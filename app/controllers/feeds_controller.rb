@@ -1,14 +1,13 @@
 class FeedsController < ServiceController
   def get_feeds(_req, env)
     require_user env do |user|
-      GetFeedsResponse.new(feeds: user.feed_subscriptions.to_message)
+      GetFeedsResponse.new(feeds: user.feed_subscriptions.kept.to_message)
     end
   end
 
   def register_feed(req, env)
     require_user env do |user|
-      feed = user.register_feed(url: req.url)
-      subscription = feed.feed_subscriptions.where(user: user).first
+      subscription = user.register_feed(url: req.url)
       RegisterFeedResponse.new(feed: subscription.to_message)
     end
   end
@@ -24,9 +23,16 @@ class FeedsController < ServiceController
 
   def update_feed_settings(req, env)
     require_user env do |user|
-      subscription = user.feed_subscriptions.where(feed_id: req.id).first
+      subscription = user.subscription(feed: req.id)
       subscription.update_settings(autopost: req.autopost)
       UpdateFeedSettingsResponse.new(feed: subscription.to_message)
+    end
+  end
+
+  def delete_feed(req, env)
+    require_user env do |user|
+      user.subscription(feed: req.id).discard
+      DeleteFeedResponse.new
     end
   end
 end

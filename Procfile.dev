@@ -1,0 +1,3 @@
+web: bin/rails server -p 3000 -e development
+worker: bin/sidekiq -e development
+webpacker: bin/webpack-dev-server

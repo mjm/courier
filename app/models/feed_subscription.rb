@@ -1,4 +1,6 @@
 class FeedSubscription < ApplicationRecord
+  include Discard::Model
+
   belongs_to :feed
   belongs_to :user
 

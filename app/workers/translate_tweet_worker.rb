@@ -10,7 +10,7 @@ class TranslateTweetWorker
 
     tweets = Translator.new(post.content_html).tweets
 
-    post.feed_subscriptions.each do |subscription|
+    post.feed_subscriptions.kept.each do |subscription|
       existing_tweets = post.tweets.where(feed_subscription: subscription)
       next if existing_tweets.any?
 

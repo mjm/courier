@@ -134,7 +134,10 @@ feedDropdown feed =
                                 )
                             ]
                         ]
-                    , a [ class "dropdown-item has-text-danger" ]
+                    , a
+                        [ class "dropdown-item has-text-danger"
+                        , onClick (DeleteFeed feed)
+                        ]
                         [ icon Solid "trash"
                         , span [] [ text "Delete Feed" ]
                         ]
