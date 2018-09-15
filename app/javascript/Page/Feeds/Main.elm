@@ -6,8 +6,8 @@ import Date
 import Html
 import Json.Decode exposing (decodeValue)
 import Page.Feeds.Flags exposing (Flags)
-import Page.Feeds.Model as Model exposing (Model)
-import Page.Feeds.Update exposing (Message(..), update)
+import Page.Feeds.Model as Model exposing (Model, Message(..))
+import Page.Feeds.Update exposing (update)
 import Page.Feeds.View exposing (view)
 import Task
 import Time
@@ -20,6 +20,7 @@ init flags =
     , feeds = feedsFromFlags flags
     , draftFeed = Nothing
     , errors = []
+    , modal = Nothing
     , now = Date.fromTime 0
     }
         ! [ Task.perform Tick Time.now ]

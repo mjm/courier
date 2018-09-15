@@ -1,30 +1,12 @@
-module Page.Feeds.Update exposing (Message(..), update)
+module Page.Feeds.Update exposing (update)
 
-import Data.Feed exposing (Feed, DraftFeed)
+import Data.Feed as Feed exposing (Feed, DraftFeed)
 import Date
 import Dom
 import Http
-import Page.Feeds.Model exposing (Model)
+import Page.Feeds.Model exposing (Model, Modal, Message(..))
 import Request.Feed
 import Task
-import Time exposing (Time)
-
-
-type Message
-    = Noop
-    | DismissError String
-    | Tick Time
-    | FeedsLoaded (Result Http.Error (List Feed))
-    | SetAddingFeed Bool
-    | SetDraftFeedUrl String
-    | AddFeed
-    | FeedAdded (Result Http.Error Feed)
-    | RefreshFeed Feed
-    | FeedRefreshed (Result Http.Error ())
-    | UpdateAutoposting Feed Bool
-    | SettingsUpdated (Result Http.Error Feed)
-    | DeleteFeed Feed
-    | FeedDeleted Feed (Result Http.Error ())
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -35,6 +17,9 @@ update message model =
 
         DismissError err ->
             ( removeError model err, Cmd.none )
+
+        DismissModal ->
+            ( { model | modal = Nothing }, Cmd.none )
 
         Tick time ->
             ( { model | now = Date.fromTime time }, Cmd.none )
@@ -91,7 +76,10 @@ update message model =
             ( addError model "Could not update the feed settings right now. Please try again later.", Cmd.none )
 
         DeleteFeed feed ->
-            ( model, Http.send (FeedDeleted feed) (Request.Feed.delete feed) )
+            ( { model | modal = Just (deleteFeedModal feed) }, Cmd.none )
+
+        ConfirmDeleteFeed feed ->
+            ( { model | modal = Nothing }, Http.send (FeedDeleted feed) (Request.Feed.delete feed) )
 
         FeedDeleted feed (Ok _) ->
             ( { model | feeds = deleteFeed feed model.feeds }, Cmd.none )
@@ -120,6 +108,15 @@ updateFeed feed fs =
 deleteFeed : Feed -> List Feed -> List Feed
 deleteFeed feed fs =
     List.filter (\f -> f.id /= feed.id) fs
+
+
+deleteFeedModal : Feed -> Modal
+deleteFeedModal feed =
+    { title = "Are you sure?"
+    , body = "Are you sure you want to delete the feed \"" ++ (Feed.displayName feed) ++ "\"?"
+    , confirmText = "Delete Feed"
+    , confirmMsg = ConfirmDeleteFeed feed
+    }
 
 
 updateFeedUrl : Maybe DraftFeed -> String -> Maybe DraftFeed
