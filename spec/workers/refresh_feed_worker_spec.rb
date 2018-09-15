@@ -60,7 +60,7 @@ RSpec.describe RefreshFeedWorker, type: :worker do
 
     let(:second_post) do
       {
-        item_id: 'def',
+        item_id: 'aslkdjflskd',
         title: '',
         content_text: '',
         content_html: '<p>Florp!</p>',
@@ -70,7 +70,7 @@ RSpec.describe RefreshFeedWorker, type: :worker do
     end
 
     let(:feed_posts) { [first_post, second_post] }
-    let(:new_post) { feed.posts.where(item_id: 'def').first }
+    let(:new_post) { feed.posts.where(item_id: 'aslkdjflskd').first }
 
     it 'creates a new post if the post has not been imported before' do
       expect { subject.perform(feed.id) }.to change { feed.posts.count }.by 1
