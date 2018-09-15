@@ -5,7 +5,7 @@ rvm:
 cache: bundler
 before_install:
 - gem install bundler -v 1.16.1
-script: 'true'
+script: bin/rake
 deploy:
   provider: heroku
   api_key:
