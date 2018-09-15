@@ -18,6 +18,8 @@ class Feed < ApplicationRecord
     where(home_page_url: normalized_url)
   }
 
+  after_create :refresh
+
   class << self
     def register(user, url:)
       Feed.where(url: url).first_or_create.tap do |feed|

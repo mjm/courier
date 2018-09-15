@@ -1,3 +1,8 @@
 alice_example:
   feed: example
   user: alice
+
+bob_refreshed_example:
+  feed: refreshed_example
+  user: bob
+  autopost: true

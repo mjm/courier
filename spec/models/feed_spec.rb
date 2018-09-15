@@ -48,6 +48,11 @@ RSpec.describe Feed, type: :model do
         feed
         expect(users(:alice).feed_ids).to include(feed.id)
       end
+
+      it 'enqueues a job to load the contents of the feed' do
+        feed
+        expect(RefreshFeedWorker).to have_enqueued_sidekiq_job(feed.id)
+      end
     end
 
     context 'when the feed is registered to another user' do
