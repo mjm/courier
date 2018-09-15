@@ -8,12 +8,17 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "EventMessage" do
     oneof :event do
       optional :tweet_updated_event, :message, 1, "TweetUpdatedEvent"
+      optional :tweet_created_event, :message, 2, "TweetCreatedEvent"
     end
   end
   add_message "TweetUpdatedEvent" do
+    optional :tweet, :message, 1, "TweetMessage"
+  end
+  add_message "TweetCreatedEvent" do
     optional :tweet, :message, 1, "TweetMessage"
   end
 end
 
 EventMessage = Google::Protobuf::DescriptorPool.generated_pool.lookup("EventMessage").msgclass
 TweetUpdatedEvent = Google::Protobuf::DescriptorPool.generated_pool.lookup("TweetUpdatedEvent").msgclass
+TweetCreatedEvent = Google::Protobuf::DescriptorPool.generated_pool.lookup("TweetCreatedEvent").msgclass

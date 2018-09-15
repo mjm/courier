@@ -8,6 +8,8 @@ class Tweet < ApplicationRecord
   enum status: %i[draft canceled posted]
   validate :valid_status_change
 
+  after_create :broadcast
+
   def post_to_twitter
     PostTweetsWorker.perform_async([id])
   end
@@ -29,5 +31,12 @@ class Tweet < ApplicationRecord
     elsif status_was == 'canceled' && posted?
       errors.add(:status, "can't go from canceled to posted")
     end
+  end
+
+  private
+
+  def broadcast
+    event = TweetCreatedEvent.new(tweet: to_message)
+    EventsChannel.broadcast_event_to(user, event)
   end
 end

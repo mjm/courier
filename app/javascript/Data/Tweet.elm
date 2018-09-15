@@ -1,4 +1,4 @@
-module Data.Tweet exposing (Tweet, PostInfo, Status(..), decoder, listDecoder, update)
+module Data.Tweet exposing (Tweet, PostInfo, Status(..), compare, decoder, listDecoder, update)
 
 import Date exposing (Date)
 import Json.Decode as Decode exposing (Decoder, string, int)
@@ -74,3 +74,19 @@ update existing new =
         new
     else
         existing
+
+
+compare : Tweet -> Tweet -> Order
+compare a b =
+    case ( a.post.publishedAt, b.post.publishedAt ) of
+        ( Just a, Just b ) ->
+            Basics.compare (Date.toTime b) (Date.toTime a)
+
+        ( Just _, Nothing ) ->
+            LT
+
+        ( Nothing, Just _ ) ->
+            GT
+
+        ( Nothing, Nothing ) ->
+            EQ

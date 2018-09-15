@@ -5,9 +5,14 @@ import "tweets.proto";
 message EventMessage {
   oneof event {
     TweetUpdatedEvent  tweet_updated_event  = 1;
+    TweetCreatedEvent  tweet_created_event  = 2;
   }
 }
 
 message TweetUpdatedEvent {
+  TweetMessage  tweet  = 1;
+}
+
+message TweetCreatedEvent {
   TweetMessage  tweet  = 1;
 }

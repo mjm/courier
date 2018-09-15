@@ -104,6 +104,16 @@ handleEvent event model =
         TweetUpdated tweet ->
             ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
 
+        TweetCreated tweet ->
+            ( { model | tweets = addTweet tweet model.tweets }, Cmd.none )
+
+
+addTweet : Tweet -> List (Editable Tweet) -> List (Editable Tweet)
+addTweet tweet ts =
+    List.sortWith
+        (\a b -> Tweet.compare (Editable.value a) (Editable.value b))
+        ((Viewing tweet) :: ts)
+
 
 updateTweet : Tweet -> Model -> Model
 updateTweet tweet model =
