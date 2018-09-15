@@ -25,7 +25,7 @@ class TranslateTweetWorker
 
       if subscription.autopost
         logger.info 'Queuing job to post tweets to Twitter'
-        PostTweetsWorker.perform_in(autopost_delay, created_tweets.map(&:id))
+        PostTweetsWorker.perform_in(subscription.autopost_delay, created_tweets.map(&:id))
       end
     end
   end
