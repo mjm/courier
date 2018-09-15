@@ -20,6 +20,18 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "RefreshFeedResponse" do
   end
+  add_message "UpdateFeedSettingsRequest" do
+    optional :id, :int64, 1
+    optional :autopost, :enum, 2, "UpdateFeedSettingsRequest.Flag"
+  end
+  add_enum "UpdateFeedSettingsRequest.Flag" do
+    value :UNCHANGED, 0
+    value :OFF, 1
+    value :ON, 2
+  end
+  add_message "UpdateFeedSettingsResponse" do
+    optional :feed, :message, 1, "FeedMessage"
+  end
   add_message "FeedMessage" do
     optional :id, :int64, 1
     optional :url, :string, 2
@@ -41,5 +53,8 @@ RegisterFeedRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("Re
 RegisterFeedResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("RegisterFeedResponse").msgclass
 RefreshFeedRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("RefreshFeedRequest").msgclass
 RefreshFeedResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("RefreshFeedResponse").msgclass
+UpdateFeedSettingsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("UpdateFeedSettingsRequest").msgclass
+UpdateFeedSettingsRequest::Flag = Google::Protobuf::DescriptorPool.generated_pool.lookup("UpdateFeedSettingsRequest.Flag").enummodule
+UpdateFeedSettingsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("UpdateFeedSettingsResponse").msgclass
 FeedMessage = Google::Protobuf::DescriptorPool.generated_pool.lookup("FeedMessage").msgclass
 FeedSettingsMessage = Google::Protobuf::DescriptorPool.generated_pool.lookup("FeedSettingsMessage").msgclass

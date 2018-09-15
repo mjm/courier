@@ -1,14 +1,15 @@
 class FeedsController < ServiceController
   def get_feeds(_req, env)
     require_user env do |user|
-      GetFeedsResponse.new(feeds: user.feeds.to_message)
+      GetFeedsResponse.new(feeds: user.feed_subscriptions.to_message)
     end
   end
 
   def register_feed(req, env)
     require_user env do |user|
       feed = user.register_feed(url: req.url)
-      RegisterFeedResponse.new(feed: feed.to_message)
+      subscription = feed.feed_subscriptions.where(user: user).first
+      RegisterFeedResponse.new(feed: subscription.to_message)
     end
   end
 
@@ -18,6 +19,14 @@ class FeedsController < ServiceController
       RefreshFeedResponse.new
     rescue ActiveRecord::RecordNotFound
       Twirp::Error.not_found "Could not find feed #{req.id}"
+    end
+  end
+
+  def update_feed_settings(req, env)
+    require_user env do |user|
+      subscription = user.feed_subscriptions.where(feed_id: req.id).first
+      subscription.update_settings(autopost: req.autopost)
+      UpdateFeedSettingsResponse.new(feed: subscription.to_message)
     end
   end
 end

@@ -13,6 +13,11 @@ feedsBuilder =
     apiBuilder "Feeds"
 
 
+feedDecoder : Decode.Decoder Feed
+feedDecoder =
+    Decode.field "feed" Feed.decoder
+
+
 feeds : Http.Request (List Feed)
 feeds =
     let
@@ -27,14 +32,10 @@ feeds =
 
 register : DraftFeed -> Http.Request Feed
 register feed =
-    let
-        decoder =
-            Decode.field "feed" Feed.decoder
-    in
-        feedsBuilder "RegisterFeed"
-            |> withJsonBody (Feed.encode feed)
-            |> withExpect (Http.expectJson decoder)
-            |> toRequest
+    feedsBuilder "RegisterFeed"
+        |> withJsonBody (Feed.encode feed)
+        |> withExpect (Http.expectJson feedDecoder)
+        |> toRequest
 
 
 refresh : Feed -> Http.Request ()
@@ -53,12 +54,9 @@ updateSettings : Feed -> SettingsChanges -> Http.Request Feed
 updateSettings feed settings =
     let
         body =
-            Encode.object
-                [ ( "feed_id", Encode.int feed.id )
-                , ( "settings", Feed.encodeSettings settings )
-                ]
+            Feed.encodeSettings feed.id settings
     in
         feedsBuilder "UpdateFeedSettings"
             |> withJsonBody body
-            |> withExpect (Http.expectJson Feed.decoder)
+            |> withExpect (Http.expectJson feedDecoder)
             |> toRequest

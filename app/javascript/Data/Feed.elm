@@ -70,10 +70,12 @@ encode feed =
         [ ( "url", Encode.string feed.url ) ]
 
 
-encodeSettings : SettingsChanges -> Value
-encodeSettings changes =
+encodeSettings : Int -> SettingsChanges -> Value
+encodeSettings id changes =
     Encode.object
-        [ ( "autopost", encodeSetting changes.autopost ) ]
+        [ ( "id", Encode.int id )
+        , ( "autopost", encodeSetting changes.autopost )
+        ]
 
 
 encodeSetting : Maybe Bool -> Value

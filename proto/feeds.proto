@@ -4,6 +4,7 @@ service Feeds {
   rpc GetFeeds(GetFeedsRequest) returns (GetFeedsResponse);
   rpc RegisterFeed(RegisterFeedRequest) returns (RegisterFeedResponse);
   rpc RefreshFeed(RefreshFeedRequest) returns (RefreshFeedResponse);
+  rpc UpdateFeedSettings(UpdateFeedSettingsRequest) returns (UpdateFeedSettingsResponse);
 }
 
 message GetFeedsRequest {
@@ -26,6 +27,21 @@ message RefreshFeedRequest {
 }
 
 message RefreshFeedResponse {
+}
+
+message UpdateFeedSettingsRequest {
+  enum Flag {
+    UNCHANGED = 0;
+    OFF = 1;
+    ON = 2;
+  }
+
+  int64  id        = 1;
+  Flag   autopost  = 2;
+}
+
+message UpdateFeedSettingsResponse {
+  FeedMessage  feed  = 1;
 }
 
 message FeedMessage {

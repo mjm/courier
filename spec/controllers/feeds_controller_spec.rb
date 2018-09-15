@@ -1,14 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe FeedsController, type: :rpc do
-  fixtures :feeds
+  fixtures :feeds, :feed_subscriptions
 
   describe '#get_feeds' do
     rpc_method :GetFeeds
 
     it 'returns a list of feeds the user is subscribed to' do
       expect(response).to eq GetFeedsResponse.new(
-        feeds: [feeds(:example).to_message]
+        feeds: [feed_subscriptions(:alice_example).to_message]
       )
     end
 
@@ -19,6 +19,7 @@ RSpec.describe FeedsController, type: :rpc do
     rpc_method :RegisterFeed
     let(:request) { { url: 'https://foo.example.org/feed.json' } }
     let(:created_feed) { Feed.where(url: 'https://foo.example.org/feed.json').first }
+    let(:created_subscription) { created_feed.feed_subscriptions.first }
 
     it 'registers the feed' do
       expect { response }.to change { users(:alice).feeds.count }.by 1
@@ -26,7 +27,7 @@ RSpec.describe FeedsController, type: :rpc do
 
     it 'returns a description of the registered feed' do
       expect(response).to eq RegisterFeedResponse.new(
-        feed: created_feed.to_message
+        feed: created_subscription.to_message
       )
     end
 
