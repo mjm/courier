@@ -25,6 +25,10 @@ class FeedSubscription < ApplicationRecord
     end
   end
 
+  def schedule_tweets(tweets)
+    Tweet.post_to_twitter(tweets, delay: autopost_delay) if autopost
+  end
+
   private
 
   def translate_existing_posts

@@ -7,6 +7,7 @@ class PostTweetsWorker
     @tweets = Tweet.where(id: tweet_ids)
     tweets.each do |tweet|
       next unless tweet.draft?
+      next unless tweet.post_job_id == jid
 
       posted_tweet = twitter(tweet.user).update(tweet.body)
 

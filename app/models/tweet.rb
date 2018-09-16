@@ -10,8 +10,15 @@ class Tweet < ApplicationRecord
 
   after_create :broadcast
 
+  def self.post_to_twitter(tweets, delay: 2.seconds)
+    jid = PostTweetsWorker.perform_in(delay, tweets.map(&:id))
+    tweets.each do |t|
+      t.update! post_job_id: jid
+    end
+  end
+
   def post_to_twitter
-    PostTweetsWorker.perform_async([id])
+    self.class.post_to_twitter([self])
   end
 
   def to_message
