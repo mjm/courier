@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  fixtures :users
-
   describe '#from_omniauth' do
     let(:auth) do
       OmniAuth::AuthHash.new(

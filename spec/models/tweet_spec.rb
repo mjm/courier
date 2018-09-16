@@ -1,9 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Tweet, type: :model do
-  # oh god
-  fixtures :tweets, :posts, :feeds, :feed_subscriptions, :users
-
   describe '#to_message' do
     it 'represents a simple tweet' do
       tweet = tweets(:alice_example_status)

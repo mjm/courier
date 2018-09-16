@@ -43,7 +43,6 @@ module RPCHelpers
   def self.extend_object(base)
     super
     base.subject { described_class.service }
-    base.fixtures :users
     base.let(:request) { {} }
     base.let(:current_user) { users(:alice) }
     base.let(:env) { { user: current_user } }

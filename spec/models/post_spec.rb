@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Post, type: :model do
-  fixtures :posts
-
   describe '#to_message' do
     it 'represents basic metadata about a post' do
       expect(posts(:example_status).to_message).to eq PostMessage.new(

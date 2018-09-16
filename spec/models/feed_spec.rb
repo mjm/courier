@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Feed, type: :model do
-  fixtures :feeds, :users, :feed_subscriptions
-
   describe '#to_message' do
     it 'represents a simple feed' do
       feed = feeds(:example)

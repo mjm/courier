@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe TranslateTweetWorker, type: :worker do
-  fixtures :feeds, :feed_subscriptions, :posts
-
   let(:tweet) { post.tweets.first }
 
   context 'when the tweet has already been translated' do

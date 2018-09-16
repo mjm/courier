@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe FeedSubscription, type: :model do
-  fixtures :users, :feeds, :feed_subscriptions, :posts
-
   subject { FeedSubscription.new }
 
   describe '#autopost_delay' do

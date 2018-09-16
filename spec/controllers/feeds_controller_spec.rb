@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe FeedsController, type: :rpc do
-  fixtures :feeds, :feed_subscriptions
-
   describe '#get_feeds' do
     rpc_method :GetFeeds
 

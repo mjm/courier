@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe RefreshFeedWorker, type: :worker do
-  fixtures :feeds, :posts
-
   let(:feed) { feeds(:example) }
   let(:downloader) { instance_double('FeedDownloader', feed: downloaded_feed) }
   let(:downloaded_feed) do
