@@ -11,14 +11,19 @@ class Tweet < ApplicationRecord
   after_create :broadcast
 
   def self.post_to_twitter(tweets, delay: 2.seconds)
-    jid = PostTweetsWorker.perform_in(delay, tweets.map(&:id))
+    will_post_at = delay.from_now
+    jid = PostTweetsWorker.perform_at(will_post_at, tweets.map(&:id))
     tweets.each do |t|
-      t.update! post_job_id: jid
+      t.update! post_job_id: jid, will_post_at: will_post_at
     end
   end
 
   def post_to_twitter
     self.class.post_to_twitter([self])
+  end
+
+  def will_post?
+    draft? && post_job_id.present? && will_post_at.present?
   end
 
   def to_message
@@ -28,7 +33,8 @@ class Tweet < ApplicationRecord
       post: post.to_message,
       status: status.upcase,
       posted_at: posted_at ? posted_at.getutc.iso8601 : '',
-      posted_tweet_id: posted_tweet_id || ''
+      posted_tweet_id: posted_tweet_id || '',
+      will_post_at: will_post? ? will_post_at.getutc.iso8601 : ''
     )
   end
 

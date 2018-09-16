@@ -62,6 +62,7 @@ message TweetMessage {
   Status       status           = 4;
   string       posted_at        = 5;
   string       posted_tweet_id  = 6;
+  string       will_post_at     = 7;
 }
 
 message PostMessage {

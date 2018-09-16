@@ -46,7 +46,7 @@ userFromFlags flags =
 subscriptions : Model -> Sub Message
 subscriptions model =
     Sub.batch
-        [ Time.every (10 * Time.second) Tick
+        [ Time.every Time.second Tick
         , ActionCable.listen CableMsg model.cable
         ]
 

@@ -42,6 +42,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :status, :enum, 4, "TweetMessage.Status"
     optional :posted_at, :string, 5
     optional :posted_tweet_id, :string, 6
+    optional :will_post_at, :string, 7
   end
   add_enum "TweetMessage.Status" do
     value :DRAFT, 0

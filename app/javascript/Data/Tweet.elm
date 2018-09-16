@@ -19,6 +19,7 @@ type alias Tweet =
     , status : Status
     , postedAt : Maybe Date
     , tweetId : Maybe String
+    , willPostAt : Maybe Date
     }
 
 
@@ -39,6 +40,7 @@ decoder =
         |> optional "status" (Decode.map statusFromString string) Draft
         |> optional "postedAt" Util.Date.decoder Nothing
         |> optional "postedTweetId" (Decode.maybe string) Nothing
+        |> optional "willPostAt" Util.Date.decoder Nothing
 
 
 postDecoder : Decoder PostInfo

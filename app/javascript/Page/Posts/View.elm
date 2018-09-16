@@ -8,6 +8,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Page.Posts.Model exposing (Model, Message(..))
+import Time
 import Views.Error as Error
 import Views.Icon exposing (..)
 import Views.Page as Page
@@ -110,7 +111,7 @@ viewTweetCard user tweet now =
         , footer [ class "card-footer" ] <|
             case tweet.status of
                 Draft ->
-                    draftActions tweet
+                    draftActions tweet now
 
                 Canceled ->
                     canceledActions tweet
@@ -156,8 +157,8 @@ savingTweetCard user post =
         ]
 
 
-draftActions : Tweet -> List (Html Message)
-draftActions tweet =
+draftActions : Tweet -> Date -> List (Html Message)
+draftActions tweet now =
     [ a
         [ onClick <| CancelTweet tweet
         , class "card-footer-item has-text-danger"
@@ -172,8 +173,45 @@ draftActions tweet =
         [ onClick <| SubmitTweet tweet
         , class "card-footer-item"
         ]
-        [ icon Solid "share", span [] [ text "Post Now" ] ]
+        [ icon Solid "share"
+        , span [] [ text "Post Now" ]
+        , willPostETA tweet now
+        ]
     ]
+
+
+willPostETA : Tweet -> Date -> Html msg
+willPostETA tweet now =
+    case tweet.willPostAt of
+        Just date ->
+            let
+                eta =
+                    relativeETA date now
+            in
+                span [ class "is-size-7 has-text-grey" ]
+                    [ text <| " (ETA " ++ eta ++ ")" ]
+
+        Nothing ->
+            text ""
+
+
+relativeETA : Date -> Date -> String
+relativeETA date now =
+    let
+        time =
+            (Date.toTime date) - (Date.toTime now)
+
+        stringify =
+            (\x -> toString (round x))
+    in
+        if time < 0 then
+            "soon"
+        else if time < Time.minute then
+            (stringify (Time.inSeconds time)) ++ "s"
+        else if time < Time.hour then
+            (stringify (Time.inMinutes time)) ++ "m"
+        else
+            (stringify (Time.inHours time)) ++ "h"
 
 
 canceledActions : Tweet -> List (Html Message)
