@@ -8,7 +8,8 @@ class Tweet < ApplicationRecord
   enum status: %i[draft canceled posted]
   validate :valid_status_change
 
-  after_create :broadcast
+  after_create :broadcast_create
+  after_update :broadcast_update
 
   def self.post_to_twitter(tweets, delay: 2.seconds)
     will_post_at = delay.from_now
@@ -48,8 +49,13 @@ class Tweet < ApplicationRecord
 
   private
 
-  def broadcast
+  def broadcast_create
     event = TweetCreatedEvent.new(tweet: to_message)
+    EventsChannel.broadcast_event_to(user, event)
+  end
+
+  def broadcast_update
+    event = TweetUpdatedEvent.new(tweet: to_message)
     EventsChannel.broadcast_event_to(user, event)
   end
 end

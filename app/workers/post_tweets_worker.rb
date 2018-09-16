@@ -16,16 +16,10 @@ class PostTweetsWorker
         posted_at: Time.now,
         posted_tweet_id: posted_tweet.id.to_s
       )
-      broadcast tweet
     end
   end
 
   private
-
-  def broadcast(tweet)
-    event = TweetUpdatedEvent.new(tweet: tweet.to_message)
-    EventsChannel.broadcast_event_to(tweet.user, event)
-  end
 
   def twitter(user)
     Twitter::REST::Client.new do |config|
