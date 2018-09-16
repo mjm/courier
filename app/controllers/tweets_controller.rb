@@ -13,6 +13,14 @@ class TweetsController < ServiceController
     end
   end
 
+  def uncancel_tweet(req, env)
+    require_user env do |user|
+      tweet = user.tweets.find(req.id)
+      tweet.draft!
+      UncancelTweetResponse.new(tweet: tweet.to_message)
+    end
+  end
+
   def update_tweet(req, env)
     require_user env do |user|
       tweet = user.tweets.find(req.id)

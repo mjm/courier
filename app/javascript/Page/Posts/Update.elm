@@ -40,6 +40,15 @@ update message model =
         CanceledTweet (Err _) ->
             ( addError model "Could not cancel posting the tweet right now. Please try again later.", Cmd.none )
 
+        UncancelTweet tweet ->
+            ( model, Http.send UncanceledTweet <| Request.Tweet.uncancel tweet )
+
+        UncanceledTweet (Ok tweet) ->
+            ( updateTweet tweet model, Cmd.none )
+
+        UncanceledTweet (Err _) ->
+            ( addError model "Could not undo canceling posting the tweet right now. Please try again later.", Cmd.none )
+
         EditTweet tweet ->
             ( { model | tweets = editTweet tweet model.tweets }, Cmd.none )
 

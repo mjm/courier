@@ -176,11 +176,11 @@ draftActions tweet =
     ]
 
 
-canceledActions : Tweet -> List (Html msg)
+canceledActions : Tweet -> List (Html Message)
 canceledActions tweet =
     [ div [ class "card-footer-item" ]
         [ span [] [ text "Canceled. " ]
-        , a [] [ text "Undo?" ]
+        , a [ onClick (UncancelTweet tweet) ] [ text "Undo?" ]
         ]
     ]
 

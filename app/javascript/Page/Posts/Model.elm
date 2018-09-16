@@ -29,6 +29,8 @@ type Message
     | Tick Time
     | CancelTweet Tweet
     | CanceledTweet (Result Http.Error Tweet)
+    | UncancelTweet Tweet
+    | UncanceledTweet (Result Http.Error Tweet)
     | EditTweet Tweet
     | SetTweetBody Tweet String
     | CancelEditTweet Tweet

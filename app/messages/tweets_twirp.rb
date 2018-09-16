@@ -6,6 +6,7 @@ class TweetsService < Twirp::Service
   service 'Tweets'
   rpc :GetTweets, GetTweetsRequest, GetTweetsResponse, :ruby_method => :get_tweets
   rpc :CancelTweet, CancelTweetRequest, CancelTweetResponse, :ruby_method => :cancel_tweet
+  rpc :UncancelTweet, UncancelTweetRequest, UncancelTweetResponse, :ruby_method => :uncancel_tweet
   rpc :UpdateTweet, UpdateTweetRequest, UpdateTweetResponse, :ruby_method => :update_tweet
   rpc :PostTweet, PostTweetRequest, PostTweetResponse, :ruby_method => :post_tweet
 end

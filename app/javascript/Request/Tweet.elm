@@ -30,6 +30,18 @@ cancel tweet =
             |> toRequest
 
 
+uncancel : Tweet -> Http.Request Tweet
+uncancel tweet =
+    let
+        body =
+            Encode.object [ ( "id", Encode.int tweet.id ) ]
+    in
+        tweetsBuilder "UncancelTweet"
+            |> withJsonBody body
+            |> withExpect (Http.expectJson tweetDecoder)
+            |> toRequest
+
+
 update : Tweet -> Bool -> Http.Request Tweet
 update tweet shouldPost =
     let

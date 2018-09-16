@@ -15,6 +15,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "CancelTweetResponse" do
     optional :tweet, :message, 1, "TweetMessage"
   end
+  add_message "UncancelTweetRequest" do
+    optional :id, :int64, 1
+  end
+  add_message "UncancelTweetResponse" do
+    optional :tweet, :message, 1, "TweetMessage"
+  end
   add_message "UpdateTweetRequest" do
     optional :id, :int64, 1
     optional :body, :string, 2
@@ -54,6 +60,8 @@ GetTweetsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("GetTw
 GetTweetsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("GetTweetsResponse").msgclass
 CancelTweetRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("CancelTweetRequest").msgclass
 CancelTweetResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("CancelTweetResponse").msgclass
+UncancelTweetRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("UncancelTweetRequest").msgclass
+UncancelTweetResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("UncancelTweetResponse").msgclass
 UpdateTweetRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("UpdateTweetRequest").msgclass
 UpdateTweetResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("UpdateTweetResponse").msgclass
 PostTweetRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("PostTweetRequest").msgclass
