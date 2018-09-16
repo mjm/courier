@@ -13,7 +13,11 @@ Rails.application.routes.draw do
   # XML-RPC ping service
   mount PingService, at: '/ping'
 
+  # Stripe webhook
+  post '/stripe/webhook', to: 'stripe#webhook'
+
   # Elm pages
   get '/feeds', to: 'pages#feeds'
+  get '/account', to: 'pages#account'
   root to: 'pages#index'
 end

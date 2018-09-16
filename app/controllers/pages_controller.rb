@@ -14,6 +14,9 @@ class PagesController < ApplicationController
     )
   end
 
+  def account
+  end
+
   private
 
   def set_user_json
