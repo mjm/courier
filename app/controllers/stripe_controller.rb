@@ -1,5 +1,5 @@
 class StripeController < ApplicationController
-  protect_from_forgery except: :webhook
+  protect_from_forgery except: %i[webhook subscribe]
 
   def webhook; end
 
@@ -8,15 +8,19 @@ class StripeController < ApplicationController
       email: params[:stripeEmail],
       source: params[:stripeToken]
     )
-    p customer
+    current_user.update!(
+      email: customer.email,
+      stripe_customer_id: customer.id
+    )
 
     subscription = Stripe::Subscription.create(
       customer: customer.id,
-      items: [{
-        plan: 'plan_DcLKc40R2MpDkG'
-      }]
+      items: [{ plan: Plan::MONTHLY.plan_id }]
     )
-    p subscription
+    current_user.update!(
+      stripe_subscription_id: subscription.id,
+      subscription_expires_at: Time.at(subscription.current_period_end)
+    )
 
     redirect_to account_url
   end

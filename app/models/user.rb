@@ -26,4 +26,13 @@ class User < ApplicationRecord
   def subscription(feed:)
     feed_subscriptions.where(feed: feed).first
   end
+
+  def to_message
+    UserMessage.new(
+      username: username,
+      name: name,
+      subscribed: stripe_subscription_id.present?,
+      subscription_expires_at: subscription_expires_at? ? subscription_expires_at.getutc.iso8601 : ''
+    )
+  end
 end

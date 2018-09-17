@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+message UserMessage {
+  string  username                 = 1;
+  string  name                     = 2;
+  bool    subscribed               = 3;
+  string  subscription_expires_at  = 4;
+}

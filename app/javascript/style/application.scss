@@ -37,3 +37,7 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 	-o-animation: rotating 1s linear infinite;
 	animation: rotating 1s linear infinite;
 }
+
+button.stripe-button-el {
+  display: none !important;
+}

@@ -54,6 +54,13 @@ profileNavbarItem user =
                         [ icon Solid "rss"
                         , span [] [ text "Your Feeds" ]
                         ]
+                    , a
+                        [ class "navbar-item"
+                        , href "/account"
+                        ]
+                        [ icon Solid "user-circle"
+                        , span [] [ text "Your Account" ]
+                        ]
                     ]
                 ]
 

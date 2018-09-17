@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_16_012218) do
+ActiveRecord::Schema.define(version: 2018_09_17_005150) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -85,6 +85,10 @@ ActiveRecord::Schema.define(version: 2018_09_16_012218) do
     t.string "twitter_access_secret"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "email"
+    t.string "stripe_customer_id"
+    t.string "stripe_subscription_id"
+    t.datetime "subscription_expires_at"
   end
 
   add_foreign_key "feed_subscriptions", "feeds"

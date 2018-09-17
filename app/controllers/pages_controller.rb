@@ -20,9 +20,6 @@ class PagesController < ApplicationController
   private
 
   def set_user_json
-    @user_json = {
-      username: current_user.username,
-      name: current_user.name
-    }.to_json
+    @user_json = current_user.to_message.to_json
   end
 end
