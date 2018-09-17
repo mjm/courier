@@ -8,7 +8,10 @@ import Page.Account.Model exposing (Model, Message(..))
 view : Model -> Html Message
 view model =
     div []
-        [ Html.form []
+        [ Html.form
+            [ action "/subscribe"
+            , method "POST"
+            ]
             [ node "script"
                 [ src "https://checkout.stripe.com/checkout.js"
                 , class "stripe-button"
@@ -17,6 +20,7 @@ view model =
                 , attribute "data-description" "Monthly autoposting subscription"
                 , attribute "data-amount" "500"
                 , attribute "data-label" "Subscribe"
+                , attribute "data-zip-code" "true"
                 ]
                 []
             ]
