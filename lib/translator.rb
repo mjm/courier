@@ -3,10 +3,10 @@ require 'tweet_document'
 
 # Transforms a blog post into text that would make sense to tweet.
 class Translator
-  attr_reader :input
+  attr_reader :content_html
 
-  def initialize(input)
-    @input = input
+  def initialize(content_html)
+    @content_html = content_html
   end
 
   def tweets
@@ -23,7 +23,7 @@ class Translator
 
   def translate
     return if @body
-    parser.parse(input)
+    parser.parse(content_html)
     @body = document.contents
     @media_urls = document.media_urls
   end
