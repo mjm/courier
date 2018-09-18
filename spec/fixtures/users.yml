@@ -5,6 +5,7 @@ alice:
   name: Alice
   twitter_access_token: aslkdjfalksdfj
   twitter_access_secret: aslkdjfaksdfj
+  subscription_expires_at: <%= (Time.now + 1.year).to_s(:db) %>
 
 bob:
   username: bob456

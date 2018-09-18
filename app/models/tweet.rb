@@ -12,6 +12,9 @@ class Tweet < ApplicationRecord
   after_update :broadcast_update
 
   def self.post_to_twitter(tweets, delay: 2.seconds)
+    tweets = tweets.select { |t| t.user.valid_subscription? }
+    return if tweets.empty?
+
     will_post_at = delay.from_now
     jid = PostTweetsWorker.perform_at(will_post_at, tweets.map(&:id))
     tweets.each do |t|

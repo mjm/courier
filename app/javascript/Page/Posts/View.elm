@@ -1,7 +1,7 @@
 module Page.Posts.View exposing (view)
 
 import Data.Tweet exposing (Tweet, PostInfo, Status(..))
-import Data.User as User exposing (User)
+import Data.User as User exposing (User, SubscriptionStatus(..))
 import Date exposing (Date)
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
@@ -24,6 +24,7 @@ view model =
             [ div []
                 [ h2 [ class "title has-text-centered" ] [ text "Your Tweets" ]
                 , hr [] []
+                , subscriptionMessage model.user model.now
                 , List.map (postEntry model.user model.now) model.tweets |> div []
                 ]
             ]
@@ -31,6 +32,22 @@ view model =
     , Page.footer
     ]
         |> div []
+
+
+subscriptionMessage : User -> Date -> Html Message
+subscriptionMessage user now =
+    case User.subscriptionStatus user now of
+        NotSubscribed ->
+            div [ class "notification is-warning has-text-centered" ]
+                [ text "You do not have a paid subscription to Courier, so you can only preview the tweets that would be posted for you."
+                , br [] []
+                , text "You can sign up at any time from the "
+                , a [ href "/account" ] [ text "Your Account" ]
+                , text " page."
+                ]
+
+        _ ->
+            text ""
 
 
 postEntry : User -> Date -> Editable Tweet -> Html Message

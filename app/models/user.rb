@@ -27,6 +27,14 @@ class User < ApplicationRecord
     feed_subscriptions.where(feed: feed).first
   end
 
+  def valid_subscription?
+    subscription_expires_at.present? && !subscription_expires_at.past?
+  end
+
+  def subscription_expired?
+    subscription_expires_at.past?
+  end
+
   def to_message
     UserMessage.new(
       username: username,

@@ -8,6 +8,7 @@ class PostTweetsWorker
     tweets.each do |tweet|
       next unless tweet.draft?
       next unless tweet.post_job_id == jid
+      next unless tweet.user.valid_subscription?
 
       posted_tweet = twitter(tweet.user).update(tweet.body)
 

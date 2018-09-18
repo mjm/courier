@@ -1,6 +1,6 @@
 module Page.Account.View exposing (view)
 
-import Date.Extra as DateE
+import Data.User as User exposing (SubscriptionStatus(..))
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -28,28 +28,26 @@ view model =
 
 subscriptionInfo : Model -> Html Message
 subscriptionInfo model =
-    case model.user.subscriptionExpiresAt of
-        Just expiresAt ->
-            case DateE.compare expiresAt model.now of
-                LT ->
-                    p [ class "has-text-centered" ]
-                        [ text "Oh no! Your subscription to Courier has "
-                        , strong [] [ text "expired" ]
-                        , text "."
-                        ]
+    case User.subscriptionStatus model.user model.now of
+        Expired expiresAt ->
+            p [ class "has-text-centered" ]
+                [ text "Oh no! Your subscription to Courier has "
+                , strong [] [ text "expired" ]
+                , text "."
+                ]
 
-                _ ->
-                    div [ class "content" ]
-                        [ p [ class "has-text-centered" ]
-                            [ text "You have a subscription to Courier! Happy posting!" ]
-                        , p [ class "has-text-centered" ]
-                            [ text "Your subscription will renew "
-                            , strong [] [ text (relativeTime model.now expiresAt) ]
-                            , text "."
-                            ]
-                        ]
+        Valid expiresAt ->
+            div [ class "content" ]
+                [ p [ class "has-text-centered" ]
+                    [ text "You have a subscription to Courier! Happy posting!" ]
+                , p [ class "has-text-centered" ]
+                    [ text "Your subscription will renew "
+                    , strong [] [ text (relativeTime model.now expiresAt) ]
+                    , text "."
+                    ]
+                ]
 
-        Nothing ->
+        NotSubscribed ->
             div [ class "content" ]
                 [ p [ class "has-text-centered" ]
                     [ text "You have not subscribed to Courier yet. Your tweets will not be posted automatically until you subscribe." ]
