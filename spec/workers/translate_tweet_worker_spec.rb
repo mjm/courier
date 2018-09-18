@@ -42,4 +42,13 @@ RSpec.describe TranslateTweetWorker, type: :worker do
       end
     end
   end
+
+  context 'when the tweet has media URLs' do
+    let(:post) { posts(:example_images) }
+
+    it 'adds the media URLs to the created tweet' do
+      subject.perform(post.id)
+      expect(tweet.media_urls).to eq %w[https://example.org/media/foo.jpg]
+    end
+  end
 end

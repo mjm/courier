@@ -23,7 +23,8 @@ class TranslateTweetWorker
         Tweet.create(
           feed_subscription: subscription,
           post: post,
-          body: tweet.body
+          body: tweet.body,
+          media_urls: tweet.media_urls
         )
       end
 

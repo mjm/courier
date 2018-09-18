@@ -13,3 +13,11 @@ example_untranslated:
   content_html: '<p>Foo bar baz</p>'
   published_at: <%= Time.utc(2018, 2, 2).to_s(:db) %>
   modified_at: <%= Time.utc(2018, 2, 3).to_s(:db) %>
+
+example_images:
+  feed: example
+  item_id: image-post
+  url: https://example.org/image-post
+  content_html: >
+    <p>This post has an image:</p>
+    <img src="https://example.org/media/foo.jpg">
