@@ -112,7 +112,7 @@ tweetCard user postTweet now =
             viewTweetCard user tweet now
 
         Editing _ tweet ->
-            editTweetCard user tweet
+            editTweetCard user tweet now
 
         Saving _ tweet ->
             savingTweetCard user tweet.post
@@ -128,7 +128,7 @@ viewTweetCard user tweet now =
         , footer [ class "card-footer" ] <|
             case tweet.status of
                 Draft ->
-                    draftActions tweet now
+                    draftActions user tweet now
 
                 Canceled ->
                     canceledActions tweet
@@ -138,8 +138,8 @@ viewTweetCard user tweet now =
         ]
 
 
-editTweetCard : User -> Tweet -> Html Message
-editTweetCard user tweet =
+editTweetCard : User -> Tweet -> Date -> Html Message
+editTweetCard user tweet now =
     Html.form [ action "javascript:void(0);" ]
         [ article [ class "card" ]
             [ div [ class "card-content" ]
@@ -156,7 +156,7 @@ editTweetCard user tweet =
                         ]
                     ]
                 ]
-            , footer [ class "card-footer" ] <| editActions tweet
+            , footer [ class "card-footer" ] <| editActions user tweet now
             ]
         ]
 
@@ -174,27 +174,41 @@ savingTweetCard user post =
         ]
 
 
-draftActions : Tweet -> Date -> List (Html Message)
-draftActions tweet now =
-    [ a
-        [ onClick <| CancelTweet tweet
-        , class "card-footer-item has-text-danger"
+draftActions : User -> Tweet -> Date -> List (Html Message)
+draftActions user tweet now =
+    let
+        validSubscription =
+            case User.subscriptionStatus user now of
+                Valid _ ->
+                    True
+
+                _ ->
+                    False
+    in
+        [ a
+            [ onClick <| CancelTweet tweet
+            , class "card-footer-item has-text-danger"
+            ]
+            [ icon Solid "ban", span [] [ text "Don't Post" ] ]
+        , a
+            [ onClick <| EditTweet tweet
+            , class "card-footer-item has-text-primary"
+            ]
+            [ icon Solid "pencil-alt", span [] [ text "Edit Tweet" ] ]
         ]
-        [ icon Solid "ban", span [] [ text "Don't Post" ] ]
-    , a
-        [ onClick <| EditTweet tweet
-        , class "card-footer-item has-text-primary"
-        ]
-        [ icon Solid "pencil-alt", span [] [ text "Edit Tweet" ] ]
-    , a
-        [ onClick <| SubmitTweet tweet
-        , class "card-footer-item"
-        ]
-        [ icon Solid "share"
-        , span [] [ text "Post Now" ]
-        , willPostETA tweet now
-        ]
-    ]
+            ++ (if User.isValidSubscription user now then
+                    [ a
+                        [ onClick <| SubmitTweet tweet
+                        , class "card-footer-item"
+                        ]
+                        [ icon Solid "share"
+                        , span [] [ text "Post Now" ]
+                        , willPostETA tweet now
+                        ]
+                    ]
+                else
+                    []
+               )
 
 
 willPostETA : Tweet -> Date -> Html msg
@@ -268,8 +282,8 @@ postedActions tweet now =
     ]
 
 
-editActions : Tweet -> List (Html Message)
-editActions tweet =
+editActions : User -> Tweet -> Date -> List (Html Message)
+editActions user tweet now =
     [ a
         [ class "card-footer-item has-text-danger"
         , onClick (CancelEditTweet tweet)
@@ -280,12 +294,17 @@ editActions tweet =
         , onClick (SaveTweet tweet False)
         ]
         [ span [] [ text "Save Draft" ] ]
-    , a
-        [ class "card-footer-item"
-        , onClick (SaveTweet tweet True)
-        ]
-        [ span [] [ text "Post Now " ] ]
     ]
+        ++ (if User.isValidSubscription user now then
+                [ a
+                    [ class "card-footer-item"
+                    , onClick (SaveTweet tweet True)
+                    ]
+                    [ span [] [ text "Post Now " ] ]
+                ]
+            else
+                []
+           )
 
 
 tweetUserInfo : User -> PostInfo -> Html Message

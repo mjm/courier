@@ -1,4 +1,4 @@
-module Data.User exposing (User, SubscriptionStatus(..), subscriptionStatus, avatarUrl, decoder)
+module Data.User exposing (User, SubscriptionStatus(..), subscriptionStatus, isValidSubscription, avatarUrl, decoder)
 
 import Date exposing (Date)
 import Date.Extra as DateE
@@ -34,6 +34,16 @@ subscriptionStatus user now =
 
         Nothing ->
             NotSubscribed
+
+
+isValidSubscription : User -> Date -> Bool
+isValidSubscription user now =
+    case subscriptionStatus user now of
+        Valid _ ->
+            True
+
+        _ ->
+            False
 
 
 avatarUrl : User -> String
