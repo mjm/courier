@@ -3,6 +3,8 @@ require 'tweet_document'
 
 # Transforms a blog post into text that would make sense to tweet.
 class Translator
+  Tweet = Struct.new(:body, :media_urls)
+
   attr_reader :title, :url, :content_html
 
   def initialize(title: '', url: '', content_html:)
@@ -13,27 +15,21 @@ class Translator
 
   def tweets
     translate
-    [@body]
-  end
-
-  def media_urls
-    translate
-    @media_urls
+    @tweets
   end
 
   private
 
   def translate
-    return if @body
+    return if @tweets
 
     if title.present? && url.present?
-      @body = "#{title} #{url}"
+      @tweets = [Tweet.new("#{title} #{url}", [])]
       return
     end
 
     parser.parse(content_html)
-    @body = document.contents
-    @media_urls = document.media_urls
+    @tweets = [Tweet.new(document.contents, document.media_urls)]
   end
 
   def document

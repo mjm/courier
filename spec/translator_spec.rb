@@ -6,15 +6,14 @@ RSpec.describe Translator do
   let(:url) { '' }
   let(:content_html) { '' }
   subject { Translator.new(title: title, url: url, content_html: content_html) }
-  let(:translated) { subject.tweets.first }
 
   matcher :translate_to do |expected|
     match do |actual|
-      actual.tweets.first == expected
+      actual.tweets.first.body == expected
     end
 
     failure_message do |actual|
-      "expected #{actual.content_html.inspect} to translate to #{expected.inspect},\n but instead translated to #{actual.tweets.first.inspect}"
+      "expected #{actual.content_html.inspect} to translate to #{expected.inspect},\n but instead translated to #{actual.tweets.first.body.inspect}"
     end
   end
 
@@ -32,7 +31,7 @@ RSpec.describe Translator do
     end
 
     it 'attaches no media URLs' do
-      expect(subject.media_urls).to eq []
+      expect(subject.tweets.first.media_urls).to eq []
     end
 
     context 'and tweets are requested multiple times' do
@@ -139,7 +138,7 @@ RSpec.describe Translator do
     end
 
     it 'attaches the image URLs as a media item' do
-      expect(subject.media_urls).to eq %w[
+      expect(subject.tweets.first.media_urls).to eq %w[
         https://example.com/foo.jpg
         https://example.com/bar.jpg
       ]

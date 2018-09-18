@@ -23,7 +23,7 @@ class TranslateTweetWorker
         Tweet.create(
           feed_subscription: subscription,
           post: post,
-          body: tweet
+          body: tweet.body
         )
       end
 
