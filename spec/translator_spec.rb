@@ -1,8 +1,11 @@
+require 'rails_helper'
 require 'translator'
 
 RSpec.describe Translator do
+  let(:title) { '' }
+  let(:url) { '' }
   let(:content_html) { '' }
-  subject { Translator.new(content_html) }
+  subject { Translator.new(title: title, url: url, content_html: content_html) }
   let(:translated) { subject.tweets.first }
 
   matcher :translate_to do |expected|
@@ -11,20 +14,20 @@ RSpec.describe Translator do
     end
 
     failure_message do |actual|
-      "expected #{actual.content_html.inspect} to translate to #{expected.inspect},\n but instead translated to #{actual.translate.inspect}"
+      "expected #{actual.content_html.inspect} to translate to #{expected.inspect},\n but instead translated to #{actual.tweets.first.inspect}"
     end
   end
 
-  context 'when the content_html is an empty string' do
+  context 'when the html is an empty string' do
     it 'translates an empty string' do
       should translate_to ''
     end
   end
 
-  context 'when the content_html is a simple, unformatted string' do
+  context 'when the html is a simple, unformatted string' do
     let(:content_html) { 'This is a very simple tweet.' }
 
-    it 'translates to the content_html string' do
+    it 'translates to the input string' do
       should translate_to content_html
     end
 
@@ -40,7 +43,7 @@ RSpec.describe Translator do
     end
   end
 
-  context 'when the content_html has undesired HTML tags' do
+  context 'when the html has undesired HTML tags' do
     let(:content_html) do
       %(<p>This is <strong>also</strong> a si<em>mp</em>le tweet.</p>)
     end
@@ -50,7 +53,7 @@ RSpec.describe Translator do
     end
   end
 
-  context 'when the content_html has multiple paragraphs' do
+  context 'when the html has multiple paragraphs' do
     let(:content_html) do
       %(<p>Paragraph 1</p><p>Paragraph 2</p>)
     end
@@ -60,7 +63,7 @@ RSpec.describe Translator do
     end
   end
 
-  context 'when the content_html has line break tags' do
+  context 'when the html has line break tags' do
     let(:content_html) do
       %(Some content<br>Some more content<br />This is it.)
     end
@@ -70,7 +73,7 @@ RSpec.describe Translator do
     end
   end
 
-  context 'when the content_html has a link' do
+  context 'when the html has a link' do
     let(:content_html) do
       %(This is <a href="http://example.com/foo/bar">some #content.</a>)
     end
@@ -80,7 +83,7 @@ RSpec.describe Translator do
     end
   end
 
-  context 'when the content_html has multiple links' do
+  context 'when the html has multiple links' do
     let(:content_html) do
       %(
         This is <a href="http://example.com/foo">some</a>
@@ -93,7 +96,7 @@ RSpec.describe Translator do
     end
   end
 
-  context 'when the content_html has a block quote' do
+  context 'when the html has a block quote' do
     let(:content_html) do
       %(<p>Check this thing out:</p><blockquote>I said a thing</blockquote>)
     end
@@ -103,7 +106,7 @@ RSpec.describe Translator do
     end
   end
 
-  context 'when the content_html has HTML entities' do
+  context 'when the html has HTML entities' do
     let(:content_html) do
       %(<p>I&#8217;m having a &#8220;great time&#8221;. Here's
       &lt;strong&gt;some html&lt;/strong&gt;)
@@ -114,7 +117,7 @@ RSpec.describe Translator do
     end
   end
 
-  context 'when the content_html has a trailing newline after a paragraph' do
+  context 'when the html has a trailing newline after a paragraph' do
     let(:content_html) do
       "<p>This is some text</p>\n"
     end
@@ -124,7 +127,7 @@ RSpec.describe Translator do
     end
   end
 
-  context 'when the content_html has image tags in it' do
+  context 'when the html has image tags in it' do
     let(:content_html) do
       %(<p>Check it out!</p>
         <p><img src="https://example.com/foo.jpg">
@@ -140,6 +143,16 @@ RSpec.describe Translator do
         https://example.com/foo.jpg
         https://example.com/bar.jpg
       ]
+    end
+  end
+
+  context 'when a title and URL are provided' do
+    let(:title) { %(Welcome to Microblogging) }
+    let(:url) { %(https://example.com/abc/) }
+    let(:content_html) { %(<p>This is my welcome post.</p>) }
+
+    it 'uses the title and URL for the tweet' do
+      should translate_to %(Welcome to Microblogging https://example.com/abc/)
     end
   end
 end

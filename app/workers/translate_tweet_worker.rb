@@ -8,7 +8,11 @@ class TranslateTweetWorker
   def perform(post_id)
     @post = Post.find(post_id)
 
-    tweets = Translator.new(post.content_html).tweets
+    tweets = Translator.new(
+      title: post.title,
+      url: post.url,
+      content_html: post.content_html
+    ).tweets
 
     post.feed_subscriptions.kept.each do |subscription|
       existing_tweets = post.tweets.where(feed_subscription: subscription)
