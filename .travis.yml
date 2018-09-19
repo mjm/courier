@@ -17,6 +17,6 @@ deploy:
   provider: heroku
   api_key:
     secure: luw2K0gMk4f/w0+HPJnHZO0FZ3e2tWF9g96AlsyfGMeZ5a3Zo1ff2iAsX7nZRXec6tqh/OrSkUJDEjSRFFbybKVHvzwnFp73xE7T4LZ+HNP+L/iRTZxf4kyT/c5zksvlsa+1xqmHaTrIQeSyk629OqcJalrgLQL2CCHGvb6o+ZFYdgBH4oKTaKkNMwVYI+dSyIwHRpHgpYn7JyyhQWUR4SCYwybkx51OJsQkcfzWTTyQtT0zAOC2SxI3+153S4ODIzYNFpiTDbxzqb+FvWBSMGw2I1tG0jhw1dEo3p38gUrmwGK2nn62PDdA/d8eM4P4yEPihnerNnwGz0Pg0FuPgLb97zUAWAme6pDJGl9xZMx1QAPn0ZcFCf/TgkYx2vbnF6/w85bKjhnRL51GrXMTUSP9eI27MtYVOYxGTWdN2kmiAH7PygMpMN//nKgxefCMYOwyAlNOkQvsEUg0I4+J6Okf96IDTN/vxXS7IsnrX+fNAilH90CNXJfKNbmP7sJp5YGSKEj6xg1zIO2mqbCWJMZAScahLLdBLV4Or4cDNBz1qo4UZMW2nojS5wgZw/eKmwRgj7KNtjme4pZgD4Fl0Cl6r7AAlyFQTpwPwMF1d7nRfZazffrSYriBPL/tX0YQ+ySrqQ5U3rKsDXEE1ganwsB2t9bQnVfdQgN4lPmHDpI=
-  app: courier-gateway
+  app: courier-staging
   on:
-    repo: mjm/courier-gateway
+    repo: mjm/courier
