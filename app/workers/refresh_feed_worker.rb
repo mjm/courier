@@ -2,6 +2,7 @@ require 'feed_downloader'
 
 class RefreshFeedWorker
   include Sidekiq::Worker
+  sidekiq_options unique: :while_executing, log_duplicate_payload: true
 
   attr_reader :feed
 

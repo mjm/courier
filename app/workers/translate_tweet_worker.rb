@@ -2,6 +2,7 @@ require 'translator'
 
 class TranslateTweetWorker
   include Sidekiq::Worker
+  sidekiq_options unique: :until_executed, log_duplicate_payload: true
 
   attr_reader :post
 
