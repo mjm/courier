@@ -14,7 +14,7 @@ Rails.application.routes.draw do
   mount PingService, at: '/ping'
 
   # Stripe
-  post '/stripe/webhook', to: 'stripe#webhook'
+  mount StripeEvent::Engine, at: '/stripe/webhook'
   post '/subscribe', to: 'stripe#subscribe'
 
   # Elm pages

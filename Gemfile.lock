@@ -226,6 +226,9 @@ GEM
       sprockets (>= 3.0.0)
     stripe (3.26.1)
       faraday (~> 0.10)
+    stripe_event (2.1.1)
+      activesupport (>= 3.1)
+      stripe (>= 2.8, < 4.0)
     thor (0.20.0)
     thread_safe (0.3.6)
     tilt (2.0.8)
@@ -299,6 +302,7 @@ DEPENDENCIES
   spring
   spring-watcher-listen (~> 2.0.0)
   stripe
+  stripe_event
   twirp
   twitter
   tzinfo-data
