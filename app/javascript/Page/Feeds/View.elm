@@ -225,11 +225,15 @@ addFeedForm feed =
                 [ button
                     [ class "button is-light"
                     , onClickPreventDefault (SetAddingFeed False)
+                    , type_ "button"
                     ]
                     [ text "Cancel" ]
                 ]
             , p [ class "control" ]
-                [ button [ class "button is-primary" ]
+                [ button
+                    [ class "button is-primary"
+                    , type_ "submit"
+                    ]
                     [ text "Add Feed" ]
                 ]
             ]
