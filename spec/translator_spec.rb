@@ -154,4 +154,23 @@ RSpec.describe Translator do
       should translate_to %(Welcome to Microblogging https://example.com/abc/)
     end
   end
+
+  context 'when the html contains an embedded tweet' do
+    let(:content_html) do
+      %(<p>I would 100% support making college free.</p>
+      <blockquote class="twitter-tweet" data-width="550" data-dnt="true">
+      <p lang="en" dir="ltr">Make college free. Cancel student debt.</p>
+      <p>&quot;Won&#39;t the people who already paid be bitter?&quot;</p>
+      <p>I&#39;d hope they would be happy no one else has to go through that.</p>
+      <p>Would you stop using plumbing because it&#39;s not fair to people who died before it was invented?</p>
+      <p>Forward. Always.</p>
+      <p>&mdash; Alexandra Goblin (@alexandraerin) <a href="https://twitter.com/alexandraerin/status/1042248937246273536?ref_src=twsrc%5Etfw">September 19, 2018</a></p></blockquote>
+      <p><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+      )
+    end
+
+    it 'replaces the embedded tweet content with the tweet URL' do
+      should translate_to %(I would 100% support making college free. https://twitter.com/alexandraerin/status/1042248937246273536)
+    end
+  end
 end
