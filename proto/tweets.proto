@@ -56,13 +56,14 @@ message TweetMessage {
     POSTED    = 2;
   }
 
-  int64        id               = 1;
-  string       body             = 2;
-  PostMessage  post             = 3;
-  Status       status           = 4;
-  string       posted_at        = 5;
-  string       posted_tweet_id  = 6;
-  string       will_post_at     = 7;
+           int64        id               = 1;
+           string       body             = 2;
+           PostMessage  post             = 3;
+           Status       status           = 4;
+           string       posted_at        = 5;
+           string       posted_tweet_id  = 6;
+           string       will_post_at     = 7;
+  repeated string       media_urls       = 8;
 }
 
 message PostMessage {

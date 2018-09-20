@@ -14,6 +14,7 @@ RSpec.describe PostTweetsWorker, type: :worker do
   STATUS_UPDATE_URL = 'https://api.twitter.com/1.1/statuses/update.json'.freeze
 
   before do
+    subject.jid = 'abc'
     stub_request(:post, STATUS_UPDATE_URL).to_return(
       body: File.new(file_fixture('tweet.json')),
       headers: { content_type: 'application/json; charset=utf8' }
@@ -23,10 +24,10 @@ RSpec.describe PostTweetsWorker, type: :worker do
   it 'sends the tweets to Twitter' do
     subject.perform(ids)
     expect(a_request(:post, STATUS_UPDATE_URL).with(
-      body: { status: 'This is an example status post.' }
+      body: { status: 'This is an example status post.', media_ids: '' }
     )).to have_been_made
     expect(a_request(:post, STATUS_UPDATE_URL).with(
-      body: { status: 'This is a second tweet for the same post.' }
+      body: { status: 'This is a second tweet for the same post.', media_ids: '' }
     )).to have_been_made
   end
 

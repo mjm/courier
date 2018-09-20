@@ -1,3 +1,6 @@
+require 'fileutils'
+require 'digest'
+
 class PostTweetsWorker
   include Sidekiq::Worker
 
@@ -10,7 +13,8 @@ class PostTweetsWorker
       next unless tweet.post_job_id == jid
       next unless tweet.user.valid_subscription?
 
-      posted_tweet = twitter(tweet.user).update(tweet.body)
+      media_files = download_media_files(tweet)
+      posted_tweet = twitter(tweet.user).update_with_media(tweet.body, media_files)
 
       tweet.update(
         status: :posted,
@@ -28,6 +32,27 @@ class PostTweetsWorker
       config.consumer_secret = Rails.application.credentials.twitter[:api_secret]
       config.access_token = user.twitter_access_token
       config.access_token_secret = user.twitter_access_secret
+    end
+  end
+
+  def download_media_files(tweet)
+    files_dir = Rails.root / 'tmp' / jid / 'tweets' / tweet.id.to_s
+    FileUtils.rm_rf files_dir
+    FileUtils.mkdir_p files_dir
+    tweet.media_urls.map do |url|
+      filename = Digest::SHA1.hexdigest(url)
+      path = files_dir / filename
+
+      response = connection(url).get
+      path.binwrite(response.body)
+      path.open
+    end
+  end
+
+  def connection(url)
+    Faraday.new(url) do |conn|
+      conn.response :follow_redirects
+      conn.adapter :typhoeus
     end
   end
 end

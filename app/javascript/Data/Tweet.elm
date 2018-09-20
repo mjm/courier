@@ -20,6 +20,7 @@ type alias Tweet =
     , postedAt : Maybe Date
     , tweetId : Maybe String
     , willPostAt : Maybe Date
+    , mediaUrls : List String
     }
 
 
@@ -41,6 +42,7 @@ decoder =
         |> optional "postedAt" Util.Date.decoder Nothing
         |> optional "postedTweetId" (Decode.maybe string) Nothing
         |> optional "willPostAt" Util.Date.decoder Nothing
+        |> optional "mediaUrls" (Decode.list string) []
 
 
 postDecoder : Decoder PostInfo

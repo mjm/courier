@@ -38,7 +38,8 @@ class Tweet < ApplicationRecord
       status: status.upcase,
       posted_at: posted_at ? posted_at.getutc.iso8601 : '',
       posted_tweet_id: posted_tweet_id || '',
-      will_post_at: will_post? ? will_post_at.getutc.iso8601 : ''
+      will_post_at: will_post? ? will_post_at.getutc.iso8601 : '',
+      media_urls: media_urls
     )
   end
 

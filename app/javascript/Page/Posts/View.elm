@@ -122,9 +122,11 @@ viewTweetCard : User -> Tweet -> Date -> Html Message
 viewTweetCard user tweet now =
     article [ class "card" ]
         [ div [ class "card-content" ]
-            [ tweetUserInfo user tweet.post
-            , p [ style [ ( "white-space", "pre-line" ) ] ] [ text tweet.body ]
-            ]
+            ([ tweetUserInfo user tweet.post
+             , p [ style [ ( "white-space", "pre-line" ) ] ] [ text tweet.body ]
+             ]
+                ++ List.map viewMediaItem tweet.mediaUrls
+            )
         , footer [ class "card-footer" ] <|
             case tweet.status of
                 Draft ->
@@ -136,6 +138,12 @@ viewTweetCard user tweet now =
                 Posted ->
                     postedActions tweet now
         ]
+
+
+viewMediaItem : String -> Html Message
+viewMediaItem url =
+    div []
+        [ img [ src url ] [] ]
 
 
 editTweetCard : User -> Tweet -> Date -> Html Message

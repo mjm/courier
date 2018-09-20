@@ -14,7 +14,7 @@ class FeedDownloader
   def feed
     logger.debug "Downloading feed at #{url}"
 
-    response = Faraday.new(url).get do |req|
+    response = connection(url).get do |req|
       req.headers['If-None-Match'] = etag if etag
       req.headers['If-Modified-Since'] = last_modified if last_modified
     end
@@ -24,6 +24,13 @@ class FeedDownloader
   Feed = Struct.new(:title, :home_page_url, :etag, :last_modified, :posts)
 
   private
+
+  def connection(url)
+    Faraday.new(url) do |conn|
+      conn.response :follow_redirects
+      conn.adapter :typhoeus
+    end
+  end
 
   def handle_response(response)
     logger.info "Downloaded #{url} - #{response.status} #{response.body.size}"
