@@ -172,5 +172,19 @@ RSpec.describe Translator do
     it 'replaces the embedded tweet content with the tweet URL' do
       should translate_to %(I would 100% support making college free. https://twitter.com/alexandraerin/status/1042248937246273536)
     end
+
+    context 'and the embedded tweet has other Twitter links in it' do
+      let(:content_html) do
+        %(<p>And I&#8217;m sitting here with two level 117 characters.</p>
+<blockquote class="twitter-tweet" data-width="550" data-dnt="true">
+<p lang="en" dir="ltr">Congratulations <a href="https://twitter.com/Methodgg?ref_src=twsrc%5Etfw">@Methodgg</a> on the world first clear of Mythic Uldir!!! <a href="https://t.co/iUCOwDbPYw">pic.twitter.com/iUCOwDbPYw</a></p>
+<p>&mdash; World of Warcraft (@Warcraft) <a href="https://twitter.com/Warcraft/status/1042485327267422208?ref_src=twsrc%5Etfw">September 19, 2018</a></p></blockquote>
+<p><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>)
+      end
+
+      it 'only includes the link to the embedded tweet' do
+        should translate_to %(And I’m sitting here with two level 117 characters. https://twitter.com/Warcraft/status/1042485327267422208)
+      end
+    end
   end
 end
