@@ -9,7 +9,7 @@ StripeEvent.signing_secret = Rails.configuration.stripe[:signing_secret]
 Plan::MONTHLY = Plan.new(
   key: :monthly,
   name: 'Monthly Plan',
-  plan_id: STRIPE_ENV == :production ? 'plan_DcPlEgFAqBYpnH' : 'plan_DcLKc40R2MpDkG',
+  plan_id: STRIPE_ENV == :production ? 'plan_DcPlEgFAqBYpnH' : 'plan_DdvIUmVUiibVMa',
   amount: 500,
   interval: 'month'
 )
