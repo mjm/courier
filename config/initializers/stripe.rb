@@ -41,4 +41,13 @@ StripeEvent.configure do |events|
     invoice = event.data.object
     Rails.logger.info "Invoice #{invoice.id} for customer #{invoice.customer} failed to be paid."
   end
+
+  events.subscribe 'customer.subscription.deleted' do |event|
+    subscription = event.data.object
+    Rails.logger.info "Subscription #{subscription.id} was deleted."
+    User.where(stripe_subscription_id: subscription.id).update_all(
+      stripe_subscription_id: nil,
+      subscription_expires_at: nil
+    )
+  end
 end
