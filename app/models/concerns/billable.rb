@@ -34,6 +34,17 @@ module Billable
     update! subscription_renews_at: nil
   end
 
+  def update_subscription(subscription = nil)
+    subscription ||= fetch_subscription
+
+    period_end = Time.at(subscription.current_period_end)
+    update!(
+      stripe_subscription_id: subscription.id,
+      subscription_renews_at: period_end,
+      subscription_expires_at: period_end + 1.day
+    )
+  end
+
   private
 
   def fetch_subscription
@@ -52,12 +63,7 @@ module Billable
       customer: stripe_customer_id,
       items: [{ plan: Plan::MONTHLY.plan_id }]
     )
-    period_end = Time.at(subscription.current_period_end)
-    update!(
-      stripe_subscription_id: subscription.id,
-      subscription_renews_at: period_end,
-      subscription_expires_at: period_end + 1.day
-    )
+    update_subscription(subscription)
     subscription
   end
 end

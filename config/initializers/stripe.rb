@@ -31,7 +31,7 @@ StripeEvent.configure do |events|
     subscription = Stripe::Subscription.retrieve(invoice.subscription)
     user = User.where(stripe_subscription_id: subscription.id).first
     if user
-      user.update!(subscription_expires_at: Time.at(subscription.current_period_end))
+      user.update_subscription(subscription)
     else
       Rails.logger.error "No user was found for paid subscription #{subscription.id}"
     end
