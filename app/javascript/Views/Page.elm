@@ -61,6 +61,14 @@ profileNavbarItem user =
                         [ icon Solid "user-circle"
                         , span [] [ text "Your Account" ]
                         ]
+                    , hr [ class "navbar-divider" ] []
+                    , a
+                        [ class "navbar-item"
+                        , href "/sign_out"
+                        ]
+                        [ icon Solid "sign-out-alt"
+                        , span [] [ text "Sign Out" ]
+                        ]
                     ]
                 ]
 
