@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  include Billable
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :registerable, :rememberable, :omniauthable, :trackable,
@@ -27,20 +29,13 @@ class User < ApplicationRecord
     feed_subscriptions.where(feed: feed).first
   end
 
-  def valid_subscription?
-    subscription_expires_at.present? && !subscription_expires_at.past?
-  end
-
-  def subscription_expired?
-    subscription_expires_at.past?
-  end
-
   def to_message
     UserMessage.new(
       username: username,
       name: name,
       subscribed: stripe_subscription_id.present?,
-      subscription_expires_at: subscription_expires_at? ? subscription_expires_at.getutc.iso8601 : ''
+      subscription_expires_at: subscription_expires_at? ? subscription_expires_at.getutc.iso8601 : '',
+      subscription_renews_at: subscription_renews_at? ? subscription_renews_at.getutc.iso8601 : ''
     )
   end
 end

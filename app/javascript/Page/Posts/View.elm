@@ -1,7 +1,7 @@
 module Page.Posts.View exposing (view)
 
 import Data.Tweet exposing (Tweet, PostInfo, Status(..))
-import Data.User as User exposing (User, SubscriptionStatus(..))
+import Data.User as User exposing (User)
 import Date exposing (Date)
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
@@ -36,18 +36,16 @@ view model =
 
 subscriptionMessage : User -> Date -> Html Message
 subscriptionMessage user now =
-    case User.subscriptionStatus user now of
-        NotSubscribed ->
-            div [ class "notification is-warning has-text-centered" ]
-                [ text "You do not have a paid subscription to Courier, so you can only preview the tweets that would be posted for you."
-                , br [] []
-                , text "You can sign up at any time from the "
-                , a [ href "/account" ] [ text "Your Account" ]
-                , text " page."
-                ]
-
-        _ ->
-            text ""
+    if User.isValidSubscription user now then
+        text ""
+    else
+        div [ class "notification is-warning has-text-centered" ]
+            [ text "You do not have a paid subscription to Courier, so you can only preview the tweets that would be posted for you."
+            , br [] []
+            , text "You can sign up at any time from the "
+            , a [ href "/account" ] [ text "Your Account" ]
+            , text " page."
+            ]
 
 
 postEntry : User -> Date -> Editable Tweet -> Html Message
@@ -184,39 +182,30 @@ savingTweetCard user post =
 
 draftActions : User -> Tweet -> Date -> List (Html Message)
 draftActions user tweet now =
-    let
-        validSubscription =
-            case User.subscriptionStatus user now of
-                Valid _ ->
-                    True
-
-                _ ->
-                    False
-    in
-        [ a
-            [ onClick <| CancelTweet tweet
-            , class "card-footer-item has-text-danger"
-            ]
-            [ icon Solid "ban", span [] [ text "Don't Post" ] ]
-        , a
-            [ onClick <| EditTweet tweet
-            , class "card-footer-item has-text-primary"
-            ]
-            [ icon Solid "pencil-alt", span [] [ text "Edit Tweet" ] ]
+    [ a
+        [ onClick <| CancelTweet tweet
+        , class "card-footer-item has-text-danger"
         ]
-            ++ (if User.isValidSubscription user now then
-                    [ a
-                        [ onClick <| SubmitTweet tweet
-                        , class "card-footer-item"
-                        ]
-                        [ icon Solid "share"
-                        , span [] [ text "Post Now" ]
-                        , willPostETA tweet now
-                        ]
+        [ icon Solid "ban", span [] [ text "Don't Post" ] ]
+    , a
+        [ onClick <| EditTweet tweet
+        , class "card-footer-item has-text-primary"
+        ]
+        [ icon Solid "pencil-alt", span [] [ text "Edit Tweet" ] ]
+    ]
+        ++ (if User.isValidSubscription user now then
+                [ a
+                    [ onClick <| SubmitTweet tweet
+                    , class "card-footer-item"
                     ]
-                else
-                    []
-               )
+                    [ icon Solid "share"
+                    , span [] [ text "Post Now" ]
+                    , willPostETA tweet now
+                    ]
+                ]
+            else
+                []
+           )
 
 
 willPostETA : Tweet -> Date -> Html msg

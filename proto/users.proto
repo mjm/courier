@@ -1,8 +1,20 @@
 syntax = "proto3";
 
+service Users {
+  rpc CancelSubscription(CancelSubscriptionRequest) returns (CancelSubscriptionResponse);
+}
+
+message CancelSubscriptionRequest {
+}
+
+message CancelSubscriptionResponse {
+  UserMessage  user  = 1;
+}
+
 message UserMessage {
   string  username                 = 1;
   string  name                     = 2;
   bool    subscribed               = 3;
   string  subscription_expires_at  = 4;
+  string  subscription_renews_at   = 5;
 }

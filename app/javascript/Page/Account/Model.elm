@@ -2,6 +2,7 @@ module Page.Account.Model exposing (Model, Message(..))
 
 import Data.User exposing (User)
 import Date exposing (Date)
+import Http
 import Time exposing (Time)
 
 
@@ -14,3 +15,5 @@ type alias Model =
 
 type Message
     = Tick Time
+    | CancelSubscription
+    | SubscriptionCanceled (Result Http.Error User)

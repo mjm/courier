@@ -1,3 +1,5 @@
+require 'twirp_ext'
+
 Rails.application.routes.draw do
   devise_for :users, controllers: { omniauth_callbacks: 'users/callbacks' }
 
@@ -7,8 +9,9 @@ Rails.application.routes.draw do
   end
 
   # Twirp services
-  mount FeedsController.service, at: FeedsController.path
-  mount TweetsController.service, at: TweetsController.path
+  service FeedsController
+  service TweetsController
+  service UsersController
 
   # XML-RPC ping service
   mount PingService, at: '/ping'

@@ -4,6 +4,7 @@ import Data.User as User exposing (SubscriptionStatus(..))
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Page.Account.Model exposing (Model, Message(..))
 import Views.Icon exposing (..)
 import Views.Page as Page
@@ -36,14 +37,34 @@ subscriptionInfo model =
                 , text "."
                 ]
 
-        Valid expiresAt ->
+        Canceled expiresAt ->
+            div [ class "content" ]
+                [ p [ class "has-text-centered" ]
+                    [ text "Your subscription has been canceled, but you can still use Courier until it expires." ]
+                , p [ class "has-text-centered" ]
+                    [ text "Your subscription will expire "
+                    , strong [] [ text (relativeTime model.now expiresAt) ]
+                    , text "."
+                    ]
+                ]
+
+        Valid _ renewsAt ->
             div [ class "content" ]
                 [ p [ class "has-text-centered" ]
                     [ text "You have a subscription to Courier! Happy posting!" ]
                 , p [ class "has-text-centered" ]
                     [ text "Your subscription will renew "
-                    , strong [] [ text (relativeTime model.now expiresAt) ]
+                    , strong [] [ text (relativeTime model.now renewsAt) ]
                     , text "."
+                    ]
+                , p [ class "has-text-centered" ]
+                    [ button
+                        [ onClick CancelSubscription
+                        , class "button is-danger"
+                        ]
+                        [ icon Solid "ban"
+                        , span [] [ text "Cancel My Subscription" ]
+                        ]
                     ]
                 ]
 

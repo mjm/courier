@@ -12,13 +12,15 @@ type alias User =
     , name : String
     , subscribed : Bool
     , subscriptionExpiresAt : Maybe Date
+    , subscriptionRenewsAt : Maybe Date
     }
 
 
 type SubscriptionStatus
     = NotSubscribed
-    | Valid Date
+    | Valid Date Date
     | Expired Date
+    | Canceled Date
 
 
 subscriptionStatus : User -> Date -> SubscriptionStatus
@@ -30,7 +32,12 @@ subscriptionStatus user now =
                     Expired expiresAt
 
                 _ ->
-                    Valid expiresAt
+                    case user.subscriptionRenewsAt of
+                        Just renewsAt ->
+                            Valid expiresAt renewsAt
+
+                        Nothing ->
+                            Canceled expiresAt
 
         Nothing ->
             NotSubscribed
@@ -39,7 +46,7 @@ subscriptionStatus user now =
 isValidSubscription : User -> Date -> Bool
 isValidSubscription user now =
     case subscriptionStatus user now of
-        Valid _ ->
+        Valid _ _ ->
             True
 
         _ ->
@@ -58,3 +65,4 @@ decoder =
         |> required "name" string
         |> optional "subscribed" bool False
         |> optional "subscriptionExpiresAt" Util.Date.decoder Nothing
+        |> optional "subscriptionRenewsAt" Util.Date.decoder Nothing

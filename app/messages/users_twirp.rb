@@ -2,3 +2,11 @@
 require 'twirp'
 require_relative 'users_pb.rb'
 
+class UsersService < Twirp::Service
+  service 'Users'
+  rpc :CancelSubscription, CancelSubscriptionRequest, CancelSubscriptionResponse, :ruby_method => :cancel_subscription
+end
+
+class UsersClient < Twirp::Client
+  client_for UsersService
+end
