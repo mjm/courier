@@ -1,11 +1,13 @@
 syntax = "proto3";
 
+import "feeds.proto";
 import "tweets.proto";
 
 message EventMessage {
   oneof event {
     TweetUpdatedEvent  tweet_updated_event  = 1;
     TweetCreatedEvent  tweet_created_event  = 2;
+    FeedUpdatedEvent   feed_updated_event   = 3;
   }
 }
 
@@ -15,4 +17,8 @@ message TweetUpdatedEvent {
 
 message TweetCreatedEvent {
   TweetMessage  tweet  = 1;
+}
+
+message FeedUpdatedEvent {
+  FeedMessage  feed  = 1;
 }

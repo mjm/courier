@@ -7,9 +7,9 @@ import Data.Account as Account
 import Data.Event as Event exposing (Event(..))
 import Data.Tweet as Tweet exposing (Tweet)
 import Date exposing (Date)
-import Page.Posts.Model exposing (Model, Message(..))
 import Http
 import Json.Decode as Decode
+import Page.Posts.Model exposing (Model, Message(..))
 import Request.Tweet
 import Util.Editable as Editable exposing (Editable(..))
 
@@ -130,6 +130,9 @@ handleEvent event model =
 
         TweetCreated tweet ->
             ( { model | tweets = addTweet tweet model.tweets }, Cmd.none )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 addTweet : Tweet -> List (Editable Tweet) -> List (Editable Tweet)

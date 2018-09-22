@@ -3,12 +3,14 @@
 
 require 'google/protobuf'
 
+require 'feeds_pb'
 require 'tweets_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "EventMessage" do
     oneof :event do
       optional :tweet_updated_event, :message, 1, "TweetUpdatedEvent"
       optional :tweet_created_event, :message, 2, "TweetCreatedEvent"
+      optional :feed_updated_event, :message, 3, "FeedUpdatedEvent"
     end
   end
   add_message "TweetUpdatedEvent" do
@@ -17,8 +19,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "TweetCreatedEvent" do
     optional :tweet, :message, 1, "TweetMessage"
   end
+  add_message "FeedUpdatedEvent" do
+    optional :feed, :message, 1, "FeedMessage"
+  end
 end
 
 EventMessage = Google::Protobuf::DescriptorPool.generated_pool.lookup("EventMessage").msgclass
 TweetUpdatedEvent = Google::Protobuf::DescriptorPool.generated_pool.lookup("TweetUpdatedEvent").msgclass
 TweetCreatedEvent = Google::Protobuf::DescriptorPool.generated_pool.lookup("TweetCreatedEvent").msgclass
+FeedUpdatedEvent = Google::Protobuf::DescriptorPool.generated_pool.lookup("FeedUpdatedEvent").msgclass

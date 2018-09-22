@@ -1,9 +1,14 @@
 module Page.Feeds.Update exposing (update)
 
+import ActionCable
+import ActionCable.Msg as ACMsg
+import ActionCable.Identifier as ID
+import Data.Event as Event exposing (Event(..))
 import Data.Feed as Feed exposing (Feed, DraftFeed)
 import Date
 import Dom
 import Http
+import Json.Decode as Decode
 import Page.Feeds.Model exposing (Model, Modal, Message(..))
 import Request.Feed
 import Task
@@ -14,6 +19,15 @@ update message model =
     case message of
         Noop ->
             ( model, Cmd.none )
+
+        CableMsg msg ->
+            handleCableMessage msg model
+
+        Subscribe () ->
+            subscribe model
+
+        HandleSocketData id value ->
+            handleSocketData id value model
 
         DismissError err ->
             ( removeError model err, Cmd.none )
@@ -86,6 +100,42 @@ update message model =
 
         FeedDeleted feed (Err _) ->
             ( addError model "Could not delete the feed right now. Please try again later.", Cmd.none )
+
+
+handleCableMessage : ACMsg.Msg -> Model -> ( Model, Cmd Message )
+handleCableMessage msg model =
+    ActionCable.update msg model.cable
+        |> (\( cable, cmd ) -> { model | cable = cable } ! [ cmd ])
+
+
+subscribe : Model -> ( Model, Cmd Message )
+subscribe model =
+    case ActionCable.subscribeTo (ID.newIdentifier "EventsChannel" []) model.cable of
+        Ok ( cable, cmd ) ->
+            ( { model | cable = cable }, cmd )
+
+        Err err ->
+            ( model, Cmd.none )
+
+
+handleSocketData : ID.Identifier -> Decode.Value -> Model -> ( Model, Cmd Message )
+handleSocketData id value model =
+    case Decode.decodeValue Event.decoder value of
+        Ok event ->
+            handleEvent event model
+
+        Err _ ->
+            ( model, Cmd.none )
+
+
+handleEvent : Event -> Model -> ( Model, Cmd Message )
+handleEvent event model =
+    case event of
+        FeedUpdated feed ->
+            ( { model | feeds = updateFeed feed model.feeds }, Cmd.none )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 addFeed : Feed -> List Feed -> List Feed

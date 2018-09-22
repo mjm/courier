@@ -19,6 +19,7 @@ class Feed < ApplicationRecord
   }
 
   after_create :refresh
+  after_update :broadcast_update
 
   class << self
     def register(user, url:)
@@ -44,5 +45,14 @@ class Feed < ApplicationRecord
       updated_at: format_timestamp(updated_at),
       refreshed_at: format_timestamp(refreshed_at)
     )
+  end
+
+  private
+
+  def broadcast_update
+    feed_subscriptions.each do |subscription|
+      event = FeedUpdatedEvent.new(feed: subscription.to_message)
+      EventsChannel.broadcast_event_to(subscription.user, event)
+    end
   end
 end

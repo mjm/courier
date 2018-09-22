@@ -1,5 +1,6 @@
 module Page.Feeds.Main exposing (main)
 
+import ActionCable
 import Data.Feed as Feed exposing (Feed)
 import Data.User as User exposing (User)
 import Date
@@ -22,6 +23,10 @@ init flags =
     , errors = []
     , modal = Nothing
     , now = Date.fromTime 0
+    , cable =
+        ActionCable.initCable flags.cableUrl
+            |> ActionCable.onWelcome (Just Subscribe)
+            |> ActionCable.onDidReceiveData (Just HandleSocketData)
     }
         ! [ Task.perform Tick Time.now ]
 
@@ -40,7 +45,10 @@ userFromFlags flags =
 
 subscriptions : Model -> Sub Message
 subscriptions model =
-    Time.every (10 * Time.second) Tick
+    Sub.batch
+        [ Time.every (10 * Time.second) Tick
+        , ActionCable.listen CableMsg model.cable
+        ]
 
 
 main : Program Flags Model Message
