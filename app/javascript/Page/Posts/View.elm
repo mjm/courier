@@ -12,6 +12,7 @@ import Page.Posts.Model exposing (Model, Message(..))
 import Time
 import Views.Error as Error
 import Views.Icon exposing (..)
+import Views.Linkify exposing (linkify)
 import Views.Page as Page
 import Util.Editable as Editable exposing (Editable(..))
 
@@ -122,7 +123,7 @@ viewTweetCard user tweet now =
     article [ class "card" ]
         [ div [ class "card-content" ]
             ([ tweetUserInfo user tweet.post
-             , p [ style [ ( "white-space", "pre-line" ) ] ] [ text tweet.body ]
+             , p [ style [ ( "white-space", "pre-line" ) ] ] (linkify tweet.body)
              ]
                 ++ List.map viewMediaItem tweet.mediaUrls
             )
