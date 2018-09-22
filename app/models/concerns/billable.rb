@@ -38,9 +38,10 @@ module Billable
     subscription ||= fetch_subscription
 
     period_end = Time.at(subscription.current_period_end).utc
+    renews_at = subscription.canceled_at.present? ? nil : period_end
     update!(
       stripe_subscription_id: subscription.id,
-      subscription_renews_at: period_end,
+      subscription_renews_at: renews_at,
       subscription_expires_at: period_end + 1.day
     )
   end
