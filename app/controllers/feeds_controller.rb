@@ -31,8 +31,13 @@ class FeedsController < ServiceController
 
   def delete_feed(req, env)
     require_user env do |user|
-      user.subscription(feed: req.id).discard
-      DeleteFeedResponse.new
+      subscription = user.subscription(feed: req.id)
+      if subscription
+        subscription.discard
+        DeleteFeedResponse.new
+      else
+        Twirp::Error.not_found "Could not find feed #{req.id}"
+      end
     end
   end
 end

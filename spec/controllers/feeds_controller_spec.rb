@@ -66,4 +66,43 @@ RSpec.describe FeedsController, type: :rpc do
       end
     end
   end
+
+  describe '#delete_feed' do
+    rpc_method :DeleteFeed
+    let(:feed) { feeds(:example) }
+    let(:request) { { id: feed.id } }
+
+    it 'discards the feed' do
+      expect { response }.to change {
+        users(:alice).feed_subscriptions.kept.count
+      }.by(-1)
+    end
+
+    it 'does not delete the feed' do
+      response
+      expect(users(:alice).subscription(feed: feed.id)).to be_present
+    end
+
+    it 'returns an empty response' do
+      expect(response).to eq DeleteFeedResponse.new
+    end
+
+    include_examples 'an unauthenticated request'
+
+    context 'when the feed does not exist' do
+      let(:request) { { id: 123 } }
+
+      it 'returns a not found error' do
+        expect(response).to be_a_twirp_error :not_found
+      end
+    end
+
+    context 'when the user is not subscribed to the feed' do
+      let(:feed) { feeds(:refreshed_example) }
+
+      it 'returns a not found error' do
+        expect(response).to be_a_twirp_error :not_found
+      end
+    end
+  end
 end
