@@ -142,7 +142,7 @@ viewTweetCard user tweet now =
 
 viewMediaItem : String -> Html Message
 viewMediaItem url =
-    div []
+    figure [ class "image is-128x128" ]
         [ img [ src url ] [] ]
 
 
