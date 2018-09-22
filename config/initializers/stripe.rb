@@ -32,17 +32,22 @@ StripeEvent.configure do |events|
     invoice = event.data.object
     Rails.logger.info "Invoice #{invoice.id} for customer #{invoice.customer} was successfully paid"
     subscription = Stripe::Subscription.retrieve(invoice.subscription)
-    user = User.where(stripe_subscription_id: subscription.id).first
-    if user
+    User.where(stripe_subscription_id: subscription.id).each do |user|
       user.update_subscription(subscription)
-    else
-      Rails.logger.error "No user was found for paid subscription #{subscription.id}"
     end
   end
 
   events.subscribe 'invoice.payment_failed' do |event|
     invoice = event.data.object
     Rails.logger.info "Invoice #{invoice.id} for customer #{invoice.customer} failed to be paid."
+  end
+
+  events.subscribe 'customer.subscription.updated' do |event|
+    subscription = event.data.object
+    Rails.logger.info "Subscription #{subscription.id} was updated."
+    User.where(stripe_subscription_id: subscription.id).each do |user|
+      user.update_subscription(subscription)
+    end
   end
 
   events.subscribe 'customer.subscription.deleted' do |event|
