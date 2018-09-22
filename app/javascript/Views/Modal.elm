@@ -24,6 +24,11 @@ modal modal =
                     [ header [ class "modal-card-head" ]
                         [ p [ class "modal-card-title is-size-5" ]
                             [ text modal.title ]
+                        , button
+                            [ class "delete"
+                            , onClick modal.dismissMsg
+                            ]
+                            []
                         ]
                     , section [ class "modal-card-body" ]
                         [ p [] [ text modal.body ] ]
@@ -33,11 +38,6 @@ modal modal =
                             , onClick modal.confirmMsg
                             ]
                             [ text modal.confirmText ]
-                        , button
-                            [ class "button"
-                            , onClick modal.dismissMsg
-                            ]
-                            [ text "Cancel" ]
                         ]
                     ]
                 ]

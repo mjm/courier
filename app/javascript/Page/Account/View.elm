@@ -7,13 +7,15 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Page.Account.Model exposing (Model, Message(..))
 import Views.Icon exposing (..)
+import Views.Modal exposing (modal)
 import Views.Page as Page
 
 
 view : Model -> Html Message
 view model =
     div []
-        [ Page.navbar (Just model.user)
+        [ modal model.modal
+        , Page.navbar (Just model.user)
         , section [ class "section" ]
             [ div [ class "container" ]
                 [ div []

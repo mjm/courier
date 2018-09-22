@@ -18,6 +18,7 @@ init flags =
     { user = userFromFlags flags
     , stripeKey = flags.stripeKey
     , now = Date.fromTime 0
+    , modal = Nothing
     }
         ! [ Task.perform Tick Time.now ]
 
