@@ -10,6 +10,8 @@ class TweetsController < ServiceController
       tweet = user.tweets.find(req.id)
       tweet.canceled!
       CancelTweetResponse.new(tweet: tweet.to_message)
+    rescue ActiveRecord::RecordNotFound
+      Twirp::Error.not_found "Could not find tweet #{req.id}"
     end
   end
 

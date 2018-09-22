@@ -3,9 +3,16 @@ alice_example_status:
   feed_subscription: alice_example
   body: This is an example status post.
   post_job_id: abc
+  created_at: <%= Time.utc(2018, 2, 2).to_s(:db) %>
 
 alice_example_status2:
   post: example_status
   feed_subscription: alice_example
   body: This is a second tweet for the same post.
   post_job_id: abc
+  created_at: <%= Time.utc(2018, 2, 2, 0, 0, 1).to_s(:db) %>
+
+alice_example_post:
+  post: example_post
+  feed_subscription: alice_example
+  body: My Example Post https://example.org/ghi

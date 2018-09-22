@@ -21,3 +21,12 @@ example_images:
   content_html: >
     <p>This post has an image:</p>
     <img src="https://example.org/media/foo.jpg">
+
+example_post:
+  feed: example
+  item_id: ghi
+  url: https://example.org/ghi
+  title: My Example Post
+  content_html: <p>This is some content.</p>
+  published_at: <%= Time.utc(2018, 2, 4).to_s(:db) %>
+  modified_at: <%= Time.utc(2018, 2, 4).to_s(:db) %>
