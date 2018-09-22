@@ -7,9 +7,10 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Events.Extra exposing (onClickPreventDefault)
-import Page.Feeds.Model exposing (Model, Modal, Message(..))
+import Page.Feeds.Model exposing (Model, Message(..))
 import Views.Error as Error
 import Views.Icon exposing (..)
+import Views.Modal exposing (modal)
 import Views.Page as Page
 import Util.URL as URL
 
@@ -35,38 +36,6 @@ view model =
     , Page.footer
     ]
         |> div []
-
-
-modal : Maybe Modal -> Html Message
-modal modal =
-    case modal of
-        Just modal ->
-            div [ class "modal is-active" ]
-                [ div [ class "modal-background" ] []
-                , div [ class "modal-card" ]
-                    [ header [ class "modal-card-head" ]
-                        [ p [ class "modal-card-title is-size-5" ]
-                            [ text modal.title ]
-                        ]
-                    , section [ class "modal-card-body" ]
-                        [ p [] [ text modal.body ] ]
-                    , footer [ class "modal-card-foot" ]
-                        [ button
-                            [ class "button is-danger"
-                            , onClick modal.confirmMsg
-                            ]
-                            [ text modal.confirmText ]
-                        , button
-                            [ class "button"
-                            , onClick DismissModal
-                            ]
-                            [ text "Cancel" ]
-                        ]
-                    ]
-                ]
-
-        Nothing ->
-            text ""
 
 
 feeds : List Feed -> Date -> Html Message

@@ -9,9 +9,10 @@ import Date
 import Dom
 import Http
 import Json.Decode as Decode
-import Page.Feeds.Model exposing (Model, Modal, Message(..))
+import Page.Feeds.Model exposing (Model, Message(..))
 import Request.Feed
 import Task
+import Views.Modal exposing (Modal)
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -160,12 +161,13 @@ deleteFeed feed fs =
     List.filter (\f -> f.id /= feed.id) fs
 
 
-deleteFeedModal : Feed -> Modal
+deleteFeedModal : Feed -> Modal Message
 deleteFeedModal feed =
     { title = "Are you sure?"
     , body = "Are you sure you want to delete the feed \"" ++ (Feed.displayName feed) ++ "\"?"
     , confirmText = "Delete Feed"
     , confirmMsg = ConfirmDeleteFeed feed
+    , dismissMsg = DismissModal
     }
 
 

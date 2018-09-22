@@ -1,4 +1,4 @@
-module Page.Feeds.Model exposing (Model, Modal, Message(..))
+module Page.Feeds.Model exposing (Model, Message(..))
 
 import ActionCable exposing (ActionCable)
 import ActionCable.Identifier as ID
@@ -9,6 +9,7 @@ import Date exposing (Date)
 import Http
 import Json.Decode as Decode
 import Time exposing (Time)
+import Views.Modal exposing (Modal)
 
 
 type alias Model =
@@ -16,17 +17,9 @@ type alias Model =
     , feeds : List Feed
     , draftFeed : Maybe DraftFeed
     , errors : List String
-    , modal : Maybe Modal
+    , modal : Maybe (Modal Message)
     , now : Date
     , cable : ActionCable Message
-    }
-
-
-type alias Modal =
-    { title : String
-    , body : String
-    , confirmText : String
-    , confirmMsg : Message
     }
 
 
