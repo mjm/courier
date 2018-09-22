@@ -1,6 +1,6 @@
 module Page.Account.View exposing (view)
 
-import Data.User as User exposing (SubscriptionStatus(..))
+import Data.Account as Account exposing (Status(..))
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -29,7 +29,7 @@ view model =
 
 subscriptionInfo : Model -> Html Message
 subscriptionInfo model =
-    case User.subscriptionStatus model.user model.now of
+    case Account.status model.user model.now of
         Expired expiresAt ->
             p [ class "has-text-centered" ]
                 [ text "Oh no! Your subscription to Courier has "

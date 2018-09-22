@@ -1,5 +1,6 @@
 module Page.Posts.View exposing (view)
 
+import Data.Account as Account
 import Data.Tweet exposing (Tweet, PostInfo, Status(..))
 import Data.User as User exposing (User)
 import Date exposing (Date)
@@ -36,7 +37,7 @@ view model =
 
 subscriptionMessage : User -> Date -> Html Message
 subscriptionMessage user now =
-    if User.isValidSubscription user now then
+    if Account.isActive user now then
         text ""
     else
         div [ class "notification is-warning has-text-centered" ]
@@ -193,7 +194,7 @@ draftActions user tweet now =
         ]
         [ icon Solid "pencil-alt", span [] [ text "Edit Tweet" ] ]
     ]
-        ++ (if User.isValidSubscription user now then
+        ++ (if Account.isActive user now then
                 [ a
                     [ onClick <| SubmitTweet tweet
                     , class "card-footer-item"
@@ -292,7 +293,7 @@ editActions user tweet now =
         ]
         [ span [] [ text "Save Draft" ] ]
     ]
-        ++ (if User.isValidSubscription user now then
+        ++ (if Account.isActive user now then
                 [ a
                     [ class "card-footer-item"
                     , onClick (SaveTweet tweet True)

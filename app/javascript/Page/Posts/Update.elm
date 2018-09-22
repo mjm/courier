@@ -3,9 +3,9 @@ module Page.Posts.Update exposing (update)
 import ActionCable
 import ActionCable.Msg as ACMsg
 import ActionCable.Identifier as ID
+import Data.Account as Account
 import Data.Event as Event exposing (Event(..))
 import Data.Tweet as Tweet exposing (Tweet)
-import Data.User as User
 import Date exposing (Date)
 import Page.Posts.Model exposing (Model, Message(..))
 import Http
@@ -65,13 +65,15 @@ update message model =
 
         SaveTweet tweet shouldPost ->
             let
-                isValid =
-                    User.isValidSubscription model.user model.now
+                isActive =
+                    Account.isActive model.user model.now
 
                 reallyPost =
-                    isValid && shouldPost
+                    isActive && shouldPost
             in
-                ( { model | tweets = savingTweet tweet model.tweets }, Http.send TweetSaved (Request.Tweet.update tweet reallyPost) )
+                ( { model | tweets = savingTweet tweet model.tweets }
+                , Http.send TweetSaved (Request.Tweet.update tweet reallyPost)
+                )
 
         TweetSaved (Ok tweet) ->
             ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
@@ -80,8 +82,10 @@ update message model =
             ( addError model "Could not save the tweet right now. Please try again later.", Cmd.none )
 
         SubmitTweet tweet ->
-            if User.isValidSubscription model.user model.now then
-                ( { model | tweets = savingTweet tweet model.tweets }, Http.send TweetSubmitted (Request.Tweet.post tweet) )
+            if Account.isActive model.user model.now then
+                ( { model | tweets = savingTweet tweet model.tweets }
+                , Http.send TweetSubmitted (Request.Tweet.post tweet)
+                )
             else
                 ( model, Cmd.none )
 
