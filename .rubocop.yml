@@ -1,0 +1,43 @@
+AllCops:
+  Exclude:
+  # Excludes all generated/vendor code
+  - app/messages/*.rb
+  - bin/**/*
+  - db/schema.rb
+  - node_modules/**/*
+  - spec/*_helper.rb
+  - vender/**/*
+
+Rails:
+  Enabled: true
+
+# I may renable this later, but right now it's noise
+Style/Documentation:
+  Enabled: false
+
+# I've found that the default of 10 is too short
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/BlockLength:
+  Exclude:
+  # RSpec blocks are expected to be long
+  - spec/**/*
+
+# I do not like magic comments as a rule: they clutter source files
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# This can be really irritating, especially when monkey patching
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/BlockDelimiters:
+  EnforcedStyle: semantic
+  Exclude:
+  # Getting this right for RSpec is too dicey
+  - spec/**/*
+
+# I think this is fine when used sparingly
+Style/RescueModifier:
+  Enabled: false

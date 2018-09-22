@@ -37,7 +37,7 @@ module Billable
   def update_subscription(subscription = nil)
     subscription ||= fetch_subscription
 
-    period_end = Time.at(subscription.current_period_end)
+    period_end = Time.at(subscription.current_period_end).utc
     update!(
       stripe_subscription_id: subscription.id,
       subscription_renews_at: period_end,
@@ -48,7 +48,7 @@ module Billable
   private
 
   def fetch_subscription
-    return nil unless stripe_subscription_id.present?
+    return nil if stripe_subscription_id.blank?
     Stripe::Subscription.retrieve(stripe_subscription_id)
   end
 

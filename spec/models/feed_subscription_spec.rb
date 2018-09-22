@@ -68,7 +68,8 @@ RSpec.describe FeedSubscription, type: :model do
   describe 'creating a new subscription' do
     it 'enqueues a job to translate existing posts for the new user' do
       users(:bob).feeds << feeds(:example)
-      expect(TranslateTweetWorker).to have_enqueued_sidekiq_job(posts(:example_status).id)
+      expect(TranslateTweetWorker)
+        .to have_enqueued_sidekiq_job(posts(:example_status).id)
     end
   end
 end

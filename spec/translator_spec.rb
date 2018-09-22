@@ -1,6 +1,11 @@
 require 'rails_helper'
 require 'translator'
 
+# This file is full of blog post examples in strings, so it's easier to just
+# allow lines to be long.
+#
+# rubocop:disable Metrics/LineLength
+
 RSpec.describe Translator do
   let(:title) { '' }
   let(:url) { '' }
@@ -188,3 +193,5 @@ RSpec.describe Translator do
     end
   end
 end
+
+# rubocop:enable Metrics/LineLength

@@ -30,15 +30,19 @@ class Tweet < ApplicationRecord
     draft? && post_job_id.present? && will_post_at.present?
   end
 
+  def should_post?(jid:)
+    draft? && post_job_id == jid && user.valid_subscription?
+  end
+
   def to_message
     TweetMessage.new(
       id: id,
       body: body,
       post: post.to_message,
       status: status.upcase,
-      posted_at: posted_at ? posted_at.getutc.iso8601 : '',
+      posted_at: format_timestamp(posted_at),
       posted_tweet_id: posted_tweet_id || '',
-      will_post_at: will_post? ? will_post_at.getutc.iso8601 : '',
+      will_post_at: format_timestamp(will_post_at),
       media_urls: media_urls
     )
   end

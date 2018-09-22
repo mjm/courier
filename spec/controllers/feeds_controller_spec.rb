@@ -16,7 +16,9 @@ RSpec.describe FeedsController, type: :rpc do
   describe '#register_feed' do
     rpc_method :RegisterFeed
     let(:request) { { url: 'https://foo.example.org/feed.json' } }
-    let(:created_feed) { Feed.where(url: 'https://foo.example.org/feed.json').first }
+    let(:created_feed) {
+      Feed.where(url: 'https://foo.example.org/feed.json').first
+    }
     let(:created_subscription) { created_feed.feed_subscriptions.first }
 
     it 'registers the feed' do

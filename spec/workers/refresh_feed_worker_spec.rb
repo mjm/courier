@@ -95,7 +95,8 @@ RSpec.describe RefreshFeedWorker, type: :worker do
       subject.perform(feed.id)
 
       expect(TranslateTweetWorker).to have_enqueued_sidekiq_job(new_post.id)
-      expect(TranslateTweetWorker).to have_enqueued_sidekiq_job(posts(:example_status).id)
+      expect(TranslateTweetWorker)
+        .to have_enqueued_sidekiq_job(posts(:example_status).id)
     end
   end
 

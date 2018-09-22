@@ -8,7 +8,9 @@ class RefreshFeedWorker
 
   def perform(feed_id)
     @feed = Feed.find(feed_id)
-    feed_posts.each { |post| import_post post }
+    feed_posts.each do |post|
+      import_post post
+    end
     update_feed
   end
 
@@ -40,8 +42,8 @@ class RefreshFeedWorker
     subscription.autopost ? 5.minutes : 0
   end
 
-  def update_feed
-    feed.refreshed_at = Time.now
+  def update_feed # rubocop:disable Metrics/AbcSize
+    feed.refreshed_at = Time.now.utc
     if downloaded_feed
       feed.etag = downloaded_feed.etag
       feed.last_modified_at = downloaded_feed.last_modified

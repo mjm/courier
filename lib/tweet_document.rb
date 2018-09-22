@@ -14,23 +14,8 @@ class TweetDocument < Nokogiri::XML::SAX::Document
   end
 
   def start_element(name, attrs = [])
-    case name
-    when 'a'
-      attrs = Hash[attrs]
-      href = attrs['href']
-      handle_link_url href if href
-    when 'blockquote'
-      attrs = Hash[attrs]
-      if attrs['class'] == 'twitter-tweet'
-        @is_embedded_tweet = true
-        @embedded_tweet_url = nil
-      else
-        contents << '“'
-      end
-    when 'img'
-      attrs = Hash[attrs]
-      @media_urls << attrs['src'] if attrs.key? 'src'
-    end
+    method = "handle_#{name}"
+    send(method, Hash[attrs]) if respond_to?(method, true)
   end
 
   def characters(string)
@@ -62,6 +47,11 @@ class TweetDocument < Nokogiri::XML::SAX::Document
 
   private
 
+  def handle_a(attrs)
+    href = attrs['href']
+    handle_link_url href if href
+  end
+
   def handle_link_url(href)
     if @is_embedded_tweet
       return unless href.starts_with? 'https://twitter.com'
@@ -69,5 +59,18 @@ class TweetDocument < Nokogiri::XML::SAX::Document
     else
       @urls << href
     end
+  end
+
+  def handle_blockquote(attrs)
+    if attrs['class'] == 'twitter-tweet'
+      @is_embedded_tweet = true
+      @embedded_tweet_url = nil
+    else
+      contents << '“'
+    end
+  end
+
+  def handle_img(attrs)
+    @media_urls << attrs['src'] if attrs.key? 'src'
   end
 end

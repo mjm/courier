@@ -14,10 +14,10 @@ class FeedDownloader
   def feed
     logger.debug "Downloading feed at #{url}"
 
-    response = connection(url).get do |req|
+    response = connection(url).get { |req|
       req.headers['If-None-Match'] = etag if etag
       req.headers['If-Modified-Since'] = last_modified if last_modified
-    end
+    }
     handle_response response
   end
 

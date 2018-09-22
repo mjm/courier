@@ -24,10 +24,17 @@ class Translator
     return if @tweets
 
     if title.present? && url.present?
-      @tweets = [Tweet.new("#{title} #{url}", [])]
-      return
+      translate_with_title
+    else
+      translate_without_title
     end
+  end
 
+  def translate_with_title
+    @tweets = [Tweet.new("#{title} #{url}", [])]
+  end
+
+  def translate_without_title
     parser.parse(content_html)
     @tweets = [Tweet.new(document.contents, document.media_urls)]
   end

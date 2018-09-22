@@ -6,18 +6,22 @@ class User < ApplicationRecord
   devise :registerable, :rememberable, :omniauthable, :trackable,
          omniauth_providers: %i[twitter]
 
-  has_many :feed_subscriptions
+  has_many :feed_subscriptions, dependent: :destroy
   has_many :feeds, -> { order(:title, :url) }, through: :feed_subscriptions
-  has_many :tweets, -> { includes(:post).order('posts.published_at desc') }, through: :feed_subscriptions
+  has_many :tweets,
+           -> { includes(:post).order('posts.published_at desc') },
+           through: :feed_subscriptions
 
   def self.from_omniauth(auth)
-    where(provider: auth.provider, uid: auth.uid).first_or_initialize.tap do |user|
-      user.username = auth.info.nickname
-      user.name = auth.info.name
-      user.twitter_access_token = auth.credentials.token
-      user.twitter_access_secret = auth.credentials.secret
-      user.save
-    end
+    where(provider: auth.provider, uid: auth.uid)
+      .first_or_initialize
+      .tap do |user|
+        user.username = auth.info.nickname
+        user.name = auth.info.name
+        user.twitter_access_token = auth.credentials.token
+        user.twitter_access_secret = auth.credentials.secret
+        user.save
+      end
   end
 
   def register_feed(attrs)
@@ -26,7 +30,7 @@ class User < ApplicationRecord
   end
 
   def subscription(feed:)
-    feed_subscriptions.where(feed: feed).first
+    feed_subscriptions.find_by(feed: feed)
   end
 
   def to_message
@@ -34,8 +38,8 @@ class User < ApplicationRecord
       username: username,
       name: name,
       subscribed: stripe_subscription_id.present?,
-      subscription_expires_at: subscription_expires_at? ? subscription_expires_at.getutc.iso8601 : '',
-      subscription_renews_at: subscription_renews_at? ? subscription_renews_at.getutc.iso8601 : ''
+      subscription_expires_at: format_timestamp(subscription_expires_at),
+      subscription_renews_at: format_timestamp(subscription_renews_at)
     )
   end
 end

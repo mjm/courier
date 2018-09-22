@@ -15,7 +15,7 @@ RSpec.describe FeedDownloader do
     before { download_request.to_return(status: 404) }
 
     it 'attempts to get the feed' do
-      subject.feed rescue nil # rubocop:disable Style/RescueModifier
+      subject.feed rescue nil
       expect(download_request).to have_been_requested
     end
 
@@ -32,10 +32,9 @@ RSpec.describe FeedDownloader do
 
       it 'attempts to get the feed' do
         subject.feed
-        expect(WebMock).to have_requested(:get, url).with(headers: {
-          'If-None-Match' => '"asdf"',
-          'If-Modified-Since' => 'fake date'
-        })
+        expect(WebMock).to have_requested(:get, url)
+          .with(headers: { 'If-None-Match' => '"asdf"',
+                           'If-Modified-Since' => 'fake date' })
       end
 
       it 'returns a feed with no posts' do

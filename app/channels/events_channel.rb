@@ -10,6 +10,8 @@ class EventsChannel < ApplicationCable::Channel
     key = event.class.name.underscore
     wrapper.send("#{key}=", event)
 
-    ActionCable.server.broadcast("events:#{user.id}", wrapper.to_json, coder: nil)
+    ActionCable.server.broadcast("events:#{user.id}",
+                                 wrapper.to_json,
+                                 coder: nil)
   end
 end

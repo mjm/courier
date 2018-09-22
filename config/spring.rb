@@ -3,4 +3,6 @@
   .rbenv-vars
   tmp/restart.txt
   tmp/caching-dev.txt
-].each { |path| Spring.watch(path) }
+].each do |path|
+  Spring.watch(path)
+end

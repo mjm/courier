@@ -1,8 +1,8 @@
 class Feed < ApplicationRecord
-  has_many :feed_subscriptions
+  has_many :feed_subscriptions, dependent: :restrict_with_error
   has_many :users, through: :feed_subscriptions
 
-  has_many :posts do
+  has_many :posts, dependent: :restrict_with_error do
     def import(attrs)
       where(item_id: attrs.fetch(:item_id)).first_or_initialize.tap do |post|
         post.attributes = attrs
@@ -40,9 +40,9 @@ class Feed < ApplicationRecord
       url: url,
       title: title,
       home_page_url: home_page_url,
-      created_at: created_at.getutc.iso8601,
-      updated_at: updated_at.getutc.iso8601,
-      refreshed_at: refreshed_at ? refreshed_at.getutc.iso8601 : ''
+      created_at: format_timestamp(created_at),
+      updated_at: format_timestamp(updated_at),
+      refreshed_at: format_timestamp(refreshed_at)
     )
   end
 end

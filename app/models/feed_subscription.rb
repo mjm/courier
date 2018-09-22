@@ -4,7 +4,7 @@ class FeedSubscription < ApplicationRecord
   belongs_to :feed
   belongs_to :user
 
-  has_many :tweets
+  has_many :tweets, dependent: :destroy
 
   after_create :translate_existing_posts
 
@@ -39,9 +39,9 @@ class FeedSubscription < ApplicationRecord
 
   def write_flag(key, value)
     if value == :OFF
-      write_attribute key, false
+      self[key] = false
     elsif value == :ON
-      write_attribute key, true
+      self[key] = true
     end
   end
 end

@@ -9,13 +9,13 @@ class PagesController < ApplicationController
   end
 
   def feeds
+    subscriptions = current_user.feed_subscriptions.kept
     @feeds_json = GetFeedsResponse.encode_json(
-      GetFeedsResponse.new(feeds: current_user.feed_subscriptions.kept.to_message)
+      GetFeedsResponse.new(feeds: subscriptions.to_message)
     )
   end
 
-  def account
-  end
+  def account; end
 
   private
 

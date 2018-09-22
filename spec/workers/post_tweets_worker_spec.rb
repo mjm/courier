@@ -23,27 +23,37 @@ RSpec.describe PostTweetsWorker, type: :worker do
 
   it 'sends the tweets to Twitter' do
     subject.perform(ids)
-    expect(a_request(:post, STATUS_UPDATE_URL).with(
-      body: { status: 'This is an example status post.', media_ids: '' }
-    )).to have_been_made
-    expect(a_request(:post, STATUS_UPDATE_URL).with(
-      body: { status: 'This is a second tweet for the same post.', media_ids: '' }
-    )).to have_been_made
+    expect(
+      a_request(:post, STATUS_UPDATE_URL).with(
+        body: { status: 'This is an example status post.', media_ids: '' }
+      )
+    ).to have_been_made
+    expect(
+      a_request(:post, STATUS_UPDATE_URL).with(
+        body: {
+          status: 'This is a second tweet for the same post.',
+          media_ids: ''
+        }
+      )
+    ).to have_been_made
   end
 
   it 'moves the tweets to the posted status' do
     subject.perform(ids)
-    expect(tweets_to_post.each(&:reload).map(&:status)).to all(eq 'posted')
+    expect(tweets_to_post.each(&:reload).map(&:status))
+      .to all(eq 'posted')
   end
 
   it 'saves the timestamp when the tweet was posted' do
     subject.perform(ids)
-    expect(tweets_to_post.each(&:reload).map(&:posted_at)).not_to include(be_nil)
+    expect(tweets_to_post.each(&:reload).map(&:posted_at))
+      .not_to include(be_nil)
   end
 
   it 'saves the ID of the tweet for linking to later' do
     subject.perform(ids)
-    expect(tweets_to_post.each(&:reload).map(&:posted_tweet_id)).to all(eq '540897316908331009')
+    expect(tweets_to_post.each(&:reload).map(&:posted_tweet_id))
+      .to all(eq '540897316908331009')
   end
 
   context 'when the tweet is canceled' do
@@ -61,9 +71,11 @@ RSpec.describe PostTweetsWorker, type: :worker do
 
     it 'does not post the tweet' do
       subject.perform(ids)
-      expect(a_request(:post, STATUS_UPDATE_URL).with(
-        body: { status: 'This is an example status post.' }
-      )).not_to have_been_made
+      expect(
+        a_request(:post, STATUS_UPDATE_URL).with(
+          body: { status: 'This is an example status post.' }
+        )
+      ).not_to have_been_made
     end
   end
 
@@ -77,9 +89,11 @@ RSpec.describe PostTweetsWorker, type: :worker do
 
     it 'does not post the tweet' do
       subject.perform(ids)
-      expect(a_request(:post, STATUS_UPDATE_URL).with(
-        body: { status: 'This is an example status post.' }
-      )).not_to have_been_made
+      expect(
+        a_request(:post, STATUS_UPDATE_URL).with(
+          body: { status: 'This is an example status post.', media_ids: '' }
+        )
+      ).not_to have_been_made
     end
   end
 end
