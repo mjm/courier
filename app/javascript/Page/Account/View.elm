@@ -48,6 +48,13 @@ subscriptionInfo model =
                     , strong [] [ text (relativeTime model.now expiresAt) ]
                     , text "."
                     ]
+                , p [ class "has-text-centered" ]
+                    [ button
+                        [ onClick ReactivateSubscription
+                        , class "button is-primary"
+                        ]
+                        [ span [] [ text "Reactivate My Subscription" ] ]
+                    ]
                 ]
 
         Valid _ renewsAt ->

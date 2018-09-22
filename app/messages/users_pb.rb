@@ -9,6 +9,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "CancelSubscriptionResponse" do
     optional :user, :message, 1, "UserMessage"
   end
+  add_message "ReactivateSubscriptionRequest" do
+  end
+  add_message "ReactivateSubscriptionResponse" do
+    optional :user, :message, 1, "UserMessage"
+  end
   add_message "UserMessage" do
     optional :username, :string, 1
     optional :name, :string, 2
@@ -20,4 +25,6 @@ end
 
 CancelSubscriptionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("CancelSubscriptionRequest").msgclass
 CancelSubscriptionResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("CancelSubscriptionResponse").msgclass
+ReactivateSubscriptionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("ReactivateSubscriptionRequest").msgclass
+ReactivateSubscriptionResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("ReactivateSubscriptionResponse").msgclass
 UserMessage = Google::Protobuf::DescriptorPool.generated_pool.lookup("UserMessage").msgclass

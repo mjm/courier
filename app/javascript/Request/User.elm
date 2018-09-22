@@ -24,3 +24,11 @@ cancelSubscription =
         |> withJsonBody (Encode.object [])
         |> withExpect (Http.expectJson userDecoder)
         |> toRequest
+
+
+reactivateSubscription : Http.Request User
+reactivateSubscription =
+    usersBuilder "ReactivateSubscription"
+        |> withJsonBody (Encode.object [])
+        |> withExpect (Http.expectJson userDecoder)
+        |> toRequest

@@ -21,3 +21,6 @@ type Message
     | CancelSubscription
     | ConfirmCancelSubscription
     | SubscriptionCanceled (Result Http.Error User)
+    | ReactivateSubscription
+    | ConfirmReactivateSubscription
+    | SubscriptionReactivated (Result Http.Error User)

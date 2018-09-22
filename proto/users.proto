@@ -2,12 +2,20 @@ syntax = "proto3";
 
 service Users {
   rpc CancelSubscription(CancelSubscriptionRequest) returns (CancelSubscriptionResponse);
+  rpc ReactivateSubscription(ReactivateSubscriptionRequest) returns (ReactivateSubscriptionResponse);
 }
 
 message CancelSubscriptionRequest {
 }
 
 message CancelSubscriptionResponse {
+  UserMessage  user  = 1;
+}
+
+message ReactivateSubscriptionRequest {
+}
+
+message ReactivateSubscriptionResponse {
   UserMessage  user  = 1;
 }
 

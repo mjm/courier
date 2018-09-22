@@ -34,6 +34,18 @@ module Billable
     update! subscription_renews_at: nil
   end
 
+  # Reactives the user's canceled subscription.
+  #
+  # This will only work if the user is still within the active period of the
+  # subscription they canceled.
+  def reactivate_subscription
+    sub = fetch_subscription
+    sub.cancel_at_period_end = false
+    sub.save
+
+    update_subscription(sub)
+  end
+
   def update_subscription(subscription = nil)
     subscription ||= fetch_subscription
 
