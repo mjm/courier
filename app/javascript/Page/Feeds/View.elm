@@ -37,53 +37,50 @@ feeds fs now =
                 [ text "You don't have any feeds registered." ]
 
         fs ->
-            table [ class "table is-fullwidth" ]
-                [ List.map (feedRow now) fs |> tbody [] ]
+            div [] <|
+                List.map (feedRow now) fs
 
 
 feedRow : Date -> Feed -> Html Message
 feedRow now feed =
-    tr []
-        [ td
-            [ style
-                [ ( "width", "1rem" )
-                , ( "padding-right", "0" )
-                ]
-            ]
-            [ span [ class "icon is-medium has-text-link" ]
-                [ i [ class "fas fa-rss fa-lg" ] [] ]
-            ]
-        , td []
-            [ h1 [ class "title is-4" ]
-                [ span [] [ text (Feed.displayName feed) ]
-                ]
-            , h2 [ class "subtitle is-6" ]
-                [ a
-                    [ href feed.homePageUrl
-                    , rel "noopener"
-                    , target "_blank"
-                    ]
-                    [ span [ class "icon has-text-grey-light" ] [ i [ class "fas fa-home" ] [] ]
-                    , span [ class "has-text-grey" ] [ text (URL.displayUrl feed.homePageUrl) ]
+    div []
+        [ article [ class "media" ]
+            [ div [ class "media-content" ]
+                [ div [ class "content is-size-5 is-size-6-mobile" ]
+                    [ span [ class "has-text-link" ] [ icon Solid "rss" ]
+                    , strong [] [ text (Feed.displayName feed) ]
                     ]
                 ]
+            , div [ class "media-right" ]
+                [ feedDropdown feed ]
             ]
-        , td
-            [ class "has-text-right has-text-grey is-size-7"
-            , style [ ( "vertical-align", "middle" ) ]
-            ]
-            [ case feed.refreshedAt of
-                Just date ->
-                    text ("last checked " ++ (relativeTime now date))
+        , div [ class "level is-mobile has-text-grey is-size-7-mobile" ]
+            [ div [ class "level-left" ]
+                [ div [ class "level-item" ]
+                    [ a
+                        [ href feed.homePageUrl
+                        , rel "noopener"
+                        , target "_blank"
+                        , class "has-text-grey"
+                        ]
+                        [ icon Solid "home"
+                        , span [] [ text (URL.displayUrl feed.homePageUrl) ]
+                        ]
+                    ]
+                , div [ class "level-item" ]
+                    [ icon Solid "sync"
+                    , span []
+                        [ case feed.refreshedAt of
+                            Just date ->
+                                text ("checked " ++ (relativeTime now date))
 
-                Nothing ->
-                    text ""
+                            Nothing ->
+                                text ""
+                        ]
+                    ]
+                ]
             ]
-        , td
-            [ class "has-text-right"
-            , style [ ( "vertical-align", "middle" ) ]
-            ]
-            [ feedDropdown feed ]
+        , hr [] []
         ]
 
 
@@ -93,7 +90,7 @@ feedDropdown feed =
         autopost =
             feed.settings.autopost
     in
-        div [ class "dropdown is-hoverable" ]
+        div [ class "dropdown is-hoverable is-right" ]
             [ div [ class "dropdown-trigger" ]
                 [ button [ class "button is-white" ]
                     [ icon Solid "bars" ]
@@ -105,7 +102,7 @@ feedDropdown feed =
                         , onClick (RefreshFeed feed)
                         ]
                         [ icon Solid "sync-alt"
-                        , span [] [ text "Refresh Posts" ]
+                        , span [] [ text "Check for New Posts" ]
                         ]
                     , a
                         [ class "dropdown-item"
