@@ -5,33 +5,24 @@ import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Page
 import Page.Account.Model exposing (Model, Message(..))
 import Views.Icon exposing (..)
-import Views.Modal exposing (modal)
-import Views.Page as Page
 
 
 view : Model -> Html Message
 view model =
-    div []
-        [ modal model.modal
-        , Page.navbar (Just model.user)
-        , section [ class "section" ]
-            [ div [ class "container" ]
-                [ div []
-                    [ h2 [ class "title has-text-centered" ] [ text "Your Account" ]
-                    , hr [] []
-                    , subscriptionInfo model
-                    ]
-                ]
+    Page.view model.page <|
+        div []
+            [ h2 [ class "title has-text-centered" ] [ text "Your Account" ]
+            , hr [] []
+            , subscriptionInfo model
             ]
-        , Page.footer
-        ]
 
 
 subscriptionInfo : Model -> Html Message
 subscriptionInfo model =
-    case Account.status model.user model.now of
+    case Account.status model.page.user model.page.now of
         Expired expiresAt ->
             p [ class "has-text-centered" ]
                 [ text "Oh no! Your subscription to Courier has "
@@ -45,7 +36,7 @@ subscriptionInfo model =
                     [ text "Your subscription has been canceled, but you can still use Courier until it expires." ]
                 , p [ class "has-text-centered" ]
                     [ text "Your subscription will expire "
-                    , strong [] [ text (relativeTime model.now expiresAt) ]
+                    , strong [] [ text (relativeTime model.page.now expiresAt) ]
                     , text "."
                     ]
                 , p [ class "has-text-centered" ]
@@ -63,7 +54,7 @@ subscriptionInfo model =
                     [ text "You have a subscription to Courier! Happy posting!" ]
                 , p [ class "has-text-centered" ]
                     [ text "Your subscription will renew "
-                    , strong [] [ text (relativeTime model.now renewsAt) ]
+                    , strong [] [ text (relativeTime model.page.now renewsAt) ]
                     , text "."
                     ]
                 , p [ class "has-text-centered" ]

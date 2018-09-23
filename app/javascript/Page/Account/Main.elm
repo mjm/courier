@@ -1,37 +1,29 @@
 module Page.Account.Main exposing (main)
 
-import Data.User as User exposing (User)
-import Date
 import Html exposing (..)
-import Json.Decode exposing (decodeValue)
+import Page
 import Page.Account.Flags exposing (Flags)
 import Page.Account.Model exposing (Model, Message(..))
 import Page.Account.Update exposing (update)
 import Page.Account.View exposing (view)
 import Task
-import Time
-import Unwrap
 
 
 init : Flags -> ( Model, Cmd Message )
 init flags =
-    { user = userFromFlags flags
-    , stripeKey = flags.stripeKey
-    , now = Date.fromTime 0
-    , modal = Nothing
+    { stripeKey = flags.stripeKey
+    , page =
+        Page.init
+            flags
+            PageMsg
+            EventOccurred
     }
-        ! [ Task.perform Tick Time.now ]
-
-
-userFromFlags : Flags -> User
-userFromFlags flags =
-    decodeValue User.decoder flags.user
-        |> Unwrap.result
+        ! [ Task.perform PageMsg Page.initTask ]
 
 
 subscriptions : Model -> Sub Message
 subscriptions model =
-    Sub.none
+    Page.subscriptions model.page
 
 
 main : Program Flags Model Message

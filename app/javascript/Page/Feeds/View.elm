@@ -7,35 +7,26 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Events.Extra exposing (onClickPreventDefault)
+import Page
 import Page.Feeds.Model exposing (Model, Message(..))
-import Views.Error as Error
 import Views.Icon exposing (..)
-import Views.Modal exposing (modal)
-import Views.Page as Page
 import Util.URL as URL
 
 
 view : Model -> Html Message
 view model =
-    [ modal model.modal
-    , Page.navbar (Just model.user)
-    , Error.errors DismissError model.errors
-    , section [ class "section" ]
-        [ div [ class "container" ]
+    Page.view model.page <|
+        div []
             [ h1 [ class "title has-text-centered" ] [ text "Your Feeds" ]
             , p [ class "has-text-centered" ] [ text "Your Courier will periodically check these feeds for new posts to send to Twitter." ]
             , hr [] []
             , div [ class "columns" ]
                 [ div [ class "column is-8 is-offset-2" ]
-                    [ feeds model.feeds model.now
+                    [ feeds model.feeds model.page.now
                     , addFeedView model
                     ]
                 ]
             ]
-        ]
-    , Page.footer
-    ]
-        |> div []
 
 
 feeds : List Feed -> Date -> Html Message

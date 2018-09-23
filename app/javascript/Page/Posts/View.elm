@@ -8,32 +8,23 @@ import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Page
 import Page.Posts.Model exposing (Model, Message(..))
 import Time
-import Views.Error as Error
 import Views.Icon exposing (..)
 import Views.Linkify exposing (linkify)
-import Views.Page as Page
 import Util.Editable as Editable exposing (Editable(..))
 
 
 view : Model -> Html Message
 view model =
-    [ Page.navbar (Just model.user)
-    , Error.errors DismissError model.errors
-    , section [ class "section" ]
-        [ div [ class "container" ]
-            [ div []
-                [ h2 [ class "title has-text-centered" ] [ text "Your Tweets" ]
-                , hr [] []
-                , subscriptionMessage model.user model.now
-                , List.map (postEntry model.user model.now) model.tweets |> div []
-                ]
+    Page.view model.page <|
+        div []
+            [ h2 [ class "title has-text-centered" ] [ text "Your Tweets" ]
+            , hr [] []
+            , subscriptionMessage model.page.user model.page.now
+            , List.map (postEntry model.page.user model.page.now) model.tweets |> div []
             ]
-        ]
-    , Page.footer
-    ]
-        |> div []
 
 
 subscriptionMessage : User -> Date -> Html Message

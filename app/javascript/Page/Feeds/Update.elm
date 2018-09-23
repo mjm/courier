@@ -1,18 +1,14 @@
 module Page.Feeds.Update exposing (update)
 
-import ActionCable
-import ActionCable.Msg as ACMsg
-import ActionCable.Identifier as ID
 import Data.Event as Event exposing (Event(..))
 import Data.Feed as Feed exposing (Feed, DraftFeed)
-import Date
 import Dom
 import Http
-import Json.Decode as Decode
+import Page
+import Page.Helper exposing (addError, showModal, dismissModal)
 import Page.Feeds.Model exposing (Model, Message(..))
 import Request.Feed
 import Task
-import Views.Modal exposing (Modal)
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -21,29 +17,11 @@ update message model =
         Noop ->
             ( model, Cmd.none )
 
-        CableMsg msg ->
-            handleCableMessage msg model
+        PageMsg msg ->
+            handlePageMessage msg model
 
-        Subscribe () ->
-            subscribe model
-
-        HandleSocketData id value ->
-            handleSocketData id value model
-
-        DismissError err ->
-            ( removeError model err, Cmd.none )
-
-        DismissModal ->
-            ( { model | modal = Nothing }, Cmd.none )
-
-        Tick time ->
-            ( { model | now = Date.fromTime time }, Cmd.none )
-
-        FeedsLoaded (Ok feeds) ->
-            ( { model | feeds = feeds }, Cmd.none )
-
-        FeedsLoaded (Err _) ->
-            ( addError model "Could not load your feeds right now. Please try again later.", Cmd.none )
+        EventOccurred event ->
+            handleEvent event model
 
         SetAddingFeed isAdding ->
             if isAdding then
@@ -91,10 +69,12 @@ update message model =
             ( addError model "Could not update the feed settings right now. Please try again later.", Cmd.none )
 
         DeleteFeed feed ->
-            ( { model | modal = Just (deleteFeedModal feed) }, Cmd.none )
+            ( showModal model (deleteFeedModal feed), Cmd.none )
 
         ConfirmDeleteFeed feed ->
-            ( { model | modal = Nothing }, Http.send (FeedDeleted feed) (Request.Feed.delete feed) )
+            ( dismissModal model
+            , Http.send (FeedDeleted feed) (Request.Feed.delete feed)
+            )
 
         FeedDeleted feed (Ok _) ->
             ( { model | feeds = deleteFeed feed model.feeds }, Cmd.none )
@@ -103,30 +83,13 @@ update message model =
             ( addError model "Could not delete the feed right now. Please try again later.", Cmd.none )
 
 
-handleCableMessage : ACMsg.Msg -> Model -> ( Model, Cmd Message )
-handleCableMessage msg model =
-    ActionCable.update msg model.cable
-        |> (\( cable, cmd ) -> { model | cable = cable } ! [ cmd ])
-
-
-subscribe : Model -> ( Model, Cmd Message )
-subscribe model =
-    case ActionCable.subscribeTo (ID.newIdentifier "EventsChannel" []) model.cable of
-        Ok ( cable, cmd ) ->
-            ( { model | cable = cable }, cmd )
-
-        Err err ->
-            ( model, Cmd.none )
-
-
-handleSocketData : ID.Identifier -> Decode.Value -> Model -> ( Model, Cmd Message )
-handleSocketData id value model =
-    case Decode.decodeValue Event.decoder value of
-        Ok event ->
-            handleEvent event model
-
-        Err _ ->
-            ( model, Cmd.none )
+handlePageMessage : Page.Message -> Model -> ( Model, Cmd Message )
+handlePageMessage msg model =
+    let
+        ( page, cmd ) =
+            Page.update msg model.page
+    in
+        ( { model | page = page }, cmd )
 
 
 handleEvent : Event -> Model -> ( Model, Cmd Message )
@@ -161,13 +124,12 @@ deleteFeed feed fs =
     List.filter (\f -> f.id /= feed.id) fs
 
 
-deleteFeedModal : Feed -> Modal Message
+deleteFeedModal : Feed -> Page.Modal Message
 deleteFeedModal feed =
     { title = "Are you sure?"
     , body = "Are you sure you want to delete the feed \"" ++ (Feed.displayName feed) ++ "\"?"
     , confirmText = "Delete Feed"
     , confirmMsg = ConfirmDeleteFeed feed
-    , dismissMsg = DismissModal
     }
 
 
@@ -179,17 +141,3 @@ updateFeedUrl feed url =
 
         Nothing ->
             Just (DraftFeed url)
-
-
-addError : Model -> String -> Model
-addError model err =
-    { model | errors = (err :: model.errors) }
-
-
-removeError : Model -> String -> Model
-removeError model err =
-    let
-        errors =
-            List.filter (\e -> not (e == err)) model.errors
-    in
-        { model | errors = errors }

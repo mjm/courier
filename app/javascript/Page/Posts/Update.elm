@@ -1,14 +1,10 @@
 module Page.Posts.Update exposing (update)
 
-import ActionCable
-import ActionCable.Msg as ACMsg
-import ActionCable.Identifier as ID
 import Data.Account as Account
 import Data.Event as Event exposing (Event(..))
 import Data.Tweet as Tweet exposing (Tweet)
-import Date exposing (Date)
 import Http
-import Json.Decode as Decode
+import Page
 import Page.Posts.Model exposing (Model, Message(..))
 import Request.Tweet
 import Util.Editable as Editable exposing (Editable(..))
@@ -17,20 +13,11 @@ import Util.Editable as Editable exposing (Editable(..))
 update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
-        CableMsg msg ->
-            handleCableMessage msg model
+        PageMsg msg ->
+            handlePageMessage msg model
 
-        Subscribe () ->
-            subscribe model
-
-        HandleSocketData id value ->
-            handleSocketData id value model
-
-        DismissError error ->
-            ( removeError model error, Cmd.none )
-
-        Tick time ->
-            ( { model | now = Date.fromTime time }, Cmd.none )
+        EventOccurred event ->
+            handleEvent event model
 
         CancelTweet tweet ->
             ( model, Http.send CanceledTweet <| Request.Tweet.cancel tweet )
@@ -66,7 +53,7 @@ update message model =
         SaveTweet tweet shouldPost ->
             let
                 isActive =
-                    Account.isActive model.user model.now
+                    Account.isActive model.page.user model.page.now
 
                 reallyPost =
                     isActive && shouldPost
@@ -82,7 +69,7 @@ update message model =
             ( addError model "Could not save the tweet right now. Please try again later.", Cmd.none )
 
         SubmitTweet tweet ->
-            if Account.isActive model.user model.now then
+            if Account.isActive model.page.user model.page.now then
                 ( { model | tweets = savingTweet tweet model.tweets }
                 , Http.send TweetSubmitted (Request.Tweet.post tweet)
                 )
@@ -96,30 +83,13 @@ update message model =
             ( addError model "Could not post the tweet right now. Please try again later.", Cmd.none )
 
 
-handleCableMessage : ACMsg.Msg -> Model -> ( Model, Cmd Message )
-handleCableMessage msg model =
-    ActionCable.update msg model.cable
-        |> (\( cable, cmd ) -> { model | cable = cable } ! [ cmd ])
-
-
-subscribe : Model -> ( Model, Cmd Message )
-subscribe model =
-    case ActionCable.subscribeTo (ID.newIdentifier "EventsChannel" []) model.cable of
-        Ok ( cable, cmd ) ->
-            ( { model | cable = cable }, cmd )
-
-        Err err ->
-            ( model, Cmd.none )
-
-
-handleSocketData : ID.Identifier -> Decode.Value -> Model -> ( Model, Cmd Message )
-handleSocketData id value model =
-    case Decode.decodeValue Event.decoder value of
-        Ok event ->
-            handleEvent event model
-
-        Err _ ->
-            ( model, Cmd.none )
+handlePageMessage : Page.Message -> Model -> ( Model, Cmd Message )
+handlePageMessage msg model =
+    let
+        ( page, cmd ) =
+            Page.update msg model.page
+    in
+        ( { model | page = page }, cmd )
 
 
 handleEvent : Event -> Model -> ( Model, Cmd Message )
@@ -193,13 +163,9 @@ saveTweet t =
 
 addError : Model -> String -> Model
 addError model err =
-    { model | errors = (err :: model.errors) }
+    { model | page = Page.addError model.page err }
 
 
 removeError : Model -> String -> Model
 removeError model err =
-    let
-        errors =
-            List.filter (\e -> not (e == err)) model.errors
-    in
-        { model | errors = errors }
+    { model | page = Page.removeError model.page err }

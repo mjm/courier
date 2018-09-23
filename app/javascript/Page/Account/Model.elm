@@ -1,23 +1,20 @@
 module Page.Account.Model exposing (Model, Message(..))
 
+import Data.Event exposing (Event)
 import Data.User exposing (User)
-import Date exposing (Date)
 import Http
-import Time exposing (Time)
-import Views.Modal exposing (Modal)
+import Page exposing (Page)
 
 
 type alias Model =
-    { user : User
-    , stripeKey : String
-    , now : Date
-    , modal : Maybe (Modal Message)
+    { stripeKey : String
+    , page : Page Message
     }
 
 
 type Message
-    = DismissModal
-    | Tick Time
+    = PageMsg Page.Message
+    | EventOccurred Event
     | CancelSubscription
     | ConfirmCancelSubscription
     | SubscriptionCanceled (Result Http.Error User)

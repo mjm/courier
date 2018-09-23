@@ -1,32 +1,21 @@
 module Page.Posts.Model exposing (Model, Message(..))
 
-import ActionCable exposing (ActionCable)
-import ActionCable.Identifier as ID
-import ActionCable.Msg as ACMsg
+import Data.Event exposing (Event)
 import Data.Tweet exposing (Tweet)
-import Data.User exposing (User)
-import Date exposing (Date)
 import Http
-import Json.Decode as Decode
-import Time exposing (Time)
+import Page exposing (Page)
 import Util.Editable exposing (Editable(..))
 
 
 type alias Model =
     { tweets : List (Editable Tweet)
-    , user : User
-    , errors : List String
-    , now : Date
-    , cable : ActionCable Message
+    , page : Page Message
     }
 
 
 type Message
-    = CableMsg ACMsg.Msg
-    | Subscribe ()
-    | HandleSocketData ID.Identifier Decode.Value
-    | DismissError String
-    | Tick Time
+    = PageMsg Page.Message
+    | EventOccurred Event
     | CancelTweet Tweet
     | CanceledTweet (Result Http.Error Tweet)
     | UncancelTweet Tweet
