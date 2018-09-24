@@ -114,7 +114,7 @@ viewTweetCard user tweet now =
     article [ class "card" ]
         [ div [ class "card-content" ]
             ([ tweetUserInfo user tweet.post
-             , p [ style [ ( "white-space", "pre-line" ) ] ] (linkify tweet.body)
+             , p [ class "tweet-content" ] (linkify tweet.body)
              ]
                 ++ List.map viewMediaItem tweet.mediaUrls
             )
@@ -166,7 +166,8 @@ savingTweetCard user post =
         [ div [ class "card-content" ]
             [ tweetUserInfo user post
             , p [ class "is-size-5 has-text-centered" ]
-                [ span [ class "icon is-medium rotating" ] [ i [ class "fas fa-spinner" ] [] ]
+                [ span [ class "icon is-medium" ]
+                    [ i [ class "fas fa-spinner fa-spin" ] [] ]
                 , span [] [ text "Saving changes..." ]
                 ]
             ]

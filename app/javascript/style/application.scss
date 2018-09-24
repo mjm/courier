@@ -4,40 +4,22 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 @import '~@fortawesome/fontawesome-free/scss/brands.scss';
 @import '~@fortawesome/fontawesome-free/scss/solid.scss';
 
-@keyframes rotating {
-	from {
-		transform: rotate(0deg);
-		-o-transform: rotate(0deg);
-		-ms-transform: rotate(0deg);
-		-moz-transform: rotate(0deg);
-		-webkit-transform: rotate(0deg);
-  }
-	to {
-		transform: rotate(360deg);
-		-o-transform: rotate(360deg);
-		-ms-transform: rotate(360deg);
-		-moz-transform: rotate(360deg);
-		-webkit-transform: rotate(360deg);
-  }
-}
-@-webkit-keyframes rotating {
-	from {
-		transform: rotate(0deg);
-		-webkit-transform: rotate(0deg);
-  }
-	to {
-		transform: rotate(360deg);
-		-webkit-transform: rotate(360deg);
-  }
-}
-.rotating {
-	-webkit-animation: rotating 1s linear infinite;
-	-moz-animation: rotating 1s linear infinite;
-	-ms-animation: rotating 1s linear infinite;
-	-o-animation: rotating 1s linear infinite;
-	animation: rotating 1s linear infinite;
-}
-
 button.stripe-button-el {
   display: none !important;
+}
+
+.tweet-content {
+  white-space: pre-line;
+
+  /* Taken from https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/ */
+
+  /* These are technically the same, but use both */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+  word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
 }
