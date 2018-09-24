@@ -23,8 +23,6 @@ class Feed < ApplicationRecord
 
   class << self
     def register(user, url:)
-      url = Addressable::URI.heuristic_parse(url, scheme: 'https')
-                            .normalize.to_s
       Feed.where(url: url).first_or_create.tap do |feed|
         user.feeds << feed
       rescue ActiveRecord::RecordNotUnique

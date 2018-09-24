@@ -1,3 +1,5 @@
+require 'feed_finder'
+
 class FeedsController < ServiceController
   def get_feeds(_req, env)
     require_user env do |user|
@@ -7,7 +9,8 @@ class FeedsController < ServiceController
 
   def register_feed(req, env)
     require_user env do |user|
-      subscription = user.register_feed(url: req.url)
+      url = FeedFinder.find(req.url)
+      subscription = user.register_feed(url: url)
       RegisterFeedResponse.new(feed: subscription.to_message)
     end
   end
