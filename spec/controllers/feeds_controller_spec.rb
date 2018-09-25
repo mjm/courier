@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+require 'webmock/rspec'
+
 RSpec.describe FeedsController, type: :rpc do
   describe '#get_feeds' do
     rpc_method :GetFeeds
@@ -21,11 +23,22 @@ RSpec.describe FeedsController, type: :rpc do
     }
     let(:created_subscription) { created_feed.feed_subscriptions.first }
 
+    before do
+      stub_request(:get, 'https://foo.example.org/feed.json')
+        .to_return(
+          body: {
+            feed_url: 'https://foo.example.org/feed.json'
+          }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+    end
+
     it 'registers the feed' do
       expect { response }.to change { users(:alice).feeds.count }.by 1
     end
 
     it 'returns a description of the registered feed' do
+      response
       expect(response).to eq RegisterFeedResponse.new(
         feed: created_subscription.to_message
       )
