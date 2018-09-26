@@ -1,10 +1,9 @@
 module Page.Account.Update exposing (update)
 
-import Date
 import Http
 import Page
-import Page.Helper exposing (addError, showModal, dismissModal)
-import Page.Account.Model exposing (Model, Message(..))
+import Page.Account.Model exposing (Message(..), Model)
+import Page.Helper exposing (addError, dismissModal, modalInProgress, showModal)
 import Request.User
 
 
@@ -21,29 +20,29 @@ update message model =
             ( showModal model cancelSubscriptionModal, Cmd.none )
 
         ConfirmCancelSubscription ->
-            ( dismissModal model
+            ( modalInProgress model
             , Http.send SubscriptionCanceled Request.User.cancelSubscription
             )
 
         SubscriptionCanceled (Ok user) ->
-            ( { model | page = Page.updateUser model.page user }, Cmd.none )
+            ( dismissModal { model | page = Page.updateUser model.page user }, Cmd.none )
 
         SubscriptionCanceled (Err _) ->
-            ( model, Cmd.none )
+            ( dismissModal model, Cmd.none )
 
         ReactivateSubscription ->
             ( showModal model reactivateSubscriptionModal, Cmd.none )
 
         ConfirmReactivateSubscription ->
-            ( dismissModal model
+            ( modalInProgress model
             , Http.send SubscriptionReactivated Request.User.reactivateSubscription
             )
 
         SubscriptionReactivated (Ok user) ->
-            ( { model | page = Page.updateUser model.page user }, Cmd.none )
+            ( dismissModal { model | page = Page.updateUser model.page user }, Cmd.none )
 
         SubscriptionReactivated (Err _) ->
-            ( model, Cmd.none )
+            ( dismissModal model, Cmd.none )
 
 
 handlePageMessage : Page.Message -> Model -> ( Model, Cmd Message )
@@ -52,7 +51,7 @@ handlePageMessage msg model =
         ( page, cmd ) =
             Page.update msg model.page
     in
-        ( { model | page = page }, cmd )
+    ( { model | page = page }, cmd )
 
 
 cancelSubscriptionModal : Page.Modal Message

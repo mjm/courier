@@ -1,4 +1,4 @@
-module Page.Helper exposing (..)
+module Page.Helper exposing (PageModel, addError, dismissModal, modalInProgress, showModal)
 
 import Page exposing (Page)
 
@@ -15,6 +15,11 @@ addError model err =
 showModal : PageModel a msg -> Page.Modal msg -> PageModel a msg
 showModal model modal =
     { model | page = Page.showModal model.page modal }
+
+
+modalInProgress : PageModel a msg -> PageModel a msg
+modalInProgress model =
+    { model | page = Page.modalInProgress model.page }
 
 
 dismissModal : PageModel a msg -> PageModel a msg

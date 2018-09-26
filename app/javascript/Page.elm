@@ -1,4 +1,4 @@
-module Page exposing (..)
+module Page exposing (Flags, Message(..), Modal, NavBar, Page, addError, dismissModal, init, initTask, modalInProgress, removeError, showModal, subscriptions, update, updateUser, view)
 
 import ActionCable exposing (ActionCable)
 import ActionCable.Identifier as ID
@@ -21,7 +21,7 @@ type alias Page msg =
     { now : Date
     , user : User
     , navbar : NavBar
-    , modal : Maybe (Modal msg)
+    , modal : ModalState msg
     , errors : List String
     , cable : ActionCable Message
     , wrapper : Message -> msg
@@ -34,6 +34,12 @@ type alias NavBar =
     }
 
 
+type ModalState msg
+    = Dismissed
+    | Showing (Modal msg)
+    | InProgress (Modal msg)
+
+
 type alias Modal msg =
     { title : String
     , body : String
@@ -44,7 +50,7 @@ type alias Modal msg =
 
 addError : Page msg -> String -> Page msg
 addError page err =
-    { page | errors = (err :: page.errors) }
+    { page | errors = err :: page.errors }
 
 
 removeError : Page msg -> String -> Page msg
@@ -53,22 +59,31 @@ removeError page err =
         errors =
             List.filter (\e -> not (e == err)) page.errors
     in
-        { page | errors = errors }
+    { page | errors = errors }
 
 
 showModal : Page msg -> Modal msg -> Page msg
 showModal page modal =
-    { page | modal = Just modal }
+    { page | modal = Showing modal }
+
+
+modalInProgress : Page msg -> Page msg
+modalInProgress page =
+    let
+        modalState =
+            case page.modal of
+                Showing m ->
+                    InProgress m
+
+                _ ->
+                    page.modal
+    in
+    { page | modal = modalState }
 
 
 dismissModal : Page msg -> Page msg
 dismissModal page =
-    { page | modal = Nothing }
-
-
-dismissModalMsg : (Message -> msg) -> msg
-dismissModalMsg wrapper =
-    wrapper DismissModal
+    { page | modal = Dismissed }
 
 
 updateUser : Page msg -> User -> Page msg
@@ -96,18 +111,18 @@ init flags wrapper onEvent =
         user =
             Decode.decodeValue User.decoder flags.user |> Unwrap.result
     in
-        { now = Date.fromTime 0
-        , user = user
-        , navbar = { isMenuOpen = False }
-        , modal = Nothing
-        , errors = []
-        , cable =
-            ActionCable.initCable flags.cableUrl
-                |> ActionCable.onWelcome (Just Subscribe)
-                |> ActionCable.onDidReceiveData (Just HandleSocketData)
-        , wrapper = wrapper
-        , onEvent = onEvent
-        }
+    { now = Date.fromTime 0
+    , user = user
+    , navbar = { isMenuOpen = False }
+    , modal = Dismissed
+    , errors = []
+    , cable =
+        ActionCable.initCable flags.cableUrl
+            |> ActionCable.onWelcome (Just Subscribe)
+            |> ActionCable.onDidReceiveData (Just HandleSocketData)
+    , wrapper = wrapper
+    , onEvent = onEvent
+    }
 
 
 initTask : Task x Message
@@ -204,36 +219,74 @@ view page innerHtml =
         ]
 
 
-modal : Maybe (Modal msg) -> msg -> Html msg
+modal : ModalState msg -> msg -> Html msg
 modal modal dismiss =
     case modal of
-        Just modal ->
-            div [ class "modal is-active" ]
-                [ div [ class "modal-background" ] []
-                , div [ class "modal-card" ]
-                    [ header [ class "modal-card-head" ]
-                        [ p [ class "modal-card-title is-size-5" ]
-                            [ text modal.title ]
-                        , button
-                            [ class "delete"
-                            , onClick dismiss
-                            ]
-                            []
-                        ]
-                    , section [ class "modal-card-body" ]
-                        [ p [] [ text modal.body ] ]
-                    , footer [ class "modal-card-foot" ]
-                        [ button
-                            [ class "button is-danger"
-                            , onClick modal.confirmMsg
-                            ]
-                            [ text modal.confirmText ]
-                        ]
+        Showing modal ->
+            showingModal modal dismiss
+
+        InProgress modal ->
+            inProgressModal modal
+
+        Dismissed ->
+            text ""
+
+
+showingModal : Modal msg -> msg -> Html msg
+showingModal modal dismiss =
+    div [ class "modal is-active" ]
+        [ div [ class "modal-background" ] []
+        , div [ class "modal-card" ]
+            [ header [ class "modal-card-head" ]
+                [ p [ class "modal-card-title is-size-5" ]
+                    [ text modal.title ]
+                , button
+                    [ class "delete"
+                    , onClick dismiss
+                    ]
+                    []
+                ]
+            , section [ class "modal-card-body" ]
+                [ p [] [ text modal.body ] ]
+            , footer [ class "modal-card-foot" ]
+                [ button
+                    [ class "button is-danger"
+                    , onClick modal.confirmMsg
+                    ]
+                    [ icon Solid "check"
+                    , span [] [ text modal.confirmText ]
                     ]
                 ]
+            ]
+        ]
 
-        Nothing ->
-            text ""
+
+inProgressModal : Modal msg -> Html msg
+inProgressModal modal =
+    div [ class "modal is-active" ]
+        [ div [ class "modal-background" ] []
+        , div [ class "modal-card" ]
+            [ header [ class "modal-card-head" ]
+                [ p [ class "modal-card-title is-size-5" ]
+                    [ text modal.title ]
+                , button
+                    [ class "delete"
+                    ]
+                    []
+                ]
+            , section [ class "modal-card-body" ]
+                [ p [] [ text modal.body ] ]
+            , footer [ class "modal-card-foot" ]
+                [ button
+                    [ class "button is-danger"
+                    , disabled True
+                    ]
+                    [ icon Solid "spinner fa-spin"
+                    , span [] [ text modal.confirmText ]
+                    ]
+                ]
+            ]
+        ]
 
 
 navbar : Page msg -> Html msg

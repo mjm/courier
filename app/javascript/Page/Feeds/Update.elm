@@ -1,12 +1,12 @@
 module Page.Feeds.Update exposing (update)
 
 import Data.Event as Event exposing (Event(..))
-import Data.Feed as Feed exposing (Feed, DraftFeed)
+import Data.Feed as Feed exposing (DraftFeed, Feed)
 import Dom
 import Http
 import Page
-import Page.Helper exposing (addError, showModal, dismissModal)
-import Page.Feeds.Model exposing (Model, Message(..))
+import Page.Feeds.Model exposing (Message(..), Model)
+import Page.Helper exposing (addError, dismissModal, modalInProgress, showModal)
 import Request.Feed
 import Task
 
@@ -28,6 +28,7 @@ update message model =
                 ( { model | draftFeed = Just (DraftFeed "") }
                 , Task.attempt (\_ -> Noop) (Dom.focus "add-feed-url")
                 )
+
             else
                 ( { model | draftFeed = Nothing }, Cmd.none )
 
@@ -72,15 +73,19 @@ update message model =
             ( showModal model (deleteFeedModal feed), Cmd.none )
 
         ConfirmDeleteFeed feed ->
-            ( dismissModal model
+            ( modalInProgress model
             , Http.send (FeedDeleted feed) (Request.Feed.delete feed)
             )
 
         FeedDeleted feed (Ok _) ->
-            ( { model | feeds = deleteFeed feed model.feeds }, Cmd.none )
+            ( dismissModal { model | feeds = deleteFeed feed model.feeds }
+            , Cmd.none
+            )
 
         FeedDeleted feed (Err _) ->
-            ( addError model "Could not delete the feed right now. Please try again later.", Cmd.none )
+            ( dismissModal <| addError model "Could not delete the feed right now. Please try again later."
+            , Cmd.none
+            )
 
 
 handlePageMessage : Page.Message -> Model -> ( Model, Cmd Message )
@@ -89,7 +94,7 @@ handlePageMessage msg model =
         ( page, cmd ) =
             Page.update msg model.page
     in
-        ( { model | page = page }, cmd )
+    ( { model | page = page }, cmd )
 
 
 handleEvent : Event -> Model -> ( Model, Cmd Message )
@@ -113,6 +118,7 @@ updateFeed feed fs =
         (\f ->
             if f.id == feed.id then
                 feed
+
             else
                 f
         )
@@ -127,7 +133,7 @@ deleteFeed feed fs =
 deleteFeedModal : Feed -> Page.Modal Message
 deleteFeedModal feed =
     { title = "Are you sure?"
-    , body = "Are you sure you want to delete the feed \"" ++ (Feed.displayName feed) ++ "\"?"
+    , body = "Are you sure you want to delete the feed \"" ++ Feed.displayName feed ++ "\"?"
     , confirmText = "Delete Feed"
     , confirmMsg = ConfirmDeleteFeed feed
     }
