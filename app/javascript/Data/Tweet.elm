@@ -1,8 +1,9 @@
-module Data.Tweet exposing (Tweet, PostInfo, Status(..), compare, decoder, listDecoder, update)
+module Data.Tweet exposing (PostInfo, Status(..), Tweet, compare, decoder, listDecoder, update)
 
+import Data.Feed as Feed exposing (Feed)
 import Date exposing (Date)
-import Json.Decode as Decode exposing (Decoder, string, int)
-import Json.Decode.Pipeline exposing (decode, required, optional)
+import Json.Decode as Decode exposing (Decoder, int, string)
+import Json.Decode.Pipeline exposing (decode, optional, required)
 import Util.Date
 
 
@@ -21,6 +22,7 @@ type alias Tweet =
     , tweetId : Maybe String
     , willPostAt : Maybe Date
     , mediaUrls : List String
+    , feed : Feed
     }
 
 
@@ -43,6 +45,7 @@ decoder =
         |> optional "postedTweetId" (Decode.maybe string) Nothing
         |> optional "willPostAt" Util.Date.decoder Nothing
         |> optional "mediaUrls" (Decode.list string) []
+        |> required "feed" Feed.decoder
 
 
 postDecoder : Decoder PostInfo
@@ -76,6 +79,7 @@ update : Tweet -> Tweet -> Tweet
 update existing new =
     if existing.id == new.id then
         new
+
     else
         existing
 

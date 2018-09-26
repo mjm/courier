@@ -3,6 +3,7 @@
 
 require 'google/protobuf'
 
+require 'feeds_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "GetTweetsRequest" do
   end
@@ -44,6 +45,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :posted_tweet_id, :string, 6
     optional :will_post_at, :string, 7
     repeated :media_urls, :string, 8
+    optional :feed, :message, 9, "FeedMessage"
   end
   add_enum "TweetMessage.Status" do
     value :DRAFT, 0

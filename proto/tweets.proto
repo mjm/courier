@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "feeds.proto";
+
 service Tweets {
   rpc GetTweets(GetTweetsRequest) returns (GetTweetsResponse);
   rpc CancelTweet(CancelTweetRequest) returns (CancelTweetResponse);
@@ -64,6 +66,7 @@ message TweetMessage {
            string       posted_tweet_id  = 6;
            string       will_post_at     = 7;
   repeated string       media_urls       = 8;
+           FeedMessage  feed             = 9;
 }
 
 message PostMessage {

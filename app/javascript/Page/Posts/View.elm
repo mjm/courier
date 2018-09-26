@@ -1,7 +1,8 @@
 module Page.Posts.View exposing (view)
 
 import Data.Account as Account
-import Data.Tweet exposing (Tweet, PostInfo, Status(..))
+import Data.Feed as Feed
+import Data.Tweet exposing (PostInfo, Status(..), Tweet)
 import Data.User as User exposing (User)
 import Date exposing (Date)
 import DateFormat.Relative exposing (relativeTime)
@@ -9,11 +10,11 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Page
-import Page.Posts.Model exposing (Model, Message(..))
+import Page.Posts.Model exposing (Message(..), Model)
 import Time
+import Util.Editable as Editable exposing (Editable(..))
 import Views.Icon exposing (..)
 import Views.Linkify exposing (linkify)
-import Util.Editable as Editable exposing (Editable(..))
 
 
 view : Model -> Html Message
@@ -31,6 +32,7 @@ subscriptionMessage : User -> Date -> Html Message
 subscriptionMessage user now =
     if Account.isActive user now then
         text ""
+
     else
         div [ class "notification is-warning has-text-centered" ]
             [ text "You do not have a paid subscription to Courier, so you can only preview the tweets that would be posted for you."
@@ -66,34 +68,35 @@ postDetails tweet now =
         modified =
             if t.post.publishedAt == t.post.modifiedAt then
                 Nothing
+
             else
                 Maybe.map (relativeTime now) t.post.modifiedAt
     in
-        p []
-            [ ul [ class "fa-ul" ]
-                [ li []
-                    [ span [ class "fa-li" ]
-                        [ i [ class "fas fa-calendar-alt" ] [] ]
-                    , text ("Published " ++ published)
-                    ]
-                , case modified of
-                    Nothing ->
-                        text ""
+    p []
+        [ ul [ class "fa-ul" ]
+            [ li []
+                [ span [ class "fa-li" ]
+                    [ i [ class "fas fa-calendar-alt" ] [] ]
+                , text ("Published " ++ published)
+                ]
+            , case modified of
+                Nothing ->
+                    text ""
 
-                    Just m ->
-                        li []
-                            [ span [ class "fa-li" ]
-                                [ i [ class "fas fa-calendar-plus" ] [] ]
-                            , text ("Updated " ++ m)
-                            ]
-                , li []
-                    [ span [ class "fa-li" ]
-                        [ i [ class "fas fa-external-link-square-alt" ] [] ]
-                    , a [ href t.post.url, rel "noopener", target "_blank" ]
-                        [ text "View on your site" ]
-                    ]
+                Just m ->
+                    li []
+                        [ span [ class "fa-li" ]
+                            [ i [ class "fas fa-calendar-plus" ] [] ]
+                        , text ("Updated " ++ m)
+                        ]
+            , li []
+                [ span [ class "fa-li" ]
+                    [ i [ class "fas fa-external-link-square-alt" ] [] ]
+                , a [ href t.post.url, rel "noopener", target "_blank" ]
+                    [ text <| "View on " ++ Feed.displayName t.feed ]
                 ]
             ]
+        ]
 
 
 tweetCard : User -> Editable Tweet -> Date -> Html Message
@@ -197,6 +200,7 @@ draftActions user tweet now =
                     , willPostETA tweet now
                     ]
                 ]
+
             else
                 []
            )
@@ -210,8 +214,8 @@ willPostETA tweet now =
                 eta =
                     relativeETA date now
             in
-                span [ class "is-size-7 has-text-grey" ]
-                    [ text <| " (ETA " ++ eta ++ ")" ]
+            span [ class "is-size-7 has-text-grey" ]
+                [ text <| " (ETA " ++ eta ++ ")" ]
 
         Nothing ->
             text ""
@@ -221,19 +225,22 @@ relativeETA : Date -> Date -> String
 relativeETA date now =
     let
         time =
-            (Date.toTime date) - (Date.toTime now)
+            Date.toTime date - Date.toTime now
 
         stringify =
-            (\x -> toString (round x))
+            \x -> toString (round x)
     in
-        if time < 0 then
-            "soon"
-        else if time < Time.minute then
-            (stringify (Time.inSeconds time)) ++ "s"
-        else if time < Time.hour then
-            (stringify (Time.inMinutes time)) ++ "m"
-        else
-            (stringify (Time.inHours time)) ++ "h"
+    if time < 0 then
+        "soon"
+
+    else if time < Time.minute then
+        stringify (Time.inSeconds time) ++ "s"
+
+    else if time < Time.hour then
+        stringify (Time.inMinutes time) ++ "m"
+
+    else
+        stringify (Time.inHours time) ++ "h"
 
 
 canceledActions : Tweet -> List (Html Message)
@@ -253,7 +260,7 @@ postedActions tweet now =
             [ text "Posted"
             , case tweet.postedAt of
                 Just date ->
-                    text (" " ++ (relativeTime now date))
+                    text (" " ++ relativeTime now date)
 
                 Nothing ->
                     text ""
@@ -293,6 +300,7 @@ editActions user tweet now =
                     ]
                     [ span [] [ text "Post Now " ] ]
                 ]
+
             else
                 []
            )

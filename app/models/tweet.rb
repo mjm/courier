@@ -34,7 +34,7 @@ class Tweet < ApplicationRecord
     draft? && post_job_id == jid && user.valid_subscription?
   end
 
-  def to_message
+  def to_message # rubocop:disable Metrics/AbcSize
     TweetMessage.new(
       id: id,
       body: body,
@@ -43,7 +43,8 @@ class Tweet < ApplicationRecord
       posted_at: format_timestamp(posted_at),
       posted_tweet_id: posted_tweet_id || '',
       will_post_at: format_timestamp(will_post_at),
-      media_urls: media_urls
+      media_urls: media_urls,
+      feed: feed.to_message
     )
   end
 
