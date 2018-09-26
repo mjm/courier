@@ -12,7 +12,8 @@ RSpec.describe Tweet, type: :model do
           url: 'https://example.org/abc',
           published_at: '2018-02-02T00:00:00Z',
           modified_at: '2018-02-03T00:00:00Z'
-        )
+        ),
+        feed: feeds(:example).to_message
       )
     end
   end
