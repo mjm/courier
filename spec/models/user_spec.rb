@@ -56,5 +56,22 @@ RSpec.describe User, type: :model do
         )
       end
     end
+
+    context 'when the user is not in the allowed user list' do
+      before do
+        Rails.configuration.allowed_users_filter = ->(u) { u != 'example123' }
+      end
+      after do
+        Rails.configuration.allowed_users_filter = ->(_) { true }
+      end
+
+      it 'does not create a new user' do
+        expect { user }.not_to(change { User.count })
+      end
+
+      it 'returns nil' do
+        expect(user).to be_nil
+      end
+    end
   end
 end

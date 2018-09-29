@@ -16,15 +16,23 @@ class User < ApplicationRecord
            through: :feed_subscriptions
 
   def self.from_omniauth(auth)
+    return nil unless allow_username?(auth.uid)
+
     where(provider: auth.provider, uid: auth.uid)
       .first_or_initialize
-      .tap do |user|
-        user.username = auth.info.nickname
-        user.name = auth.info.name
-        user.twitter_access_token = auth.credentials.token
-        user.twitter_access_secret = auth.credentials.secret
-        user.save
-      end
+      .tap { |user| user.apply_omniauth(auth) }
+  end
+
+  def self.allow_username?(username)
+    Rails.configuration.allowed_users_filter.call(username)
+  end
+
+  def apply_omniauth(auth)
+    self.username = auth.info.nickname
+    self.name = auth.info.name
+    self.twitter_access_token = auth.credentials.token
+    self.twitter_access_secret = auth.credentials.secret
+    save
   end
 
   def register_feed(attrs)
