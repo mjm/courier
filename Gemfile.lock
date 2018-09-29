@@ -63,6 +63,7 @@ GEM
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     crass (1.0.4)
+    dante (0.2.0)
     devise (4.5.0)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -120,6 +121,7 @@ GEM
     mini_portile2 (2.3.0)
     minitest (5.11.3)
     msgpack (1.2.4)
+    multi_json (1.13.1)
     multipart-post (2.0.0)
     naught (1.1.0)
     nio4r (2.3.1)
@@ -246,6 +248,10 @@ GEM
       sprockets (>= 3.0.0)
     stripe (3.26.1)
       faraday (~> 0.10)
+    stripe-ruby-mock (2.5.4)
+      dante (>= 0.2.0)
+      multi_json (~> 1.0)
+      stripe (>= 2.0.3)
     stripe_event (2.1.1)
       activesupport (>= 3.1)
       stripe (>= 2.8, < 4.0)
@@ -329,6 +335,7 @@ DEPENDENCIES
   spring
   spring-watcher-listen (~> 2.0.0)
   stripe
+  stripe-ruby-mock (~> 2.5)
   stripe_event
   timecop
   twirp

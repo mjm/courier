@@ -2,6 +2,10 @@
 module Billable
   extend ActiveSupport::Concern
 
+  class BillingError < StandardError; end
+  class NoSubscription < BillingError; end
+  class SubscriptionNotCanceled < BillingError; end
+
   # Checks if the user currently has a subscription.
   def valid_subscription?
     subscription_expires_at.present? && !subscription_expires_at.past?
@@ -28,6 +32,8 @@ module Billable
   # time.
   def cancel_subscription
     sub = fetch_subscription
+    raise NoSubscription, 'User does not have a subscription' if sub.blank?
+
     sub.cancel_at_period_end = true
     sub.save
 
@@ -40,6 +46,12 @@ module Billable
   # subscription they canceled.
   def reactivate_subscription
     sub = fetch_subscription
+    raise NoSubscription, 'User does not have a subscription' if sub.blank?
+    unless sub.cancel_at_period_end
+      raise SubscriptionNotCanceled, 'Cannot reactivate subscription ' \
+        "because it isn't canceled"
+    end
+
     sub.cancel_at_period_end = false
     sub.save
 

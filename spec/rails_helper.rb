@@ -73,4 +73,16 @@ RSpec.configure do |config|
       end
     end
   end
+
+  config.before :each do
+    StripeMock.start
+    StripeMock.create_test_helper.create_plan(
+      id: Plan::MONTHLY.plan_id,
+      amount: Plan::MONTHLY.amount,
+      interval: Plan::MONTHLY.interval
+    )
+  end
+  config.after :each do
+    StripeMock.stop
+  end
 end
