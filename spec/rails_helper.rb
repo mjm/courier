@@ -65,6 +65,7 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.extend RPCHelpers, type: :rpc
+  config.include Devise::Test::ControllerHelpers, type: :controller
 
   config.before :each do
     Sidekiq.configure_client do |c|
