@@ -61,6 +61,7 @@ RSpec.describe Tweet, type: :model do
     let(:the_tweets) { [tweets(:alice_example_post)] }
     let(:tweet_ids) { [tweets(:alice_example_post).id] }
     before { Timecop.freeze(2018) }
+    after { Timecop.return }
 
     it 'enqueues a job to post the tweets' do
       Tweet.post_to_twitter(the_tweets)
@@ -72,7 +73,7 @@ RSpec.describe Tweet, type: :model do
       Tweet.post_to_twitter(the_tweets)
       tweet = the_tweets.first.reload
       expect(tweet.post_job_id).not_to be_nil
-      expect(tweet.will_post_at).to eq 2.seconds.from_now
+      expect(tweet.will_post_at.to_i).to eq 2.seconds.from_now.to_i
     end
 
     it 'allows overriding the delay before tweeting' do
@@ -80,7 +81,7 @@ RSpec.describe Tweet, type: :model do
       tweet = the_tweets.first.reload
       expect(PostTweetsWorker)
         .to have_enqueued_sidekiq_job(tweet_ids).at(Time.now + 4.hours)
-      expect(tweet.will_post_at).to eq 4.hours.from_now
+      expect(tweet.will_post_at.to_i).to eq 4.hours.from_now.to_i
     end
 
     context 'when no tweets are passed in' do
