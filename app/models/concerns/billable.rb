@@ -11,11 +11,6 @@ module Billable
     subscription_expires_at.present? && !subscription_expires_at.past?
   end
 
-  # Checks if the user's subscription has expired.
-  def subscription_expired?
-    subscription_expires_at.past?
-  end
-
   # Subscribes the user to a new plan.
   #
   # Currently assumes that the user doesn't already have a subscription. This

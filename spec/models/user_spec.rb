@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
+  it_behaves_like 'billable'
+
   describe '#from_omniauth' do
     let(:auth) do
       OmniAuth::AuthHash.new(

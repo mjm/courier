@@ -22,6 +22,7 @@ require 'action_cable/testing/rspec'
 # require only the support files necessary.
 #
 Dir[Rails.root.join('spec', 'support', '**', '*.rb')].each { |f| require f }
+Dir[Rails.root.join('spec', 'concerns', '**', '*.rb')].each { |f| require f }
 
 Sidekiq::Logging.logger = nil
 
