@@ -66,11 +66,11 @@ RSpec.describe User, type: :model do
       end
 
       it 'does not create a new user' do
-        expect { user }.not_to(change { User.count })
+        expect { user rescue nil }.not_to(change { User.count })
       end
 
-      it 'returns nil' do
-        expect(user).to be_nil
+      it 'raises an error' do
+        expect { user }.to raise_error(User::LoginNotAllowed)
       end
     end
   end

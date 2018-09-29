@@ -5,9 +5,9 @@
 # information.
 
 if ENV['ALLOWED_TWITTER_USERS'].present?
-  allowed_users = ENV['ALLOWED_TWITTER_USERS'].split(',')
+  allowed_users = ENV['ALLOWED_TWITTER_USERS'].split(',').map(&:downcase)
   Rails.configuration.allowed_users_filter =
-    ->(username) { allowed_users.include? username }
+    ->(username) { allowed_users.include? username.downcase }
   Rails.logger.info \
     "Only allowing Twitter users: #{allowed_users.join(' ')}"
 else

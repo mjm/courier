@@ -15,8 +15,13 @@ class User < ApplicationRecord
            },
            through: :feed_subscriptions
 
+  class LoginNotAllowed < StandardError; end
+
   def self.from_omniauth(auth)
-    return nil unless allow_username?(auth.uid)
+    unless allow_username?(auth.info.nickname)
+      raise LoginNotAllowed,
+            "Twitter user #{auth.info.nickname} is not allowed to login"
+    end
 
     where(provider: auth.provider, uid: auth.uid)
       .first_or_initialize
