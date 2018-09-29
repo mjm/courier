@@ -55,4 +55,86 @@ RSpec.describe Tweet, type: :model do
       expect(subject.reload).to be_posted
     end
   end
+
+  # rubocop:disable Rails/TimeZone
+  describe 'posting tweets to Twitter' do
+    let(:the_tweets) { [tweets(:alice_example_post)] }
+    let(:tweet_ids) { [tweets(:alice_example_post).id] }
+    before { Timecop.freeze(2018) }
+
+    it 'enqueues a job to post the tweets' do
+      Tweet.post_to_twitter(the_tweets)
+      expect(PostTweetsWorker)
+        .to have_enqueued_sidekiq_job(tweet_ids).at(Time.now + 2.seconds)
+    end
+
+    it 'saves information about the job on the tweets' do
+      Tweet.post_to_twitter(the_tweets)
+      tweet = the_tweets.first.reload
+      expect(tweet.post_job_id).not_to be_nil
+      expect(tweet.will_post_at).to eq 2.seconds.from_now
+    end
+
+    it 'allows overriding the delay before tweeting' do
+      Tweet.post_to_twitter(the_tweets, delay: 4.hours)
+      tweet = the_tweets.first.reload
+      expect(PostTweetsWorker)
+        .to have_enqueued_sidekiq_job(tweet_ids).at(Time.now + 4.hours)
+      expect(tweet.will_post_at).to eq 4.hours.from_now
+    end
+
+    context 'when no tweets are passed in' do
+      let(:the_tweets) { [] }
+
+      it 'does not enqueue a job' do
+        Tweet.post_to_twitter(the_tweets)
+        expect(PostTweetsWorker).not_to have_enqueued_sidekiq_job(anything)
+      end
+    end
+
+    context 'when the user is not currently subscribed' do
+      before { users(:alice).update! subscription_expires_at: 1.day.ago }
+
+      it 'does not enqueue a job' do
+        Tweet.post_to_twitter(the_tweets)
+        expect(PostTweetsWorker).not_to have_enqueued_sidekiq_job(anything)
+      end
+    end
+  end
+  # rubocop:enable Rails/TimeZone
+
+  describe 'creating a new tweet' do
+    let(:post) { posts(:example_untranslated) }
+    let(:user) { users(:alice) }
+    subject {
+      post.tweets.create(
+        feed_subscription: feed_subscriptions(:alice_example),
+        body: 'Foo bar baz'
+      )
+    }
+
+    it 'broadcasts an event to the user' do
+      # We can't check the content of the event because we need the already
+      # created tweet in order to know (at the very least) the ID of the tweet.
+      # I have not figured out anyway to break this dependency.
+      expect { subject }.to broadcast_to("events:#{user.id}")
+    end
+
+    it 'does not broadcast to other users' do
+      expect { subject }.not_to broadcast_to("events:#{users(:bob).id}")
+    end
+  end
+
+  describe 'updating a tweet' do
+    let(:user) { users(:alice) }
+    subject { tweets(:alice_example_status).canceled! }
+
+    it 'broadcasts an event to the user' do
+      expect { subject }.to broadcast_to("events:#{user.id}")
+    end
+
+    it 'does not broadcast to other users' do
+      expect { subject }.not_to broadcast_to("events:#{users(:bob).id}")
+    end
+  end
 end

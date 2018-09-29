@@ -26,10 +26,6 @@ class Tweet < ApplicationRecord
     self.class.post_to_twitter([self])
   end
 
-  def will_post?
-    draft? && post_job_id.present? && will_post_at.present?
-  end
-
   def should_post?(jid:)
     draft? && post_job_id == jid && user.valid_subscription?
   end

@@ -1,6 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    action-cable-testing (0.3.1)
+      actioncable (~> 5.0)
     actioncable (5.2.1)
       actionpack (= 5.2.1)
       nio4r (~> 2.0)
@@ -250,6 +252,7 @@ GEM
     thor (0.20.0)
     thread_safe (0.3.6)
     tilt (2.0.8)
+    timecop (0.9.1)
     twirp (1.0.0)
       faraday (~> 0)
       google-protobuf (~> 3.0, >= 3.0.0)
@@ -300,6 +303,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  action-cable-testing
   addressable
   bootsnap (>= 1.1.0)
   bunny
@@ -326,6 +330,7 @@ DEPENDENCIES
   spring-watcher-listen (~> 2.0.0)
   stripe
   stripe_event
+  timecop
   twirp
   twitter
   typhoeus
