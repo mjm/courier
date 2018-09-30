@@ -38,7 +38,9 @@ class FeedFinder
     case type
     when %r{^text/html} then handle_html_response(response)
     when %r{^application/json} then handle_feed_response(response)
-    else Rails.logger.warn "Unexpected content type #{type}"
+    else
+      Rails.logger.warn "Unexpected content type #{type}"
+      nil
     end
   end
 
