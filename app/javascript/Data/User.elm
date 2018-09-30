@@ -1,8 +1,8 @@
 module Data.User exposing (User, avatarUrl, decoder)
 
 import Date exposing (Date)
-import Json.Decode as Decode exposing (Decoder, string, bool)
-import Json.Decode.Pipeline exposing (decode, required, optional)
+import Json.Decode as Decode exposing (Decoder, bool, string)
+import Json.Decode.Pipeline exposing (decode, optional, required)
 import Util.Date
 
 

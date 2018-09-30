@@ -5,7 +5,7 @@ import Html
 import Json.Decode exposing (decodeValue)
 import Page
 import Page.Posts.Flags exposing (Flags)
-import Page.Posts.Model as Model exposing (Model, Message(..))
+import Page.Posts.Model as Model exposing (Message(..), Model)
 import Page.Posts.Update exposing (update)
 import Page.Posts.View exposing (view)
 import Task
@@ -15,14 +15,15 @@ import Util.Editable exposing (Editable(..))
 
 init : Flags -> ( Model, Cmd Message )
 init flags =
-    { tweets = tweetsFromFlags flags
-    , page =
-        Page.init
-            flags
-            PageMsg
-            EventOccurred
-    }
-        ! [ Task.perform PageMsg Page.initTask ]
+    ( { tweets = tweetsFromFlags flags
+      , page =
+            Page.init
+                flags
+                PageMsg
+                EventOccurred
+      }
+    , Task.perform PageMsg Page.initTask
+    )
 
 
 tweetsFromFlags : Flags -> List (Editable Tweet)

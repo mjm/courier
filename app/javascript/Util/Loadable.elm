@@ -1,4 +1,4 @@
-module Util.Loadable exposing (..)
+module Util.Loadable exposing (Loadable(..), map)
 
 {-| I know this is basically just Maybe, but it's more descriptive, especially
 when the type it contains is also a Maybe.

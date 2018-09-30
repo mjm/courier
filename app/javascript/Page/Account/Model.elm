@@ -1,4 +1,4 @@
-module Page.Account.Model exposing (Model, Message(..))
+module Page.Account.Model exposing (Message(..), Model)
 
 import Data.Event exposing (Event)
 import Data.User exposing (User)

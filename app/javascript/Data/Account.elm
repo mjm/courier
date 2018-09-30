@@ -1,4 +1,4 @@
-module Data.Account exposing (Status(..), status, isActive)
+module Data.Account exposing (Status(..), isActive, status)
 
 import Data.User as User exposing (User)
 import Date exposing (Date)

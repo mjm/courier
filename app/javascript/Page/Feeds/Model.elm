@@ -1,7 +1,7 @@
-module Page.Feeds.Model exposing (Model, Message(..))
+module Page.Feeds.Model exposing (Message(..), Model)
 
 import Data.Event exposing (Event)
-import Data.Feed exposing (Feed, DraftFeed)
+import Data.Feed exposing (DraftFeed, Feed)
 import Http
 import Page exposing (Page)
 

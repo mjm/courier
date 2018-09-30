@@ -1,4 +1,4 @@
-module Request.Helpers exposing (..)
+module Request.Helpers exposing (apiBuilder, apiMethodUrl)
 
 import HttpBuilder
 

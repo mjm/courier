@@ -1,8 +1,8 @@
-module Request.User exposing (..)
+module Request.User exposing (cancelSubscription, reactivateSubscription, userDecoder, usersBuilder)
 
 import Data.User as User exposing (User)
 import Http
-import HttpBuilder exposing (withExpect, withJsonBody, toRequest)
+import HttpBuilder exposing (toRequest, withExpect, withJsonBody)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Request.Helpers exposing (apiBuilder)

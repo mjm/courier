@@ -5,7 +5,7 @@ import Data.Event as Event exposing (Event(..))
 import Data.Tweet as Tweet exposing (Tweet)
 import Http
 import Page
-import Page.Posts.Model exposing (Model, Message(..))
+import Page.Posts.Model exposing (Message(..), Model)
 import Request.Tweet
 import Util.Editable as Editable exposing (Editable(..))
 
@@ -45,7 +45,7 @@ update message model =
                 updater =
                     \x -> { x | body = body }
             in
-                ( { model | tweets = updateDraftTweet updater tweet model.tweets }, Cmd.none )
+            ( { model | tweets = updateDraftTweet updater tweet model.tweets }, Cmd.none )
 
         CancelEditTweet tweet ->
             ( { model | tweets = cancelEditTweet tweet model.tweets }, Cmd.none )
@@ -58,9 +58,9 @@ update message model =
                 reallyPost =
                     isActive && shouldPost
             in
-                ( { model | tweets = savingTweet tweet model.tweets }
-                , Http.send TweetSaved (Request.Tweet.update tweet reallyPost)
-                )
+            ( { model | tweets = savingTweet tweet model.tweets }
+            , Http.send TweetSaved (Request.Tweet.update tweet reallyPost)
+            )
 
         TweetSaved (Ok tweet) ->
             ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
@@ -73,6 +73,7 @@ update message model =
                 ( { model | tweets = savingTweet tweet model.tweets }
                 , Http.send TweetSubmitted (Request.Tweet.post tweet)
                 )
+
             else
                 ( model, Cmd.none )
 
@@ -89,7 +90,7 @@ handlePageMessage msg model =
         ( page, cmd ) =
             Page.update msg model.page
     in
-        ( { model | page = page }, cmd )
+    ( { model | page = page }, cmd )
 
 
 handleEvent : Event -> Model -> ( Model, Cmd Message )
@@ -109,7 +110,7 @@ addTweet : Tweet -> List (Editable Tweet) -> List (Editable Tweet)
 addTweet tweet ts =
     List.sortWith
         (\a b -> Tweet.compare (Editable.value a) (Editable.value b))
-        ((Viewing tweet) :: ts)
+        (Viewing tweet :: ts)
 
 
 updateTweet : Tweet -> Model -> Model
@@ -118,7 +119,7 @@ updateTweet tweet model =
         updatedTweets =
             List.map (updatePostTweet tweet) model.tweets
     in
-        { model | tweets = updatedTweets }
+    { model | tweets = updatedTweets }
 
 
 updatePostTweet : Tweet -> Editable Tweet -> Editable Tweet

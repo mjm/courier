@@ -164,7 +164,9 @@ handleCableMessage : ACMsg.Msg -> Page msg -> ( Page msg, Cmd msg )
 handleCableMessage msg model =
     ActionCable.update msg model.cable
         |> (\( cable, cmd ) ->
-                { model | cable = cable } ! [ Cmd.map model.wrapper cmd ]
+                ( { model | cable = cable }
+                , Cmd.map model.wrapper cmd
+                )
            )
 
 

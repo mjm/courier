@@ -1,4 +1,4 @@
-module Util.URL.Regex exposing (regex, findAll)
+module Util.URL.Regex exposing (findAll, regex)
 
 {-| Finds all of the URLs in a body of text using a regular expression.
 
@@ -6,7 +6,7 @@ The regex itself was adapted from <https://github.com/kevva/url-regex>.
 
 -}
 
-import Regex exposing (Regex, HowMany(..))
+import Regex exposing (HowMany(..), Regex)
 
 
 regex : Regex

@@ -1,4 +1,4 @@
-module Page.Posts.Model exposing (Model, Message(..))
+module Page.Posts.Model exposing (Message(..), Model)
 
 import Data.Event exposing (Event)
 import Data.Tweet exposing (Tweet)

@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Page
-import Page.Account.Model exposing (Model, Message(..))
+import Page.Account.Model exposing (Message(..), Model)
 import Views.Icon exposing (..)
 
 

@@ -1,4 +1,4 @@
-module Views.Icon exposing (..)
+module Views.Icon exposing (IconStyle(..), icon, iconStyleClass)
 
 import Html exposing (..)
 import Html.Attributes exposing (class)
@@ -12,7 +12,7 @@ type IconStyle
 icon : IconStyle -> String -> Html msg
 icon style name =
     span [ class "icon" ]
-        [ i [ class <| (iconStyleClass style) ++ " fa-" ++ name ] [] ]
+        [ i [ class <| iconStyleClass style ++ " fa-" ++ name ] [] ]
 
 
 iconStyleClass : IconStyle -> String

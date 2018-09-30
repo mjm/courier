@@ -1,8 +1,8 @@
-module Request.Tweet exposing (..)
+module Request.Tweet exposing (cancel, post, tweetDecoder, tweetsBuilder, uncancel, update)
 
 import Data.Tweet as Tweet exposing (Tweet)
 import Http
-import HttpBuilder exposing (withExpect, withJsonBody, toRequest)
+import HttpBuilder exposing (toRequest, withExpect, withJsonBody)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Request.Helpers exposing (apiBuilder)
@@ -24,10 +24,10 @@ cancel tweet =
         body =
             Encode.object [ ( "id", Encode.int tweet.id ) ]
     in
-        tweetsBuilder "CancelTweet"
-            |> withJsonBody body
-            |> withExpect (Http.expectJson tweetDecoder)
-            |> toRequest
+    tweetsBuilder "CancelTweet"
+        |> withJsonBody body
+        |> withExpect (Http.expectJson tweetDecoder)
+        |> toRequest
 
 
 uncancel : Tweet -> Http.Request Tweet
@@ -36,10 +36,10 @@ uncancel tweet =
         body =
             Encode.object [ ( "id", Encode.int tweet.id ) ]
     in
-        tweetsBuilder "UncancelTweet"
-            |> withJsonBody body
-            |> withExpect (Http.expectJson tweetDecoder)
-            |> toRequest
+    tweetsBuilder "UncancelTweet"
+        |> withJsonBody body
+        |> withExpect (Http.expectJson tweetDecoder)
+        |> toRequest
 
 
 update : Tweet -> Bool -> Http.Request Tweet
@@ -52,10 +52,10 @@ update tweet shouldPost =
                 , ( "shouldPost", Encode.bool shouldPost )
                 ]
     in
-        tweetsBuilder "UpdateTweet"
-            |> withJsonBody body
-            |> withExpect (Http.expectJson tweetDecoder)
-            |> toRequest
+    tweetsBuilder "UpdateTweet"
+        |> withJsonBody body
+        |> withExpect (Http.expectJson tweetDecoder)
+        |> toRequest
 
 
 post : Tweet -> Http.Request Tweet
@@ -64,7 +64,7 @@ post tweet =
         body =
             Encode.object [ ( "id", Encode.int tweet.id ) ]
     in
-        tweetsBuilder "PostTweet"
-            |> withJsonBody body
-            |> withExpect (Http.expectJson tweetDecoder)
-            |> toRequest
+    tweetsBuilder "PostTweet"
+        |> withJsonBody body
+        |> withExpect (Http.expectJson tweetDecoder)
+        |> toRequest

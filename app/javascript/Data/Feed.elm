@@ -1,8 +1,8 @@
-module Data.Feed exposing (Feed, DraftFeed, SettingsChanges, displayName, decoder, listDecoder, encode, encodeSettings)
+module Data.Feed exposing (DraftFeed, Feed, SettingsChanges, decoder, displayName, encode, encodeSettings, listDecoder)
 
 import Date exposing (Date)
-import Json.Decode as Decode exposing (Decoder, int, string, list, bool)
-import Json.Decode.Pipeline exposing (decode, required, optional)
+import Json.Decode as Decode exposing (Decoder, bool, int, list, string)
+import Json.Decode.Pipeline exposing (decode, optional, required)
 import Json.Encode as Encode exposing (Value)
 import Util.Date
 
@@ -33,6 +33,7 @@ displayName : Feed -> String
 displayName feed =
     if String.isEmpty feed.title then
         feed.url
+
     else
         feed.title
 
@@ -84,6 +85,7 @@ encodeSetting value =
         Just value ->
             if value then
                 Encode.string "ON"
+
             else
                 Encode.string "OFF"
 

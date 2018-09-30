@@ -215,7 +215,7 @@ willPostETA tweet now =
                     relativeETA date now
             in
             span [ class "is-size-7 has-text-grey" ]
-                [ text <| " (ETA " ++ eta ++ ")" ]
+                [ text <| "\u{00A0}(ETA " ++ eta ++ ")" ]
 
         Nothing ->
             text ""
@@ -246,7 +246,7 @@ relativeETA date now =
 canceledActions : Tweet -> List (Html Message)
 canceledActions tweet =
     [ div [ class "card-footer-item" ]
-        [ span [] [ text "Canceled. " ]
+        [ span [] [ text "Canceled.\u{00A0}" ]
         , a [ onClick (UncancelTweet tweet) ] [ text "Undo?" ]
         ]
     ]
@@ -264,7 +264,7 @@ postedActions tweet now =
 
                 Nothing ->
                     text ""
-            , text ". "
+            , text ".\u{00A0}"
             ]
         , case tweet.tweetId of
             Just tweetId ->

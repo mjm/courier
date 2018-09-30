@@ -1,8 +1,8 @@
-module Request.Feed exposing (..)
+module Request.Feed exposing (delete, feedDecoder, feeds, feedsBuilder, refresh, register, updateSettings)
 
-import Data.Feed as Feed exposing (Feed, DraftFeed, SettingsChanges)
+import Data.Feed as Feed exposing (DraftFeed, Feed, SettingsChanges)
 import Http
-import HttpBuilder exposing (withExpect, withJsonBody, toRequest)
+import HttpBuilder exposing (toRequest, withExpect, withJsonBody)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Request.Helpers exposing (apiBuilder)
@@ -24,10 +24,10 @@ feeds =
         decoder =
             Decode.field "feeds" Feed.listDecoder
     in
-        feedsBuilder "GetFeeds"
-            |> withJsonBody (Encode.object [])
-            |> withExpect (Http.expectJson decoder)
-            |> toRequest
+    feedsBuilder "GetFeeds"
+        |> withJsonBody (Encode.object [])
+        |> withExpect (Http.expectJson decoder)
+        |> toRequest
 
 
 register : DraftFeed -> Http.Request Feed
@@ -44,10 +44,10 @@ refresh feed =
         body =
             Encode.object [ ( "id", Encode.int feed.id ) ]
     in
-        feedsBuilder "RefreshFeed"
-            |> withJsonBody body
-            |> withExpect (Http.expectJson (Decode.succeed ()))
-            |> toRequest
+    feedsBuilder "RefreshFeed"
+        |> withJsonBody body
+        |> withExpect (Http.expectJson (Decode.succeed ()))
+        |> toRequest
 
 
 updateSettings : Feed -> SettingsChanges -> Http.Request Feed
@@ -56,10 +56,10 @@ updateSettings feed settings =
         body =
             Feed.encodeSettings feed.id settings
     in
-        feedsBuilder "UpdateFeedSettings"
-            |> withJsonBody body
-            |> withExpect (Http.expectJson feedDecoder)
-            |> toRequest
+    feedsBuilder "UpdateFeedSettings"
+        |> withJsonBody body
+        |> withExpect (Http.expectJson feedDecoder)
+        |> toRequest
 
 
 delete : Feed -> Http.Request ()
@@ -68,7 +68,7 @@ delete feed =
         body =
             Encode.object [ ( "id", Encode.int feed.id ) ]
     in
-        feedsBuilder "DeleteFeed"
-            |> withJsonBody body
-            |> withExpect (Http.expectJson (Decode.succeed ()))
-            |> toRequest
+    feedsBuilder "DeleteFeed"
+        |> withJsonBody body
+        |> withExpect (Http.expectJson (Decode.succeed ()))
+        |> toRequest

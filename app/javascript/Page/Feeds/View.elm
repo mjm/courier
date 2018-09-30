@@ -1,6 +1,6 @@
 module Page.Feeds.View exposing (view)
 
-import Data.Feed as Feed exposing (Feed, DraftFeed)
+import Data.Feed as Feed exposing (DraftFeed, Feed)
 import Date exposing (Date)
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
@@ -8,9 +8,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Events.Extra exposing (onClickPreventDefault)
 import Page
-import Page.Feeds.Model exposing (Model, Message(..))
-import Views.Icon exposing (..)
+import Page.Feeds.Model exposing (Message(..), Model)
 import Util.URL as URL
+import Views.Icon exposing (..)
 
 
 view : Model -> Html Message
@@ -72,7 +72,7 @@ feedRow now feed =
                     , span []
                         [ case feed.refreshedAt of
                             Just date ->
-                                text ("checked " ++ (relativeTime now date))
+                                text ("checked " ++ relativeTime now date)
 
                             Nothing ->
                                 text ""
@@ -90,49 +90,51 @@ feedDropdown feed =
         autopost =
             feed.settings.autopost
     in
-        div [ class "dropdown is-hoverable is-right" ]
-            [ div [ class "dropdown-trigger" ]
-                [ button [ class "button is-white" ]
-                    [ icon Solid "bars" ]
-                ]
-            , div [ class "dropdown-menu has-text-left" ]
-                [ div [ class "dropdown-content" ]
-                    [ a
-                        [ class "dropdown-item"
-                        , onClick (RefreshFeed feed)
+    div [ class "dropdown is-hoverable is-right" ]
+        [ div [ class "dropdown-trigger" ]
+            [ button [ class "button is-white" ]
+                [ icon Solid "bars" ]
+            ]
+        , div [ class "dropdown-menu has-text-left" ]
+            [ div [ class "dropdown-content" ]
+                [ a
+                    [ class "dropdown-item"
+                    , onClick (RefreshFeed feed)
+                    ]
+                    [ icon Solid "sync-alt"
+                    , span [] [ text "Check for New Posts" ]
+                    ]
+                , a
+                    [ class "dropdown-item"
+                    , onClick (UpdateAutoposting feed (not autopost))
+                    ]
+                    [ span []
+                        [ icon Solid
+                            (if autopost then
+                                "comment-slash"
+
+                             else
+                                "comment"
+                            )
+                        , text
+                            (if autopost then
+                                "Turn Off Autoposting"
+
+                             else
+                                "Turn On Autoposting"
+                            )
                         ]
-                        [ icon Solid "sync-alt"
-                        , span [] [ text "Check for New Posts" ]
-                        ]
-                    , a
-                        [ class "dropdown-item"
-                        , onClick (UpdateAutoposting feed (not autopost))
-                        ]
-                        [ span []
-                            [ icon Solid
-                                (if autopost then
-                                    "comment-slash"
-                                 else
-                                    "comment"
-                                )
-                            , text
-                                (if autopost then
-                                    "Turn Off Autoposting"
-                                 else
-                                    "Turn On Autoposting"
-                                )
-                            ]
-                        ]
-                    , a
-                        [ class "dropdown-item has-text-danger"
-                        , onClick (DeleteFeed feed)
-                        ]
-                        [ icon Solid "trash"
-                        , span [] [ text "Delete Feed" ]
-                        ]
+                    ]
+                , a
+                    [ class "dropdown-item has-text-danger"
+                    , onClick (DeleteFeed feed)
+                    ]
+                    [ icon Solid "trash"
+                    , span [] [ text "Delete Feed" ]
                     ]
                 ]
             ]
+        ]
 
 
 addFeedView : Model -> Html Message

@@ -1,4 +1,4 @@
-module Views.Error exposing (..)
+module Views.Error exposing (error, errors)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -9,6 +9,7 @@ errors : (String -> msg) -> List String -> Html msg
 errors msg errs =
     if List.isEmpty errs then
         text ""
+
     else
         section [ class "section" ]
             [ List.map (error msg) errs |> div [ class "container" ] ]

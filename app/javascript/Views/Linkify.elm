@@ -44,13 +44,14 @@ createTokens text i =
         token =
             makeToken text
     in
-        (token Text i.start i.mid) ++ (token URL i.mid i.end)
+    token Text i.start i.mid ++ token URL i.mid i.end
 
 
 makeToken : String -> (String -> Token) -> Int -> Int -> List Token
 makeToken text f start end =
     if start == end then
         []
+
     else
         [ f (String.slice start end text) ]
 
@@ -64,22 +65,23 @@ tokenIndices len ms =
                 { start = 0, indices = [] }
                 ms
     in
-        if t.start == len then
-            t.indices
-        else
-            t.indices ++ [ { start = t.start, mid = len, end = len } ]
+    if t.start == len then
+        t.indices
+
+    else
+        t.indices ++ [ { start = t.start, mid = len, end = len } ]
 
 
 advance : Match -> Tokenizer -> Tokenizer
 advance m t =
     let
         end =
-            m.index + (String.length m.match)
+            m.index + String.length m.match
 
         next =
             { start = t.start, mid = m.index, end = end }
     in
-        { start = end, indices = t.indices ++ [ next ] }
+    { start = end, indices = t.indices ++ [ next ] }
 
 
 toHtml : Token -> Html msg
