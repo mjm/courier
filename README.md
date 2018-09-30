@@ -1,24 +1,7 @@
-# README
+# Courier
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+[![Build Status](https://travis-ci.com/mjm/courier.svg?branch=master)](https://travis-ci.com/mjm/courier)
+[![Code Coverage](https://codecov.io/gh/mjm/courier/branch/master/graph/badge.svg)](https://codecov.io/gh/mjm/courier)
+[![Maintainability](https://api.codeclimate.com/v1/badges/99b022798b6dd2cd6179/maintainability)](https://codeclimate.com/github/mjm/courier/maintainability)
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Smart autoposting from microblogs to Twitter
