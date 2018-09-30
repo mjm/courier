@@ -4,13 +4,5 @@
 # could potentially sign up there and use Courier for free with fake payment
 # information.
 
-if ENV['ALLOWED_TWITTER_USERS'].present?
-  allowed_users = ENV['ALLOWED_TWITTER_USERS'].split(',').map(&:downcase)
-  Rails.configuration.allowed_users_filter =
-    ->(username) { allowed_users.include? username.downcase }
-  Rails.logger.info \
-    "Only allowing Twitter users: #{allowed_users.join(' ')}"
-else
-  Rails.configuration.allowed_users_filter = ->(_) { true }
-  Rails.logger.info 'Allowing all Twitter users'
-end
+require 'allowed_users'
+Rails.configuration.allowed_users = AllowedUsers.new

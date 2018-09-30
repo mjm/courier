@@ -29,7 +29,7 @@ class User < ApplicationRecord
   end
 
   def self.allow_username?(username)
-    Rails.configuration.allowed_users_filter.call(username)
+    Rails.configuration.allowed_users.include?(username)
   end
 
   def apply_omniauth(auth)

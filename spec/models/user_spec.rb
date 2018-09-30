@@ -60,12 +60,11 @@ RSpec.describe User, type: :model do
     end
 
     context 'when the user is not in the allowed user list' do
-      before do
-        Rails.configuration.allowed_users_filter = ->(u) { u != 'example123' }
-      end
-      after do
-        Rails.configuration.allowed_users_filter = ->(_) { true }
-      end
+      let(:allowed_users) {
+        AllowedUsers.new('ALLOWED_TWITTER_USERS' => 'abc,def')
+      }
+      before { Rails.configuration.allowed_users = allowed_users }
+      after { Rails.configuration.allowed_users = AllowedUsers.new }
 
       it 'does not create a new user' do
         expect { user rescue nil }.not_to(change { User.count })
