@@ -25,21 +25,28 @@ class FeedsController < ServiceController
   end
 
   def update_feed_settings(req, env)
-    require_user env do |user|
-      subscription = user.subscription(feed: req.id)
+    require_subscription env, req.id do |subscription|
       subscription.update_settings(autopost: req.autopost)
       UpdateFeedSettingsResponse.new(feed: subscription.to_message)
     end
   end
 
   def delete_feed(req, env)
+    require_subscription env, req.id do |subscription|
+      subscription.discard
+      DeleteFeedResponse.new
+    end
+  end
+
+  private
+
+  def require_subscription(env, id)
     require_user env do |user|
-      subscription = user.subscription(feed: req.id)
+      subscription = user.subscription(feed: id)
       if subscription
-        subscription.discard
-        DeleteFeedResponse.new
+        yield subscription
       else
-        Twirp::Error.not_found "Could not find feed #{req.id}"
+        Twirp::Error.not_found "Could not find feed #{id}"
       end
     end
   end

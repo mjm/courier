@@ -1,5 +1,4 @@
 require 'rails_helper'
-
 require 'webmock/rspec'
 
 RSpec.describe FeedsController, type: :rpc do
@@ -73,6 +72,40 @@ RSpec.describe FeedsController, type: :rpc do
 
     context 'when the feed does not exist' do
       let(:request) { { id: 123 } }
+
+      it 'returns a not found error' do
+        expect(response).to be_a_twirp_error :not_found
+      end
+    end
+  end
+
+  describe '#update_feed_settings' do
+    rpc_method :UpdateFeedSettings
+    let(:feed) { feeds(:example) }
+    let(:subscription) { feed_subscriptions(:alice_example) }
+    let(:request) { { id: feed.id, autopost: :ON } }
+
+    it 'updates the autopost setting' do
+      response
+      expect(subscription.reload.autopost).to be true
+    end
+
+    it 'responds with the updated feed' do
+      expect(response.feed.settings.autopost).to be true
+    end
+
+    include_examples 'an unauthenticated request'
+
+    context 'when the feed does not exist' do
+      let(:request) { { id: 123 } }
+
+      it 'returns a not found error' do
+        expect(response).to be_a_twirp_error :not_found
+      end
+    end
+
+    context 'when the user is not subscribed to the feed' do
+      let(:feed) { feeds(:refreshed_example) }
 
       it 'returns a not found error' do
         expect(response).to be_a_twirp_error :not_found
