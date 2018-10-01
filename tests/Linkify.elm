@@ -1,4 +1,4 @@
-module Linkify exposing (..)
+module Linkify exposing (suite)
 
 import Expect
 import Html
