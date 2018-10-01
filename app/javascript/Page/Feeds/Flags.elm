@@ -6,5 +6,4 @@ import Json.Decode
 type alias Flags =
     { feeds : Json.Decode.Value
     , user : Json.Decode.Value
-    , cableUrl : String
     }

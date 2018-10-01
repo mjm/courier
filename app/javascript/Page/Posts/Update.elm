@@ -4,6 +4,8 @@ import Data.Account as Account
 import Data.Event as Event exposing (Event(..))
 import Data.Tweet as Tweet exposing (Tweet)
 import Http
+import Json.Decode exposing (decodeValue)
+import Json.Encode as Encode
 import Page
 import Page.Posts.Model exposing (Message(..), Model)
 import Request.Tweet
@@ -93,16 +95,21 @@ handlePageMessage msg model =
     ( { model | page = page }, cmd )
 
 
-handleEvent : Event -> Model -> ( Model, Cmd Message )
-handleEvent event model =
-    case event of
-        TweetUpdated tweet ->
-            ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
+handleEvent : Encode.Value -> Model -> ( Model, Cmd Message )
+handleEvent eventValue model =
+    case decodeValue Event.decoder eventValue of
+        Ok event ->
+            case event of
+                TweetUpdated tweet ->
+                    ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
 
-        TweetCreated tweet ->
-            ( { model | tweets = addTweet tweet model.tweets }, Cmd.none )
+                TweetCreated tweet ->
+                    ( { model | tweets = addTweet tweet model.tweets }, Cmd.none )
 
-        _ ->
+                _ ->
+                    ( model, Cmd.none )
+
+        Err _ ->
             ( model, Cmd.none )
 
 

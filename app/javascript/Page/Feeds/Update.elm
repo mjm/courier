@@ -2,13 +2,13 @@ module Page.Feeds.Update exposing (update)
 
 import Data.Event as Event exposing (Event(..))
 import Data.Feed as Feed exposing (DraftFeed, Feed)
-import Dom
 import Http
+import Json.Decode exposing (decodeValue)
+import Json.Encode as Encode
 import Page
 import Page.Feeds.Model exposing (Message(..), Model)
 import Page.Helper exposing (addError, dismissModal, modalInProgress, showModal)
 import Request.Feed
-import Task
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -25,9 +25,7 @@ update message model =
 
         SetAddingFeed isAdding ->
             if isAdding then
-                ( { model | draftFeed = Just (DraftFeed "") }
-                , Task.attempt (\_ -> Noop) (Dom.focus "add-feed-url")
-                )
+                ( { model | draftFeed = Just (DraftFeed "") }, Cmd.none )
 
             else
                 ( { model | draftFeed = Nothing }, Cmd.none )
@@ -97,13 +95,18 @@ handlePageMessage msg model =
     ( { model | page = page }, cmd )
 
 
-handleEvent : Event -> Model -> ( Model, Cmd Message )
-handleEvent event model =
-    case event of
-        FeedUpdated feed ->
-            ( { model | feeds = updateFeed feed model.feeds }, Cmd.none )
+handleEvent : Encode.Value -> Model -> ( Model, Cmd Message )
+handleEvent eventValue model =
+    case decodeValue Event.decoder eventValue of
+        Ok event ->
+            case event of
+                FeedUpdated feed ->
+                    ( { model | feeds = updateFeed feed model.feeds }, Cmd.none )
 
-        _ ->
+                _ ->
+                    ( model, Cmd.none )
+
+        Err _ ->
             ( model, Cmd.none )
 
 

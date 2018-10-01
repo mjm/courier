@@ -1,4 +1,4 @@
 import loadPage from '../loadPage'
-import Elm from '../Page/Feeds/Main'
+import { Elm } from '../Page/Feeds/Main'
 
 loadPage(Elm.Page.Feeds)

@@ -17,14 +17,14 @@ type Editable a
 value : Editable a -> a
 value x =
     case x of
-        Viewing x ->
-            x
+        Viewing y ->
+            y
 
-        Editing x _ ->
-            x
+        Editing y _ ->
+            y
 
-        Saving x _ ->
-            x
+        Saving y _ ->
+            y
 
 
 transform : (a -> Editable a) -> (a -> a -> Editable a) -> (a -> a -> Editable a) -> List (Editable a) -> List (Editable a)
@@ -32,8 +32,8 @@ transform viewFn editFn saveFn =
     List.map
         (\x ->
             case x of
-                Viewing x ->
-                    viewFn x
+                Viewing y ->
+                    viewFn y
 
                 Editing o d ->
                     editFn o d

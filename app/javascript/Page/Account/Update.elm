@@ -13,7 +13,7 @@ update message model =
         PageMsg msg ->
             handlePageMessage msg model
 
-        EventOccurred event ->
+        EventOccurred _ ->
             ( model, Cmd.none )
 
         CancelSubscription ->

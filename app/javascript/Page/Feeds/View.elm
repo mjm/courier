@@ -1,14 +1,13 @@
 module Page.Feeds.View exposing (view)
 
 import Data.Feed as Feed exposing (DraftFeed, Feed)
-import Date exposing (Date)
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
-import Html.Events.Extra exposing (onClickPreventDefault)
 import Page
 import Page.Feeds.Model exposing (Message(..), Model)
+import Time exposing (Posix)
 import Util.URL as URL
 import Views.Icon exposing (..)
 
@@ -22,16 +21,16 @@ view model =
             , hr [] []
             , div [ class "columns" ]
                 [ div [ class "column is-8 is-offset-2" ]
-                    [ feeds model.feeds model.page.now
+                    [ feedsList model.feeds model.page.now
                     , addFeedView model
                     ]
                 ]
             ]
 
 
-feeds : List Feed -> Date -> Html Message
-feeds fs now =
-    case fs of
+feedsList : List Feed -> Posix -> Html Message
+feedsList feeds now =
+    case feeds of
         [] ->
             p [ class "has-text-centered" ]
                 [ text "You don't have any feeds registered." ]
@@ -41,7 +40,7 @@ feeds fs now =
                 List.map (feedRow now) fs
 
 
-feedRow : Date -> Feed -> Html Message
+feedRow : Posix -> Feed -> Html Message
 feedRow now feed =
     div []
         [ article [ class "media" ]
@@ -175,6 +174,7 @@ addFeedForm feed =
                     , placeholder "Feed URL"
                     , onInput SetDraftFeedUrl
                     , value feed.url
+                    , autofocus True
                     ]
                     []
                 ]
@@ -183,7 +183,7 @@ addFeedForm feed =
             [ p [ class "control" ]
                 [ button
                     [ class "button is-light"
-                    , onClickPreventDefault (SetAddingFeed False)
+                    , onClick (SetAddingFeed False)
                     , type_ "button"
                     ]
                     [ text "Cancel" ]

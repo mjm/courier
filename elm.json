@@ -15,13 +15,11 @@
             "elm/regex": "1.0.0",
             "elm/time": "1.0.0",
             "lukewestby/elm-http-builder": "6.0.0",
-            "ryannhg/date-format": "2.0.0",
-            "CallumJHays/elm-unwrap": "1.0.0",
-            "bendyworks/elm-action-cable": "1.0.0",
-            "elm-community/html-extra": "2.2.0",
-            "justinmimbs/elm-date-extra": "3.0.0"
+            "rtfeldman/elm-iso8601-date-strings": "1.1.2",
+            "ryannhg/date-format": "2.0.0"
         },
         "indirect": {
+            "elm/parser": "1.1.0",
             "elm/url": "1.0.0",
             "elm/virtual-dom": "1.0.2"
         }

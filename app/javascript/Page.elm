@@ -1,31 +1,24 @@
 module Page exposing (Flags, Message(..), Modal, NavBar, Page, addError, dismissModal, init, initTask, modalInProgress, removeError, showModal, subscriptions, update, updateUser, view)
 
-import ActionCable exposing (ActionCable)
-import ActionCable.Identifier as ID
-import ActionCable.Msg as ACMsg
 import Data.Event as Event exposing (Event)
 import Data.User as User exposing (User)
-import Date exposing (Date)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Task exposing (Task)
-import Time exposing (Time)
-import Unwrap
+import Time exposing (Posix)
 import Views.Error as Error
 import Views.Icon exposing (..)
 
 
 type alias Page msg =
-    { now : Date
+    { now : Posix
     , user : User
     , navbar : NavBar
     , modal : ModalState msg
     , errors : List String
-    , cable : ActionCable Message
     , wrapper : Message -> msg
-    , onEvent : Event -> msg
     }
 
 
@@ -92,36 +85,33 @@ updateUser page user =
 
 
 type Message
-    = Tick Time
+    = Tick Posix
     | SetNavBarMenuOpen Bool
     | DismissError String
     | DismissModal
-    | CableMsg ACMsg.Msg
-    | Subscribe ()
-    | HandleSocketData ID.Identifier Decode.Value
 
 
 type alias Flags a =
-    { a | user : Decode.Value, cableUrl : String }
+    { a | user : Decode.Value }
 
 
-init : Flags a -> (Message -> msg) -> (Event -> msg) -> Page msg
-init flags wrapper onEvent =
+init : Flags a -> (Message -> msg) -> Page msg
+init flags wrapper =
     let
         user =
-            Decode.decodeValue User.decoder flags.user |> Unwrap.result
+            case Decode.decodeValue User.decoder flags.user of
+                Ok x ->
+                    x
+
+                Err _ ->
+                    User.empty
     in
-    { now = Date.fromTime 0
+    { now = Time.millisToPosix 0
     , user = user
     , navbar = { isMenuOpen = False }
     , modal = Dismissed
     , errors = []
-    , cable =
-        ActionCable.initCable flags.cableUrl
-            |> ActionCable.onWelcome (Just Subscribe)
-            |> ActionCable.onDidReceiveData (Just HandleSocketData)
     , wrapper = wrapper
-    , onEvent = onEvent
     }
 
 
@@ -134,7 +124,7 @@ update : Message -> Page msg -> ( Page msg, Cmd msg )
 update msg page =
     case msg of
         Tick time ->
-            ( { page | now = Date.fromTime time }, Cmd.none )
+            ( { page | now = time }, Cmd.none )
 
         SetNavBarMenuOpen isOpen ->
             ( { page | navbar = setMenuOpen page.navbar isOpen }, Cmd.none )
@@ -145,66 +135,24 @@ update msg page =
         DismissModal ->
             ( dismissModal page, Cmd.none )
 
-        CableMsg msg ->
-            handleCableMessage msg page
-
-        Subscribe () ->
-            subscribe page
-
-        HandleSocketData id value ->
-            handleSocketData id value page
-
 
 setMenuOpen : NavBar -> Bool -> NavBar
 setMenuOpen navbar isOpen =
     { navbar | isMenuOpen = isOpen }
 
 
-handleCableMessage : ACMsg.Msg -> Page msg -> ( Page msg, Cmd msg )
-handleCableMessage msg model =
-    ActionCable.update msg model.cable
-        |> (\( cable, cmd ) ->
-                ( { model | cable = cable }
-                , Cmd.map model.wrapper cmd
-                )
-           )
-
-
-subscribe : Page msg -> ( Page msg, Cmd msg )
-subscribe model =
-    case ActionCable.subscribeTo (ID.newIdentifier "EventsChannel" []) model.cable of
-        Ok ( cable, cmd ) ->
-            ( { model | cable = cable }
-            , Cmd.map model.wrapper cmd
-            )
-
-        Err err ->
-            ( model, Cmd.none )
-
-
-handleSocketData : ID.Identifier -> Decode.Value -> Page msg -> ( Page msg, Cmd msg )
-handleSocketData id value model =
-    case Decode.decodeValue Event.decoder value of
-        Ok event ->
-            ( model, Task.perform identity (Task.succeed (model.onEvent event)) )
-
-        Err _ ->
-            ( model, Cmd.none )
-
-
 subscriptions : Page msg -> Sub msg
 subscriptions page =
     Sub.batch
-        [ Time.every Time.second (\x -> page.wrapper (Tick x))
-        , Sub.map page.wrapper (ActionCable.listen CableMsg page.cable)
+        [ Time.every 1000 (\x -> page.wrapper (Tick x))
         ]
 
 
 view : Page msg -> Html msg -> Html msg
 view page innerHtml =
     div []
-        [ modal page.modal (page.wrapper DismissModal)
-        , navbar page
+        [ modalView page.modal (page.wrapper DismissModal)
+        , navbarView page
         , Error.errors (\x -> page.wrapper (DismissError x)) page.errors
         , section [ class "section" ]
             [ div [ class "container" ]
@@ -221,14 +169,14 @@ view page innerHtml =
         ]
 
 
-modal : ModalState msg -> msg -> Html msg
-modal modal dismiss =
-    case modal of
-        Showing modal ->
-            showingModal modal dismiss
+modalView : ModalState msg -> msg -> Html msg
+modalView state dismiss =
+    case state of
+        Showing m ->
+            showingModal m dismiss
 
-        InProgress modal ->
-            inProgressModal modal
+        InProgress m ->
+            inProgressModal m
 
         Dismissed ->
             text ""
@@ -291,8 +239,8 @@ inProgressModal modal =
         ]
 
 
-navbar : Page msg -> Html msg
-navbar page =
+navbarView : Page msg -> Html msg
+navbarView page =
     nav [ class "navbar is-info" ]
         [ navbarBrand page
         , navbarMenu page

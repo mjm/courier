@@ -3,6 +3,7 @@ module Page.Posts.Model exposing (Message(..), Model)
 import Data.Event exposing (Event)
 import Data.Tweet exposing (Tweet)
 import Http
+import Json.Encode as Encode
 import Page exposing (Page)
 import Util.Editable exposing (Editable(..))
 
@@ -15,7 +16,7 @@ type alias Model =
 
 type Message
     = PageMsg Page.Message
-    | EventOccurred Event
+    | EventOccurred Encode.Value
     | CancelTweet Tweet
     | CanceledTweet (Result Http.Error Tweet)
     | UncancelTweet Tweet

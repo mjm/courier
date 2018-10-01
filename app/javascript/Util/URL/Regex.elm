@@ -6,7 +6,7 @@ The regex itself was adapted from <https://github.com/kevva/url-regex>.
 
 -}
 
-import Regex exposing (HowMany(..), Regex)
+import Regex exposing (Regex)
 
 
 regex : Regex
@@ -24,13 +24,16 @@ regex =
         ++ ")"
         ++ port_
         ++ path
-        |> Regex.regex
-        |> Regex.caseInsensitive
+        |> Regex.fromStringWith
+            { caseInsensitive = True
+            , multiline = False
+            }
+        |> Maybe.withDefault Regex.never
 
 
 findAll : String -> List Regex.Match
 findAll =
-    Regex.find All regex
+    Regex.find regex
 
 
 protocol : String

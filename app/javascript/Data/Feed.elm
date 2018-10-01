@@ -1,17 +1,17 @@
 module Data.Feed exposing (DraftFeed, Feed, SettingsChanges, decoder, displayName, encode, encodeSettings, listDecoder)
 
-import Date exposing (Date)
-import Json.Decode as Decode exposing (Decoder, bool, int, list, string)
-import Json.Decode.Pipeline exposing (decode, optional, required)
+import Iso8601
+import Json.Decode as Decode exposing (Decoder, bool, int, list, maybe, string, succeed)
+import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as Encode exposing (Value)
-import Util.Date
+import Time exposing (Posix)
 
 
 type alias Feed =
     { id : Int
     , url : String
     , title : String
-    , refreshedAt : Maybe Date
+    , refreshedAt : Maybe Posix
     , homePageUrl : String
     , settings : Settings
     }
@@ -45,11 +45,11 @@ defaultSettings =
 
 decoder : Decoder Feed
 decoder =
-    decode Feed
+    succeed Feed
         |> required "id" int
         |> required "url" string
         |> optional "title" string ""
-        |> optional "refreshedAt" Util.Date.decoder Nothing
+        |> optional "refreshedAt" (maybe Iso8601.decoder) Nothing
         |> optional "homePageUrl" string ""
         |> optional "settings" settingsDecoder defaultSettings
 
@@ -61,7 +61,7 @@ listDecoder =
 
 settingsDecoder : Decoder Settings
 settingsDecoder =
-    decode Settings
+    succeed Settings
         |> optional "autopost" bool False
 
 
@@ -80,10 +80,10 @@ encodeSettings id changes =
 
 
 encodeSetting : Maybe Bool -> Value
-encodeSetting value =
-    case value of
-        Just value ->
-            if value then
+encodeSetting x =
+    case x of
+        Just isOn ->
+            if isOn then
                 Encode.string "ON"
 
             else

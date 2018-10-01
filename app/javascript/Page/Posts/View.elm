@@ -4,14 +4,13 @@ import Data.Account as Account
 import Data.Feed as Feed
 import Data.Tweet exposing (PostInfo, Status(..), Tweet)
 import Data.User as User exposing (User)
-import Date exposing (Date)
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Page
 import Page.Posts.Model exposing (Message(..), Model)
-import Time
+import Time exposing (Posix)
 import Util.Editable as Editable exposing (Editable(..))
 import Views.Icon exposing (..)
 import Views.Linkify exposing (linkify)
@@ -28,7 +27,7 @@ view model =
             ]
 
 
-subscriptionMessage : User -> Date -> Html Message
+subscriptionMessage : User -> Posix -> Html Message
 subscriptionMessage user now =
     if Account.isActive user now then
         text ""
@@ -43,7 +42,7 @@ subscriptionMessage user now =
             ]
 
 
-postEntry : User -> Date -> Editable Tweet -> Html Message
+postEntry : User -> Posix -> Editable Tweet -> Html Message
 postEntry user now tweet =
     div []
         [ div [ class "columns" ]
@@ -55,7 +54,7 @@ postEntry user now tweet =
         ]
 
 
-postDetails : Editable Tweet -> Date -> Html Message
+postDetails : Editable Tweet -> Posix -> Html Message
 postDetails tweet now =
     let
         t =
@@ -99,7 +98,7 @@ postDetails tweet now =
         ]
 
 
-tweetCard : User -> Editable Tweet -> Date -> Html Message
+tweetCard : User -> Editable Tweet -> Posix -> Html Message
 tweetCard user postTweet now =
     case postTweet of
         Viewing tweet ->
@@ -112,7 +111,7 @@ tweetCard user postTweet now =
             savingTweetCard user tweet.post
 
 
-viewTweetCard : User -> Tweet -> Date -> Html Message
+viewTweetCard : User -> Tweet -> Posix -> Html Message
 viewTweetCard user tweet now =
     article [ class "card" ]
         [ div [ class "card-content" ]
@@ -140,7 +139,7 @@ viewMediaItem url =
         [ img [ src url ] [] ]
 
 
-editTweetCard : User -> Tweet -> Date -> Html Message
+editTweetCard : User -> Tweet -> Posix -> Html Message
 editTweetCard user tweet now =
     Html.form [ action "javascript:void(0);" ]
         [ article [ class "card" ]
@@ -177,7 +176,7 @@ savingTweetCard user post =
         ]
 
 
-draftActions : User -> Tweet -> Date -> List (Html Message)
+draftActions : User -> Tweet -> Posix -> List (Html Message)
 draftActions user tweet now =
     [ a
         [ onClick <| CancelTweet tweet
@@ -206,7 +205,7 @@ draftActions user tweet now =
            )
 
 
-willPostETA : Tweet -> Date -> Html msg
+willPostETA : Tweet -> Posix -> Html msg
 willPostETA tweet now =
     case tweet.willPostAt of
         Just date ->
@@ -221,26 +220,29 @@ willPostETA tweet now =
             text ""
 
 
-relativeETA : Date -> Date -> String
+relativeETA : Posix -> Posix -> String
 relativeETA date now =
     let
-        time =
-            Date.toTime date - Date.toTime now
+        millis =
+            Time.posixToMillis date - Time.posixToMillis now
 
-        stringify =
-            \x -> toString (round x)
+        seconds =
+            toFloat millis / 1000
+
+        format =
+            \factor -> String.fromInt (round (seconds / factor))
     in
-    if time < 0 then
+    if seconds < 0 then
         "soon"
 
-    else if time < Time.minute then
-        stringify (Time.inSeconds time) ++ "s"
+    else if seconds < 60 then
+        format 1.0 ++ "s"
 
-    else if time < Time.hour then
-        stringify (Time.inMinutes time) ++ "m"
+    else if seconds < 3600 then
+        format 60.0 ++ "m"
 
     else
-        stringify (Time.inHours time) ++ "h"
+        format 3600.0 ++ "h"
 
 
 canceledActions : Tweet -> List (Html Message)
@@ -252,7 +254,7 @@ canceledActions tweet =
     ]
 
 
-postedActions : Tweet -> Date -> List (Html msg)
+postedActions : Tweet -> Posix -> List (Html msg)
 postedActions tweet now =
     [ div [ class "card-footer-item" ]
         [ icon Solid "check-circle"
@@ -280,7 +282,7 @@ postedActions tweet now =
     ]
 
 
-editActions : User -> Tweet -> Date -> List (Html Message)
+editActions : User -> Tweet -> Posix -> List (Html Message)
 editActions user tweet now =
     [ a
         [ class "card-footer-item has-text-danger"

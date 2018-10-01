@@ -1,10 +1,10 @@
 module Data.Tweet exposing (PostInfo, Status(..), Tweet, compare, decoder, listDecoder, update)
 
 import Data.Feed as Feed exposing (Feed)
-import Date exposing (Date)
-import Json.Decode as Decode exposing (Decoder, int, string)
-import Json.Decode.Pipeline exposing (decode, optional, required)
-import Util.Date
+import Iso8601
+import Json.Decode as Decode exposing (Decoder, int, maybe, string, succeed)
+import Json.Decode.Pipeline exposing (optional, required)
+import Time exposing (Posix)
 
 
 type Status
@@ -18,9 +18,9 @@ type alias Tweet =
     , body : String
     , post : PostInfo
     , status : Status
-    , postedAt : Maybe Date
+    , postedAt : Maybe Posix
     , tweetId : Maybe String
-    , willPostAt : Maybe Date
+    , willPostAt : Maybe Posix
     , mediaUrls : List String
     , feed : Feed
     }
@@ -29,32 +29,32 @@ type alias Tweet =
 type alias PostInfo =
     { id : Int
     , url : String
-    , publishedAt : Maybe Date
-    , modifiedAt : Maybe Date
+    , publishedAt : Maybe Posix
+    , modifiedAt : Maybe Posix
     }
 
 
 decoder : Decoder Tweet
 decoder =
-    decode Tweet
+    succeed Tweet
         |> required "id" int
         |> required "body" string
         |> required "post" postDecoder
         |> optional "status" (Decode.map statusFromString string) Draft
-        |> optional "postedAt" Util.Date.decoder Nothing
-        |> optional "postedTweetId" (Decode.maybe string) Nothing
-        |> optional "willPostAt" Util.Date.decoder Nothing
+        |> optional "postedAt" (maybe Iso8601.decoder) Nothing
+        |> optional "postedTweetId" (maybe string) Nothing
+        |> optional "willPostAt" (maybe Iso8601.decoder) Nothing
         |> optional "mediaUrls" (Decode.list string) []
         |> required "feed" Feed.decoder
 
 
 postDecoder : Decoder PostInfo
 postDecoder =
-    decode PostInfo
+    succeed PostInfo
         |> required "id" int
         |> required "url" string
-        |> optional "publishedAt" Util.Date.decoder Nothing
-        |> optional "modifiedAt" Util.Date.decoder Nothing
+        |> optional "publishedAt" (maybe Iso8601.decoder) Nothing
+        |> optional "modifiedAt" (maybe Iso8601.decoder) Nothing
 
 
 listDecoder : Decoder (List Tweet)
@@ -87,8 +87,10 @@ update existing new =
 compare : Tweet -> Tweet -> Order
 compare a b =
     case ( a.post.publishedAt, b.post.publishedAt ) of
-        ( Just a, Just b ) ->
-            Basics.compare (Date.toTime b) (Date.toTime a)
+        ( Just x, Just y ) ->
+            Basics.compare
+                (Time.posixToMillis y)
+                (Time.posixToMillis x)
 
         ( Just _, Nothing ) ->
             LT

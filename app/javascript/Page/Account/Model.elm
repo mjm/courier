@@ -1,8 +1,8 @@
 module Page.Account.Model exposing (Message(..), Model)
 
-import Data.Event exposing (Event)
 import Data.User exposing (User)
 import Http
+import Json.Encode as Encode
 import Page exposing (Page)
 
 
@@ -14,7 +14,7 @@ type alias Model =
 
 type Message
     = PageMsg Page.Message
-    | EventOccurred Event
+    | EventOccurred Encode.Value
     | CancelSubscription
     | ConfirmCancelSubscription
     | SubscriptionCanceled (Result Http.Error User)

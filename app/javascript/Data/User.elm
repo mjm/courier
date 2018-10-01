@@ -1,18 +1,23 @@
-module Data.User exposing (User, avatarUrl, decoder)
+module Data.User exposing (User, avatarUrl, decoder, empty)
 
-import Date exposing (Date)
-import Json.Decode as Decode exposing (Decoder, bool, string)
-import Json.Decode.Pipeline exposing (decode, optional, required)
-import Util.Date
+import Iso8601
+import Json.Decode as Decode exposing (Decoder, bool, maybe, string, succeed)
+import Json.Decode.Pipeline exposing (optional, required)
+import Time exposing (Posix)
 
 
 type alias User =
     { username : String
     , name : String
     , subscribed : Bool
-    , subscriptionExpiresAt : Maybe Date
-    , subscriptionRenewsAt : Maybe Date
+    , subscriptionExpiresAt : Maybe Posix
+    , subscriptionRenewsAt : Maybe Posix
     }
+
+
+empty : User
+empty =
+    User "" "" False Nothing Nothing
 
 
 avatarUrl : User -> String
@@ -22,9 +27,9 @@ avatarUrl user =
 
 decoder : Decoder User
 decoder =
-    decode User
+    succeed User
         |> required "username" string
         |> required "name" string
         |> optional "subscribed" bool False
-        |> optional "subscriptionExpiresAt" Util.Date.decoder Nothing
-        |> optional "subscriptionRenewsAt" Util.Date.decoder Nothing
+        |> optional "subscriptionExpiresAt" (maybe Iso8601.decoder) Nothing
+        |> optional "subscriptionRenewsAt" (maybe Iso8601.decoder) Nothing

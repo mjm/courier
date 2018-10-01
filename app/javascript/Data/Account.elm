@@ -1,38 +1,36 @@
 module Data.Account exposing (Status(..), isActive, status)
 
 import Data.User as User exposing (User)
-import Date exposing (Date)
-import Date.Extra as DateE
+import Time exposing (Posix)
 
 
 type Status
     = NotSubscribed
-    | Valid Date Date
-    | Expired Date
-    | Canceled Date
+    | Valid Posix Posix
+    | Expired Posix
+    | Canceled Posix
 
 
-status : User -> Date -> Status
+status : User -> Posix -> Status
 status user now =
     case user.subscriptionExpiresAt of
         Just expiresAt ->
-            case DateE.compare expiresAt now of
-                LT ->
-                    Expired expiresAt
+            if Time.posixToMillis expiresAt < Time.posixToMillis now then
+                Expired expiresAt
 
-                _ ->
-                    case user.subscriptionRenewsAt of
-                        Just renewsAt ->
-                            Valid expiresAt renewsAt
+            else
+                case user.subscriptionRenewsAt of
+                    Just renewsAt ->
+                        Valid expiresAt renewsAt
 
-                        Nothing ->
-                            Canceled expiresAt
+                    Nothing ->
+                        Canceled expiresAt
 
         Nothing ->
             NotSubscribed
 
 
-isActive : User -> Date -> Bool
+isActive : User -> Posix -> Bool
 isActive user now =
     case status user now of
         Valid _ _ ->
