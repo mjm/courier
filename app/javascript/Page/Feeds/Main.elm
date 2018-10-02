@@ -44,7 +44,7 @@ subscriptions model =
 
 main : Program Flags Model Message
 main =
-    Browser.element
+    Browser.document
         { init = init
         , view = view
         , update = update

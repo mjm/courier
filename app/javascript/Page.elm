@@ -1,5 +1,6 @@
 module Page exposing (Flags, Message(..), Modal, NavBar, Page, addError, dismissModal, init, initTask, modalInProgress, removeError, showModal, subscriptions, update, updateUser, view)
 
+import Browser exposing (Document)
 import Data.Event as Event exposing (Event)
 import Data.User as User exposing (User)
 import Html exposing (..)
@@ -15,6 +16,7 @@ import Views.Icon exposing (..)
 type alias Page msg =
     { now : Posix
     , user : User
+    , environment : String
     , navbar : NavBar
     , modal : ModalState msg
     , errors : List String
@@ -92,7 +94,10 @@ type Message
 
 
 type alias Flags a =
-    { a | user : Decode.Value }
+    { a
+        | user : Decode.Value
+        , environment : String
+    }
 
 
 init : Flags a -> (Message -> msg) -> Page msg
@@ -108,6 +113,7 @@ init flags wrapper =
     in
     { now = Time.millisToPosix 0
     , user = user
+    , environment = flags.environment
     , navbar = { isMenuOpen = False }
     , modal = Dismissed
     , errors = []
@@ -148,25 +154,48 @@ subscriptions page =
         ]
 
 
-view : Page msg -> Html msg -> Html msg
+view : Page msg -> Html msg -> Document msg
 view page innerHtml =
-    div []
-        [ modalView page.modal (page.wrapper DismissModal)
-        , navbarView page
-        , Error.errors (\x -> page.wrapper (DismissError x)) page.errors
-        , section [ class "section" ]
-            [ div [ class "container" ]
-                [ innerHtml ]
-            ]
-        , footer [ class "footer" ]
-            [ div [ class "content has-text-centered" ]
-                [ strong [] [ text "Courier" ]
-                , text " is created by "
-                , a [ href "https://mattmoriarity.com/" ] [ text "Matt Moriarity" ]
-                , text "."
+    { title = pageTitle page.environment
+    , body =
+        [ div []
+            [ modalView page.modal (page.wrapper DismissModal)
+            , navbarView page
+            , Error.errors (\x -> page.wrapper (DismissError x)) page.errors
+            , section [ class "section" ]
+                [ div [ class "container" ]
+                    [ innerHtml ]
+                ]
+            , footer [ class "footer" ]
+                [ div [ class "content has-text-centered" ]
+                    [ strong [] [ text "Courier" ]
+                    , text " is created by "
+                    , a [ href "https://mattmoriarity.com/" ] [ text "Matt Moriarity" ]
+                    , text "."
+                    ]
                 ]
             ]
         ]
+    }
+
+
+pageTitle : String -> String
+pageTitle env =
+    if env == "production" then
+        "Courier"
+
+    else
+        "Courier [" ++ capitalize env ++ "]"
+
+
+capitalize : String -> String
+capitalize env =
+    case String.uncons env of
+        Just ( x, xs ) ->
+            String.cons (Char.toUpper x) xs
+
+        Nothing ->
+            ""
 
 
 modalView : ModalState msg -> msg -> Html msg

@@ -3,16 +3,13 @@ class PagesController < ApplicationController
   before_action :set_user_json
 
   def index
-    @tweets_json = GetTweetsResponse.encode_json(
-      GetTweetsResponse.new(tweets: current_user.tweets.to_message)
-    )
+    tweets = current_user.tweets.to_message
+    @tweets_json = GetTweetsResponse.new(tweets: tweets).to_json
   end
 
   def feeds
-    subscriptions = current_user.feed_subscriptions.kept
-    @feeds_json = GetFeedsResponse.encode_json(
-      GetFeedsResponse.new(feeds: subscriptions.to_message)
-    )
+    subscriptions = current_user.feed_subscriptions.kept.to_message
+    @feeds_json = GetFeedsResponse.new(feeds: subscriptions).to_json
   end
 
   def account; end

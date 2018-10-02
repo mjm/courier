@@ -1,5 +1,6 @@
 module Page.Posts.View exposing (view)
 
+import Browser exposing (Document)
 import Data.Account as Account
 import Data.Feed as Feed
 import Data.Tweet exposing (PostInfo, Status(..), Tweet)
@@ -16,7 +17,7 @@ import Views.Icon exposing (..)
 import Views.Linkify exposing (linkify)
 
 
-view : Model -> Html Message
+view : Model -> Document Message
 view model =
     Page.view model.page <|
         div []

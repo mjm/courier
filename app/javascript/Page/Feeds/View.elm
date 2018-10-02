@@ -1,5 +1,6 @@
 module Page.Feeds.View exposing (view)
 
+import Browser exposing (Document)
 import Data.Feed as Feed exposing (DraftFeed, Feed)
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
@@ -12,12 +13,14 @@ import Util.URL as URL
 import Views.Icon exposing (..)
 
 
-view : Model -> Html Message
+view : Model -> Document Message
 view model =
     Page.view model.page <|
         div []
-            [ h1 [ class "title has-text-centered" ] [ text "Your Feeds" ]
-            , p [ class "has-text-centered" ] [ text "Your Courier will periodically check these feeds for new posts to send to Twitter." ]
+            [ h1 [ class "title has-text-centered" ]
+                [ text "Your Feeds" ]
+            , p [ class "has-text-centered" ]
+                [ text "Your Courier will periodically check these feeds for new posts to send to Twitter." ]
             , hr [] []
             , div [ class "columns" ]
                 [ div [ class "column is-8 is-offset-2" ]

@@ -1,5 +1,6 @@
 module Page.Account.View exposing (view)
 
+import Browser exposing (Document)
 import Data.Account as Account exposing (Status(..))
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
@@ -10,7 +11,7 @@ import Page.Account.Model exposing (Message(..), Model)
 import Views.Icon exposing (..)
 
 
-view : Model -> Html Message
+view : Model -> Document Message
 view model =
     Page.view model.page <|
         div []

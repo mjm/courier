@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Courier <%= env_description %></title>
+    <title>Courier</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <%= csrf_meta_tags %>
     <%= action_cable_meta_tag %>
@@ -10,8 +10,7 @@
     <%= yield :script %>
   </head>
 
-  <body>
-    <div id="elm-container"></div>
+  <body data-env="<%= display_env %>">
     <%# NOTE: this doesn't output the yielded content
       All page content should be coming from Elm.
       The yield is needed for the script content to be populated. %>

@@ -4,9 +4,9 @@ import { listen } from 'cable'
 
 export default function (page) {
   document.addEventListener('DOMContentLoaded', () => {
-    const node = document.getElementById('elm-container')
-    const flags = Object.assign({}, window.elmFlags)
-    const app = page.Main.init({ node, flags })
+    const environment = document.body.dataset.env
+    const flags = Object.assign({ environment }, window.elmFlags)
+    const app = page.Main.init({ flags })
 
     listen(app.ports)
   })
