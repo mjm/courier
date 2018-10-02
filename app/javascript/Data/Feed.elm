@@ -1,10 +1,16 @@
-module Data.Feed exposing (DraftFeed, Feed, SettingsChanges, decoder, displayName, encode, encodeSettings, listDecoder)
+module Data.Feed exposing (DraftFeed, Feed, SettingsChanges, Status(..), decoder, displayName, encode, encodeSettings, listDecoder)
 
 import Iso8601
 import Json.Decode as Decode exposing (Decoder, bool, int, list, maybe, string, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as Encode exposing (Value)
 import Time exposing (Posix)
+
+
+type Status
+    = Succeeded
+    | Failed
+    | Refreshing
 
 
 type alias Feed =
@@ -14,6 +20,8 @@ type alias Feed =
     , refreshedAt : Maybe Posix
     , homePageUrl : String
     , settings : Settings
+    , status : Status
+    , refreshMessage : Maybe String
     }
 
 
@@ -52,6 +60,8 @@ decoder =
         |> optional "refreshedAt" (maybe Iso8601.decoder) Nothing
         |> optional "homePageUrl" string ""
         |> optional "settings" settingsDecoder defaultSettings
+        |> optional "status" statusDecoder Succeeded
+        |> optional "refreshMessage" (maybe string) Nothing
 
 
 listDecoder : Decoder (List Feed)
@@ -63,6 +73,23 @@ settingsDecoder : Decoder Settings
 settingsDecoder =
     succeed Settings
         |> optional "autopost" bool False
+
+
+statusDecoder : Decoder Status
+statusDecoder =
+    Decode.map
+        (\x ->
+            case x of
+                "FAILED" ->
+                    Failed
+
+                "REFRESHING" ->
+                    Refreshing
+
+                _ ->
+                    Succeeded
+        )
+        string
 
 
 encode : DraftFeed -> Value

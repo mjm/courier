@@ -1,7 +1,7 @@
 module Page.Feeds.View exposing (view)
 
 import Browser exposing (Document)
-import Data.Feed as Feed exposing (DraftFeed, Feed)
+import Data.Feed as Feed exposing (DraftFeed, Feed, Status(..))
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -70,19 +70,43 @@ feedRow now feed =
                         ]
                     ]
                 , div [ class "level-item" ]
-                    [ icon Solid "sync"
-                    , span []
-                        [ case feed.refreshedAt of
-                            Just date ->
-                                text ("checked " ++ relativeTime now date)
-
-                            Nothing ->
-                                text ""
-                        ]
+                    [ refreshedIcon feed.status
+                    , refreshedLabel feed now
                     ]
                 ]
             ]
         , hr [] []
+        ]
+
+
+refreshedIcon : Status -> Html msg
+refreshedIcon status =
+    case status of
+        Succeeded ->
+            icon Solid "sync"
+
+        Refreshing ->
+            icon Solid "sync fa-spin"
+
+        Failed ->
+            icon Solid "exclamation-triangle"
+
+
+refreshedLabel : Feed -> Posix -> Html msg
+refreshedLabel feed now =
+    span [ title (Maybe.withDefault "" feed.refreshMessage) ]
+        [ case ( feed.status, feed.refreshedAt ) of
+            ( Succeeded, Just date ) ->
+                text ("checked " ++ relativeTime now date)
+
+            ( Failed, Just date ) ->
+                text ("failed to get posts" ++ relativeTime now date)
+
+            ( Refreshing, _ ) ->
+                text "refreshing now"
+
+            ( _, Nothing ) ->
+                text ""
         ]
 
 
