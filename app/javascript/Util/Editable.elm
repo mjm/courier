@@ -1,4 +1,4 @@
-module Util.Editable exposing (Editable(..), cancel, edit, save, saving, updateDraft, value)
+module Util.Editable exposing (Editable(..), cancel, edit, filter, save, saving, updateDraft, value)
 
 {-| When viewing, this simply holds a value.
 
@@ -25,6 +25,11 @@ value x =
 
         Saving y _ ->
             y
+
+
+filter : (a -> Bool) -> List (Editable a) -> List (Editable a)
+filter f xs =
+    List.filter (\x -> f (value x)) xs
 
 
 transform : (a -> Editable a) -> (a -> a -> Editable a) -> (a -> a -> Editable a) -> List (Editable a) -> List (Editable a)

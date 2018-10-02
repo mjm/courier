@@ -3,7 +3,7 @@ module Page.Posts.View exposing (view)
 import Browser exposing (Document)
 import Data.Account as Account
 import Data.Feed as Feed
-import Data.Tweet exposing (PostInfo, Status(..), Tweet)
+import Data.Tweet as Tweet exposing (PostInfo, Status(..), Tweet)
 import Data.User as User exposing (User)
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
@@ -21,10 +21,21 @@ view : Model -> Document Message
 view model =
     Page.view model.page <|
         div []
-            [ h2 [ class "title has-text-centered" ] [ text "Your Tweets" ]
+            [ h2 [ class "title has-text-centered" ]
+                [ text "Upcoming Tweets" ]
             , hr [] []
             , subscriptionMessage model.page.user model.page.now
-            , List.map (postEntry model.page.user model.page.now) model.tweets |> div []
+            , div [] <|
+                List.map
+                    (postEntry model.page.user model.page.now)
+                    (List.take 10 (Tweet.upcoming model.tweets))
+            , h2 [ class "title has-text-centered has-top-margin" ]
+                [ text "Past Tweets" ]
+            , hr [] []
+            , div [] <|
+                List.map
+                    (postEntry model.page.user model.page.now)
+                    (Tweet.past model.tweets)
             ]
 
 

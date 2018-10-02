@@ -1,10 +1,11 @@
-module Data.Tweet exposing (PostInfo, Status(..), Tweet, compare, decoder, listDecoder, update)
+module Data.Tweet exposing (PostInfo, Status(..), Tweet, compare, decoder, listDecoder, past, upcoming, update)
 
 import Data.Feed as Feed exposing (Feed)
 import Iso8601
 import Json.Decode as Decode exposing (Decoder, int, maybe, string, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
 import Time exposing (Posix)
+import Util.Editable as Editable exposing (Editable)
 
 
 type Status
@@ -100,3 +101,13 @@ compare a b =
 
         ( Nothing, Nothing ) ->
             EQ
+
+
+upcoming : List (Editable Tweet) -> List (Editable Tweet)
+upcoming =
+    Editable.filter (\t -> t.status == Draft)
+
+
+past : List (Editable Tweet) -> List (Editable Tweet)
+past =
+    Editable.filter (\t -> t.status /= Draft)
