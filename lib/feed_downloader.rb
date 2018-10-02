@@ -38,7 +38,7 @@ class FeedDownloader
     case response.status
     when 200 then parse_feed(response)
     when 304 then nil
-    when 404 then raise NotFoundError, url
+    when 404 then raise FeedNotFound, url
     end
   end
 
@@ -75,7 +75,7 @@ class FeedDownloader
     Time.iso8601(time) rescue nil
   end
 
-  class NotFoundError < StandardError
+  class FeedNotFound < StandardError
     attr_reader :url
 
     def initialize(url)

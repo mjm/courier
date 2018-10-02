@@ -11,6 +11,15 @@ class RefreshFeedWorker
     feed_posts.each do |post|
       import_post post
     end
+    feed.status = :succeeded
+    feed.refresh_message = nil
+  rescue FeedDownloader::FeedNotFound
+    feed.status = :failed
+    feed.refresh_message = 'Could not find the feed'
+  rescue StandardError
+    feed.status = :failed
+    feed.refresh_message = 'An unexpected error occurred'
+  ensure
     update_feed
   end
 
@@ -49,6 +58,7 @@ class RefreshFeedWorker
       feed.last_modified_at = downloaded_feed.last_modified
       feed.title = downloaded_feed.title
       feed.home_page_url = downloaded_feed.home_page_url
+      feed.status = :succeeded
     end
     feed.save
   end

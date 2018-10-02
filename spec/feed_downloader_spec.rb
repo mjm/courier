@@ -20,7 +20,7 @@ RSpec.describe FeedDownloader do
     end
 
     it 'raises an error' do
-      expect { subject.feed }.to raise_error(FeedDownloader::NotFoundError)
+      expect { subject.feed }.to raise_error(FeedDownloader::FeedNotFound)
     end
   end
 

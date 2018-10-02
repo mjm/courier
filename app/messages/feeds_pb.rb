@@ -46,6 +46,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :title, :string, 6
     optional :home_page_url, :string, 7
     optional :settings, :message, 8, "FeedSettingsMessage"
+    optional :status, :enum, 9, "FeedMessage.Status"
+    optional :refresh_message, :string, 10
+  end
+  add_enum "FeedMessage.Status" do
+    value :SUCCEEDED, 0
+    value :FAILED, 1
+    value :REFRESHING, 2
   end
   add_message "FeedSettingsMessage" do
     optional :autopost, :bool, 1
@@ -64,4 +71,5 @@ UpdateFeedSettingsResponse = Google::Protobuf::DescriptorPool.generated_pool.loo
 DeleteFeedRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("DeleteFeedRequest").msgclass
 DeleteFeedResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("DeleteFeedResponse").msgclass
 FeedMessage = Google::Protobuf::DescriptorPool.generated_pool.lookup("FeedMessage").msgclass
+FeedMessage::Status = Google::Protobuf::DescriptorPool.generated_pool.lookup("FeedMessage.Status").enummodule
 FeedSettingsMessage = Google::Protobuf::DescriptorPool.generated_pool.lookup("FeedSettingsMessage").msgclass

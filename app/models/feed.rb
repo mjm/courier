@@ -13,6 +13,8 @@ class Feed < ApplicationRecord
     end
   end
 
+  enum status: %i[succeeded failed refreshing]
+
   scope :by_home_page, lambda { |url|
     normalized_url = Addressable::URI.parse(url).normalize.to_s
     where(home_page_url: normalized_url)
@@ -32,6 +34,7 @@ class Feed < ApplicationRecord
   end
 
   def refresh
+    refreshing!
     RefreshFeedWorker.perform_async(id)
   end
 
@@ -43,7 +46,9 @@ class Feed < ApplicationRecord
       home_page_url: home_page_url,
       created_at: format_timestamp(created_at),
       updated_at: format_timestamp(updated_at),
-      refreshed_at: format_timestamp(refreshed_at)
+      refreshed_at: format_timestamp(refreshed_at),
+      status: status.upcase,
+      refresh_message: refresh_message || ''
     )
   end
 

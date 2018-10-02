@@ -53,14 +53,22 @@ message DeleteFeedResponse {
 }
 
 message FeedMessage {
-  int64               id            = 1;
-  string              url           = 2;
-  string              created_at    = 3;
-  string              updated_at    = 4;
-  string              refreshed_at  = 5;
-  string              title         = 6;
-  string              home_page_url = 7;
-  FeedSettingsMessage settings      = 8;
+  enum Status {
+    SUCCEEDED   = 0;
+    FAILED      = 1;
+    REFRESHING  = 2;
+  }
+
+  int64               id               = 1;
+  string              url              = 2;
+  string              created_at       = 3;
+  string              updated_at       = 4;
+  string              refreshed_at     = 5;
+  string              title            = 6;
+  string              home_page_url    = 7;
+  FeedSettingsMessage settings         = 8;
+  Status              status           = 9;
+  string              refresh_message  = 10;
 }
 
 message FeedSettingsMessage {

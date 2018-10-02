@@ -44,6 +44,18 @@ RSpec.describe RefreshFeedWorker, type: :worker do
     expect(feed.home_page_url).to eq 'https://example.com/'
   end
 
+  it 'sets the feed status to succeeded' do
+    feed.failed!
+    subject.perform(feed.id)
+    expect(feed.reload).to be_succeeded
+  end
+
+  it 'clears the refresh message on the feed' do
+    feed.update! refresh_message: 'Foo bar'
+    subject.perform(feed.id)
+    expect(feed.reload.refresh_message).to be_blank
+  end
+
   context 'when the feed has new posts' do
     let(:first_post) do
       {
@@ -140,6 +152,47 @@ RSpec.describe RefreshFeedWorker, type: :worker do
     it 'only requests the feed once' do
       expect(downloader).to receive(:feed).once
       subject.perform(feed.id)
+    end
+
+    it 'sets the feed status to succeeded' do
+      subject.perform(feed.id)
+      expect(feed.reload).to be_succeeded
+    end
+  end
+
+  context 'when the feed cannot be found' do
+    before do
+      allow(downloader)
+        .to receive(:feed)
+        .and_raise(
+          FeedDownloader::FeedNotFound.new('https://example.com/feed.json')
+        )
+    end
+
+    it 'sets the feed status to failed' do
+      subject.perform(feed.id)
+      expect(feed.reload).to be_failed
+    end
+
+    it 'sets an appropriate message on the feed' do
+      subject.perform(feed.id)
+      expect(feed.reload.refresh_message).to eq 'Could not find the feed'
+    end
+  end
+
+  context 'when the feed downloader raises an error' do
+    before do
+      allow(downloader).to receive(:feed) { raise 'Foo bar' }
+    end
+
+    it 'sets the feed status to failed' do
+      subject.perform(feed.id)
+      expect(feed.reload).to be_failed
+    end
+
+    it 'sets an appropriate message on the feed' do
+      subject.perform(feed.id)
+      expect(feed.reload.refresh_message).to eq 'An unexpected error occurred'
     end
   end
 end

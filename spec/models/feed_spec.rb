@@ -26,6 +26,21 @@ RSpec.describe Feed, type: :model do
         updated_at: feed.updated_at.to_s(:iso8601)
       )
     end
+
+    it 'represents a refreshing feed' do
+      feed = feeds(:example)
+      feed.refreshing!
+      msg = feed.to_message
+      expect(msg.status).to eq :REFRESHING
+    end
+
+    it 'represents a failed feed' do
+      feed = feeds(:example)
+      feed.update! status: :failed, refresh_message: 'Foo bar'
+      msg = feed.to_message
+      expect(msg.status).to eq :FAILED
+      expect(msg.refresh_message).to eq 'Foo bar'
+    end
   end
 
   describe '.register' do
@@ -66,6 +81,20 @@ RSpec.describe Feed, type: :model do
         feed
         expect(users(:bob).feed_ids).to include(feed.id)
       end
+    end
+  end
+
+  describe '#refresh' do
+    let(:feed) { feeds(:example) }
+
+    it 'sets the feed status to refreshing' do
+      feed.refresh
+      expect(feed.reload).to be_refreshing
+    end
+
+    it 'enqueues a job to refresh the feed' do
+      feed.refresh
+      expect(RefreshFeedWorker).to have_enqueued_sidekiq_job(feed.id)
     end
   end
 end
