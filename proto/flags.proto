@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "feeds.proto";
+import "tweets.proto";
+import "users.proto";
+
+message IndexFlags {
+  repeated TweetMessage  tweets  = 1;
+           UserMessage   user    = 2;
+}
+
+message FeedsFlags {
+  repeated FeedMessage  feeds  = 1;
+           UserMessage  user   = 2;
+}
+
+message AccountFlags {
+  string       stripe_key  = 1;
+  UserMessage  user        = 2;
+}

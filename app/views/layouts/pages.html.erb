@@ -6,8 +6,9 @@
     <%= csrf_meta_tags %>
     <%= action_cable_meta_tag %>
     <%= csp_meta_tag %>
-    <%= stylesheet_pack_tag 'main' %>
+    <%= stylesheet_pack_tag @pack %>
     <%= yield :script %>
+    <%= javascript_pack_tag @pack %>
   </head>
 
   <body data-env="<%= display_env %>">
