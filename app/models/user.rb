@@ -49,13 +49,40 @@ class User < ApplicationRecord
     feed_subscriptions.find_by(feed: feed)
   end
 
-  def to_message
-    UserMessage.new(
+  def to_message(stripe: false)
+    msg = UserMessage.new(
       username: username,
       name: name,
       subscribed: stripe_subscription_id.present?,
       subscription_expires_at: format_timestamp(subscription_expires_at),
       subscription_renews_at: format_timestamp(subscription_renews_at)
+    )
+    add_card_details(msg) if stripe
+    msg
+  end
+
+  private
+
+  def add_card_details(msg)
+    source = fetch_payment_source
+    msg.card = card_message(source) if source.present?
+  end
+
+  def fetch_payment_source
+    return nil if stripe_customer_id.blank?
+
+    customer = Stripe::Customer.retrieve(stripe_customer_id)
+    return nil if customer.default_source.blank?
+
+    customer.sources.detect { |s| s.id == customer.default_source }
+  end
+
+  def card_message(source)
+    CardMessage.new(
+      brand: source.brand,
+      last_four: source.last4,
+      exp_month: source.exp_month,
+      exp_year: source.exp_year
     )
   end
 end

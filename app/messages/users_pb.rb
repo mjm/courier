@@ -27,6 +27,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :subscribed, :bool, 3
     optional :subscription_expires_at, :string, 4
     optional :subscription_renews_at, :string, 5
+    optional :card, :message, 6, "CardMessage"
+  end
+  add_message "CardMessage" do
+    optional :brand, :string, 1
+    optional :last_four, :string, 2
+    optional :exp_month, :int32, 3
+    optional :exp_year, :int32, 4
   end
 end
 
@@ -37,3 +44,4 @@ CancelSubscriptionResponse = Google::Protobuf::DescriptorPool.generated_pool.loo
 ReactivateSubscriptionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("ReactivateSubscriptionRequest").msgclass
 ReactivateSubscriptionResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("ReactivateSubscriptionResponse").msgclass
 UserMessage = Google::Protobuf::DescriptorPool.generated_pool.lookup("UserMessage").msgclass
+CardMessage = Google::Protobuf::DescriptorPool.generated_pool.lookup("CardMessage").msgclass

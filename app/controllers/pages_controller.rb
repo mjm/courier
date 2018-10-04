@@ -15,6 +15,7 @@ class PagesController < ApplicationController
 
   def account
     stripe_key = Rails.configuration.stripe[:publishable_key]
-    render_elm :account, stripe_key: stripe_key
+    user = current_user.to_message(stripe: true)
+    render_elm :account, stripe_key: stripe_key, user: user
   end
 end

@@ -30,9 +30,17 @@ message ReactivateSubscriptionResponse {
 }
 
 message UserMessage {
-  string  username                 = 1;
-  string  name                     = 2;
-  bool    subscribed               = 3;
-  string  subscription_expires_at  = 4;
-  string  subscription_renews_at   = 5;
+  string       username                 = 1;
+  string       name                     = 2;
+  bool         subscribed               = 3;
+  string       subscription_expires_at  = 4;
+  string       subscription_renews_at   = 5;
+  CardMessage  card                     = 6;
+}
+
+message CardMessage {
+  string  brand      = 1;
+  string  last_four  = 2;
+  int32   exp_month  = 3;
+  int32   exp_year   = 4;
 }

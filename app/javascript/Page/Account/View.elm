@@ -2,6 +2,7 @@ module Page.Account.View exposing (view)
 
 import Browser exposing (Document)
 import Data.Account as Account exposing (Status(..))
+import Data.User exposing (CardBrand(..))
 import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -24,7 +25,7 @@ view model =
 userForm : Model -> Html Message
 userForm model =
     div [ class "columns" ]
-        [ div [ class "column is-two-thirds is-offset-2" ]
+        [ div [ class "column is-10 is-offset-2" ]
             [ formField "Twitter User"
                 [ p [ class "control" ]
                     [ p [ class "form-text" ]
@@ -110,6 +111,32 @@ userForm model =
                             , text "."
                             ]
                         ]
+            , formField "Payment Details"
+                [ p [ class "control" ]
+                    [ p [ class "form-text" ] <|
+                        case model.page.user.card of
+                            Just card ->
+                                [ p []
+                                    [ brandIcon card.brand
+                                    , span []
+                                        [ text " •••• "
+                                        , text card.lastFour
+                                        ]
+                                    ]
+                                , p []
+                                    [ icon Solid "calendar-times"
+                                    , text <|
+                                        "Expires "
+                                            ++ String.fromInt card.expMonth
+                                            ++ " / "
+                                            ++ String.fromInt card.expYear
+                                    ]
+                                ]
+
+                            Nothing ->
+                                [ text "No saved payment details" ]
+                    ]
+                ]
             ]
         ]
 
@@ -122,3 +149,28 @@ formField labelText hs =
         , div [ class "field-body" ]
             [ div [ class "field" ] hs ]
         ]
+
+
+brandIcon : CardBrand -> Html msg
+brandIcon b =
+    case b of
+        Visa ->
+            mediumIcon Brand "cc-visa"
+
+        AmEx ->
+            mediumIcon Brand "cc-amex"
+
+        Mastercard ->
+            mediumIcon Brand "cc-mastercard"
+
+        Discover ->
+            mediumIcon Brand "cc-discover"
+
+        DinersClub ->
+            mediumIcon Brand "cc-diners-club"
+
+        JCB ->
+            mediumIcon Brand "cc-jcb"
+
+        Unknown _ ->
+            mediumIcon Solid "credit-card"
