@@ -17,85 +17,108 @@ view model =
         div []
             [ h2 [ class "title has-text-centered" ] [ text "Your Account" ]
             , hr [] []
-            , subscriptionInfo model
+            , userForm model
             ]
 
 
-subscriptionInfo : Model -> Html Message
-subscriptionInfo model =
-    case Account.status model.page.user model.page.now of
-        Expired expiresAt ->
-            p [ class "has-text-centered" ]
-                [ text "Oh no! Your subscription to Courier has "
-                , strong [] [ text "expired" ]
-                , text "."
-                ]
-
-        Canceled expiresAt ->
-            div [ class "content" ]
-                [ p [ class "has-text-centered" ]
-                    [ text "Your subscription has been canceled, but you can still use Courier until it expires." ]
-                , p [ class "has-text-centered" ]
-                    [ text "Your subscription will expire "
-                    , strong [] [ text (relativeTime model.page.now expiresAt) ]
-                    , text "."
-                    ]
-                , p [ class "has-text-centered" ]
-                    [ button
-                        [ onClick ReactivateSubscription
-                        , class "button is-primary"
-                        ]
-                        [ span [] [ text "Reactivate My Subscription" ] ]
-                    ]
-                ]
-
-        Valid _ renewsAt ->
-            div [ class "content" ]
-                [ p [ class "has-text-centered" ]
-                    [ text "You have a subscription to Courier! Happy posting!" ]
-                , p [ class "has-text-centered" ]
-                    [ text "Your subscription will renew "
-                    , strong [] [ text (relativeTime model.page.now renewsAt) ]
-                    , text "."
-                    ]
-                , p [ class "has-text-centered" ]
-                    [ button
-                        [ onClick CancelSubscription
-                        , class "button is-danger"
-                        ]
-                        [ icon Solid "ban"
-                        , span [] [ text "Cancel My Subscription" ]
+userForm : Model -> Html Message
+userForm model =
+    div [ class "columns" ]
+        [ div [ class "column is-two-thirds is-offset-2" ]
+            [ formField "Twitter User"
+                [ p [ class "control" ]
+                    [ p [ class "form-text" ]
+                        [ a
+                            [ href <| "https://twitter.com/" ++ model.page.user.username
+                            , target "_blank"
+                            ]
+                            [ icon Brand "twitter"
+                            , span []
+                                [ text <|
+                                    model.page.user.name
+                                        ++ " ("
+                                        ++ model.page.user.username
+                                        ++ ")"
+                                ]
+                            ]
                         ]
                     ]
                 ]
+            , formField "Subscription" <|
+                case Account.status model.page.user model.page.now of
+                    NotSubscribed ->
+                        [ p [ class "field is-grouped" ]
+                            [ p [ class "control" ]
+                                [ button
+                                    [ class "button is-link"
+                                    , onClick OpenPaymentForm
+                                    ]
+                                    [ icon Solid "credit-card"
+                                    , span [] [ text "Subscribe for $5/mo" ]
+                                    ]
+                                ]
+                            ]
+                        , p [ class "help" ]
+                            [ text "Your tweets will not be posted automatically until you subscribe." ]
+                        ]
 
-        NotSubscribed ->
-            div [ class "content" ]
-                [ p [ class "has-text-centered" ]
-                    [ text "You have not subscribed to Courier yet. Your tweets will not be posted automatically until you subscribe." ]
-                , p [ class "has-text-centered" ] [ stripeButton model ]
-                ]
+                    Expired _ ->
+                        [ p [ class "field is-grouped" ]
+                            [ p [ class "control" ]
+                                [ p [ class "form-text" ]
+                                    [ text "Expired" ]
+                                ]
+                            ]
+                        ]
 
+                    Canceled expiresAt ->
+                        [ p [ class "control" ]
+                            [ p [ class "form-text" ]
+                                [ span [ class "tag is-light is-medium" ]
+                                    [ text "Canceled" ]
+                                ]
+                            ]
+                        , p [ class "help" ]
+                            [ text "Your subscription will expire "
+                            , strong [] [ text (relativeTime model.page.now expiresAt) ]
+                            , text ". "
+                            , a
+                                [ onClick ReactivateSubscription
+                                , class "has-text-link"
+                                ]
+                                [ text "Reactivate my subscription" ]
+                            , text "."
+                            ]
+                        ]
 
-stripeButton : Model -> Html Message
-stripeButton model =
-    Html.form
-        [ action "/subscribe"
-        , method "POST"
+                    Valid _ renewsAt ->
+                        [ p [ class "control" ]
+                            [ p [ class "form-text" ]
+                                [ span [ class "tag is-primary is-medium" ]
+                                    [ text "Active" ]
+                                ]
+                            ]
+                        , p [ class "help" ]
+                            [ text "Your subscription renews "
+                            , strong [] [ text (relativeTime model.page.now renewsAt) ]
+                            , text ". "
+                            , a
+                                [ onClick CancelSubscription
+                                , class "has-text-danger"
+                                ]
+                                [ text "Cancel my subscription" ]
+                            , text "."
+                            ]
+                        ]
+            ]
         ]
-        [ node "script"
-            [ src "https://checkout.stripe.com/checkout.js"
-            , class "stripe-button"
-            , attribute "data-key" model.stripeKey
-            , attribute "data-name" "Courier"
-            , attribute "data-description" "Monthly autoposting subscription"
-            , attribute "data-amount" "500"
-            , attribute "data-label" "Subscribe"
-            , attribute "data-zip-code" "true"
-            ]
-            []
-        , button [ type_ "submit", class "button is-link is-medium" ]
-            [ icon Solid "credit-card"
-            , span [] [ text "Subscribe to Courier for $5/mo" ]
-            ]
+
+
+formField : String -> List (Html Message) -> Html Message
+formField labelText hs =
+    div [ class "field is-horizontal" ]
+        [ div [ class "field-label is-normal" ]
+            [ label [ class "label" ] [ text labelText ] ]
+        , div [ class "field-body" ]
+            [ div [ class "field" ] hs ]
         ]

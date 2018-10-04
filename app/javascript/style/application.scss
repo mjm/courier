@@ -4,10 +4,6 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 @import '~@fortawesome/fontawesome-free/scss/brands.scss';
 @import '~@fortawesome/fontawesome-free/scss/solid.scss';
 
-button.stripe-button-el {
-  display: none !important;
-}
-
 .tweet-content {
   white-space: pre-line;
 
@@ -26,4 +22,8 @@ button.stripe-button-el {
 
 .has-top-margin {
   margin-top: 3rem;
+}
+
+.form-text {
+  padding: 6px 1px;
 }

@@ -9,6 +9,7 @@
     <%= stylesheet_pack_tag @pack %>
     <%= yield :script %>
     <%= javascript_pack_tag @pack %>
+    <script src="https://checkout.stripe.com/checkout.js"></script>
   </head>
 
   <body data-env="<%= display_env %>">

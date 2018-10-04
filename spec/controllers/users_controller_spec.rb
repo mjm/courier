@@ -3,6 +3,27 @@ require 'rails_helper'
 RSpec.describe UsersController, type: :rpc do
   let(:stripe_helper) { StripeMock.create_test_helper }
 
+  describe '#create_subscription' do
+    rpc_method :CreateSubscription
+
+    let(:request) { { email: email, token_id: token } }
+    let(:email) { 'foo@example.com' }
+    let(:token) { stripe_helper.generate_card_token }
+
+    context 'when a user is signed in' do
+      it 'creates a new subscription for the user' do
+        response
+        current_user.reload
+        expect(current_user.stripe_customer_id).to be_present
+        expect(current_user.stripe_subscription_id).to be_present
+      end
+
+      it 'responds with the updated user information' do
+        expect(response.user).to eq current_user.to_message
+      end
+    end
+  end
+
   describe '#cancel_subscription' do
     rpc_method :CancelSubscription
 

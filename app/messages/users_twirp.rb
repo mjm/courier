@@ -4,6 +4,7 @@ require_relative 'users_pb.rb'
 
 class UsersService < Twirp::Service
   service 'Users'
+  rpc :CreateSubscription, CreateSubscriptionRequest, CreateSubscriptionResponse, :ruby_method => :create_subscription
   rpc :CancelSubscription, CancelSubscriptionRequest, CancelSubscriptionResponse, :ruby_method => :cancel_subscription
   rpc :ReactivateSubscription, ReactivateSubscriptionRequest, ReactivateSubscriptionResponse, :ruby_method => :reactivate_subscription
 end

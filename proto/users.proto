@@ -1,8 +1,18 @@
 syntax = "proto3";
 
 service Users {
+  rpc CreateSubscription(CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
   rpc CancelSubscription(CancelSubscriptionRequest) returns (CancelSubscriptionResponse);
   rpc ReactivateSubscription(ReactivateSubscriptionRequest) returns (ReactivateSubscriptionResponse);
+}
+
+message CreateSubscriptionRequest {
+  string  email     = 1;
+  string  token_id  = 2;
+}
+
+message CreateSubscriptionResponse {
+  UserMessage  user  = 1;
 }
 
 message CancelSubscriptionRequest {

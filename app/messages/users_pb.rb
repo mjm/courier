@@ -4,6 +4,13 @@
 require 'google/protobuf'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do
+  add_message "CreateSubscriptionRequest" do
+    optional :email, :string, 1
+    optional :token_id, :string, 2
+  end
+  add_message "CreateSubscriptionResponse" do
+    optional :user, :message, 1, "UserMessage"
+  end
   add_message "CancelSubscriptionRequest" do
   end
   add_message "CancelSubscriptionResponse" do
@@ -23,6 +30,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
+CreateSubscriptionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("CreateSubscriptionRequest").msgclass
+CreateSubscriptionResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("CreateSubscriptionResponse").msgclass
 CancelSubscriptionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("CancelSubscriptionRequest").msgclass
 CancelSubscriptionResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("CancelSubscriptionResponse").msgclass
 ReactivateSubscriptionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("ReactivateSubscriptionRequest").msgclass

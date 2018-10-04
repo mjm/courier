@@ -7,14 +7,16 @@ import Page exposing (Page)
 
 
 type alias Model =
-    { stripeKey : String
-    , page : Page Message
+    { page : Page Message
     }
 
 
 type Message
     = PageMsg Page.Message
     | EventOccurred Encode.Value
+    | CreateSubscription Encode.Value
+    | SubscriptionCreated (Result Http.Error User)
+    | OpenPaymentForm
     | CancelSubscription
     | ConfirmCancelSubscription
     | SubscriptionCanceled (Result Http.Error User)

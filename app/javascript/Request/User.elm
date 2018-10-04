@@ -1,4 +1,4 @@
-module Request.User exposing (cancelSubscription, reactivateSubscription, userDecoder, usersBuilder)
+module Request.User exposing (cancelSubscription, createSubscription, reactivateSubscription, userDecoder, usersBuilder)
 
 import Data.User as User exposing (User)
 import Http
@@ -16,6 +16,21 @@ usersBuilder =
 userDecoder : Decode.Decoder User
 userDecoder =
     Decode.field "user" User.decoder
+
+
+createSubscription : String -> String -> Http.Request User
+createSubscription email token =
+    let
+        body =
+            Encode.object
+                [ ( "email", Encode.string email )
+                , ( "tokenId", Encode.string token )
+                ]
+    in
+    usersBuilder "CreateSubscription"
+        |> withJsonBody body
+        |> withExpect (Http.expectJson userDecoder)
+        |> toRequest
 
 
 cancelSubscription : Http.Request User

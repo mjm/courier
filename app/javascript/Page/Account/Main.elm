@@ -14,10 +14,15 @@ import Task
 port events : (Encode.Value -> msg) -> Sub msg
 
 
+port createSubscription : (Encode.Value -> msg) -> Sub msg
+
+
+port openPaymentForm : () -> Cmd msg
+
+
 init : Flags -> ( Model, Cmd Message )
 init flags =
-    ( { stripeKey = flags.stripeKey
-      , page =
+    ( { page =
             Page.init
                 flags
                 PageMsg
@@ -31,6 +36,7 @@ subscriptions model =
     Sub.batch
         [ Page.subscriptions model.page
         , events EventOccurred
+        , createSubscription CreateSubscription
         ]
 
 
@@ -39,6 +45,6 @@ main =
     Browser.document
         { init = init
         , view = view
-        , update = update
+        , update = update (openPaymentForm ())
         , subscriptions = subscriptions
         }
