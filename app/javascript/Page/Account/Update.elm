@@ -30,6 +30,12 @@ update openPaymentForm message model =
         OpenPaymentForm ->
             ( model, openPaymentForm )
 
+        Resubscribe ->
+            ( model
+            , Http.send SubscriptionCreated <|
+                Request.User.createSubscription "" ""
+            )
+
         CancelSubscription ->
             ( showModal model cancelSubscriptionModal, Cmd.none )
 

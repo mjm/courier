@@ -52,7 +52,14 @@ userForm model =
                             [ p [ class "control" ]
                                 [ button
                                     [ class "button is-link"
-                                    , onClick OpenPaymentForm
+                                    , onClick
+                                        (case model.page.user.card of
+                                            Just _ ->
+                                                Resubscribe
+
+                                            Nothing ->
+                                                OpenPaymentForm
+                                        )
                                     ]
                                     [ icon Solid "credit-card"
                                     , span [] [ text "Subscribe for $5/mo" ]
@@ -64,11 +71,29 @@ userForm model =
                         ]
 
                     Expired _ ->
-                        [ p [ class "field is-grouped" ]
-                            [ p [ class "control" ]
-                                [ p [ class "form-text" ]
-                                    [ text "Expired" ]
+                        [ p [ class "control" ]
+                            [ p [ class "form-text" ]
+                                [ span [ class "tag is-danger is-medium" ]
+                                    [ icon Solid "calendar-times"
+                                    , span [] [ text "Expired" ]
+                                    ]
                                 ]
+                            ]
+                        , p [ class "help" ]
+                            [ text "Your tweets will not be posted automatically until you "
+                            , a
+                                [ onClick
+                                    (case model.page.user.card of
+                                        Just _ ->
+                                            Resubscribe
+
+                                        Nothing ->
+                                            OpenPaymentForm
+                                    )
+                                , class "has-text-link"
+                                ]
+                                [ text "resubscribe" ]
+                            , text "."
                             ]
                         ]
 
@@ -76,7 +101,9 @@ userForm model =
                         [ p [ class "control" ]
                             [ p [ class "form-text" ]
                                 [ span [ class "tag is-light is-medium" ]
-                                    [ text "Canceled" ]
+                                    [ icon Solid "times"
+                                    , span [] [ text "Canceled" ]
+                                    ]
                                 ]
                             ]
                         , p [ class "help" ]
@@ -96,7 +123,9 @@ userForm model =
                         [ p [ class "control" ]
                             [ p [ class "form-text" ]
                                 [ span [ class "tag is-primary is-medium" ]
-                                    [ text "Active" ]
+                                    [ icon Solid "check"
+                                    , span [] [ text "Active" ]
+                                    ]
                                 ]
                             ]
                         , p [ class "help" ]

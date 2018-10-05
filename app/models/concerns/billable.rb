@@ -16,7 +16,7 @@ module Billable
   # Currently assumes that the user doesn't already have a subscription. This
   # needs to be more robust to various situations like that.
   def subscribe(email:, source:)
-    create_and_save_customer(email: email, source: source)
+    create_and_save_customer(email: email, source: source) if source.present?
     create_and_save_subscription
   end
 

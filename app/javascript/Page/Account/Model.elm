@@ -17,6 +17,7 @@ type Message
     | CreateSubscription Encode.Value
     | SubscriptionCreated (Result Http.Error User)
     | OpenPaymentForm
+    | Resubscribe
     | CancelSubscription
     | ConfirmCancelSubscription
     | SubscriptionCanceled (Result Http.Error User)

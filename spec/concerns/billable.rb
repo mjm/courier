@@ -73,6 +73,17 @@ RSpec.shared_examples_for 'billable' do
     end
 
     context 'when the payment details are still saved' do
+      before do
+        subject.subscribe(email: email, source: source)
+        @customer = subject.stripe_customer_id
+        subject.update!(stripe_subscription_id: nil,
+                        subscription_expires_at: nil)
+      end
+
+      it 'reuses the existing customer in the new subscription' do
+        subject.subscribe(email: '', source: '')
+        expect(subject.stripe_customer_id).to eq @customer
+      end
     end
   end
 
