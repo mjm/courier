@@ -19,23 +19,40 @@ import Views.Linkify exposing (linkify)
 
 view : Model -> Document Message
 view model =
+    let
+        upcoming =
+            Tweet.upcoming model.tweets
+
+        past =
+            Tweet.past model.tweets
+    in
     Page.view model.page <|
         div []
-            [ h2 [ class "title has-text-centered" ]
+            [ subscriptionMessage model.page.user model.page.now
+            , h2 [ class "title has-text-centered" ]
                 [ text "Upcoming Tweets" ]
             , hr [] []
-            , subscriptionMessage model.page.user model.page.now
-            , div [] <|
-                List.map
-                    (postEntry model.page.user model.page.now)
-                    (List.take 10 (Tweet.upcoming model.tweets))
+            , if List.isEmpty upcoming then
+                p [ class "has-text-centered" ]
+                    [ text "You don't have any tweets waiting to be posted." ]
+
+              else
+                div [] <|
+                    List.map
+                        (postEntry model.page.user model.page.now)
+                        (List.take 10 upcoming)
             , h2 [ class "title has-text-centered has-top-margin" ]
                 [ text "Past Tweets" ]
             , hr [] []
-            , div [] <|
-                List.map
-                    (postEntry model.page.user model.page.now)
-                    (Tweet.past model.tweets)
+            , if List.isEmpty past then
+                p [ class "has-text-centered" ]
+                    [ text "You haven't posted any tweets with Courier." ]
+
+              else
+                div [] <|
+                    List.map
+                        (postEntry model.page.user model.page.now)
+                        past
             ]
 
 
