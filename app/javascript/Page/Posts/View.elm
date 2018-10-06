@@ -168,7 +168,7 @@ viewTweetCard user tweet now =
                     canceledActions tweet
 
                 Posted ->
-                    postedActions tweet now
+                    postedActions user tweet now
         ]
 
 
@@ -303,8 +303,8 @@ canceledActions tweet =
     ]
 
 
-postedActions : Tweet -> Posix -> List (Html msg)
-postedActions tweet now =
+postedActions : User -> Tweet -> Posix -> List (Html msg)
+postedActions user tweet now =
     [ div [ class "card-footer-item" ]
         [ icon Solid "check-circle"
         , span []
@@ -320,7 +320,11 @@ postedActions tweet now =
         , case tweet.tweetId of
             Just tweetId ->
                 a
-                    [ href ("https://twitter.com/user/status/" ++ tweetId)
+                    [ href <|
+                        "https://twitter.com/"
+                            ++ user.username
+                            ++ "/status/"
+                            ++ tweetId
                     , target "_blank"
                     ]
                     [ text "View on Twitter" ]
