@@ -19,7 +19,7 @@ RSpec.describe UsersController, type: :rpc do
       end
 
       it 'responds with the updated user information' do
-        expect(response.user).to eq current_user.to_message
+        expect(response.user).to eq current_user.to_message(stripe: true)
       end
     end
   end
@@ -43,6 +43,7 @@ RSpec.describe UsersController, type: :rpc do
 
       it 'responds with the updated user' do
         expect(response.user.subscription_renews_at).to be_blank
+        expect(response.user.card).to be_present
       end
     end
 
@@ -94,6 +95,7 @@ RSpec.describe UsersController, type: :rpc do
 
       it 'responds with the updated user' do
         expect(response.user.subscription_renews_at).to be_present
+        expect(response.user.card).to be_present
       end
     end
   end
