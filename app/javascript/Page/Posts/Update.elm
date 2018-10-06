@@ -10,6 +10,7 @@ import Page
 import Page.Posts.Model exposing (Message(..), Model)
 import Request.Tweet
 import Util.Editable as Editable exposing (Editable(..))
+import Util.ExpandingList as EList exposing (ExpandingList)
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -20,6 +21,12 @@ update message model =
 
         EventOccurred event ->
             handleEvent event model
+
+        ExpandUpcomingTweets ->
+            ( { model | upcomingTweets = EList.expand 10 model.upcomingTweets }, Cmd.none )
+
+        ExpandPastTweets ->
+            ( { model | pastTweets = EList.expand 10 model.pastTweets }, Cmd.none )
 
         CancelTweet tweet ->
             ( model, Http.send CanceledTweet <| Request.Tweet.cancel tweet )
@@ -40,17 +47,17 @@ update message model =
             ( addError model "Could not undo canceling posting the tweet right now. Please try again later.", Cmd.none )
 
         EditTweet tweet ->
-            ( { model | tweets = editTweet tweet model.tweets }, Cmd.none )
+            ( updateTweets (editTweet tweet) model, Cmd.none )
 
         SetTweetBody tweet body ->
             let
                 updater =
                     \x -> { x | body = body }
             in
-            ( { model | tweets = updateDraftTweet updater tweet model.tweets }, Cmd.none )
+            ( updateTweets (updateDraftTweet updater tweet) model, Cmd.none )
 
         CancelEditTweet tweet ->
-            ( { model | tweets = cancelEditTweet tweet model.tweets }, Cmd.none )
+            ( updateTweets (cancelEditTweet tweet) model, Cmd.none )
 
         SaveTweet tweet shouldPost ->
             let
@@ -60,19 +67,19 @@ update message model =
                 reallyPost =
                     isActive && shouldPost
             in
-            ( { model | tweets = savingTweet tweet model.tweets }
+            ( updateTweets (savingTweet tweet) model
             , Http.send TweetSaved (Request.Tweet.update tweet reallyPost)
             )
 
         TweetSaved (Ok tweet) ->
-            ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
+            ( updateTweets (saveTweet tweet) model, Cmd.none )
 
         TweetSaved (Err _) ->
             ( addError model "Could not save the tweet right now. Please try again later.", Cmd.none )
 
         SubmitTweet tweet ->
             if Account.isActive model.page.user model.page.now then
-                ( { model | tweets = savingTweet tweet model.tweets }
+                ( updateTweets (savingTweet tweet) model
                 , Http.send TweetSubmitted (Request.Tweet.post tweet)
                 )
 
@@ -80,7 +87,7 @@ update message model =
                 ( model, Cmd.none )
 
         TweetSubmitted (Ok tweet) ->
-            ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
+            ( updateTweets (saveTweet tweet) model, Cmd.none )
 
         TweetSubmitted (Err _) ->
             ( addError model "Could not post the tweet right now. Please try again later.", Cmd.none )
@@ -101,16 +108,41 @@ handleEvent eventValue model =
         Ok event ->
             case event of
                 TweetUpdated tweet ->
-                    ( { model | tweets = saveTweet tweet model.tweets }, Cmd.none )
+                    ( updateTweets (saveTweet tweet) model, Cmd.none )
 
                 TweetCreated tweet ->
-                    ( { model | tweets = addTweet tweet model.tweets }, Cmd.none )
+                    ( updateTweets (addTweet tweet) model, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
 
         Err _ ->
             ( model, Cmd.none )
+
+
+allTweets : Model -> List (Editable Tweet)
+allTweets model =
+    EList.items model.upcomingTweets ++ EList.items model.pastTweets
+
+
+setTweets : List (Editable Tweet) -> Model -> Model
+setTweets tweets model =
+    let
+        upcoming =
+            Tweet.upcoming tweets
+
+        past =
+            Tweet.past tweets
+    in
+    { model
+        | upcomingTweets = EList.replace upcoming model.upcomingTweets
+        , pastTweets = EList.replace past model.pastTweets
+    }
+
+
+updateTweets : (List (Editable Tweet) -> List (Editable Tweet)) -> Model -> Model
+updateTweets f model =
+    setTweets (f (allTweets model)) model
 
 
 addTweet : Tweet -> List (Editable Tweet) -> List (Editable Tweet)
@@ -121,12 +153,8 @@ addTweet tweet ts =
 
 
 updateTweet : Tweet -> Model -> Model
-updateTweet tweet model =
-    let
-        updatedTweets =
-            List.map (updatePostTweet tweet) model.tweets
-    in
-    { model | tweets = updatedTweets }
+updateTweet tweet =
+    updateTweets (List.map (updatePostTweet tweet))
 
 
 updatePostTweet : Tweet -> Editable Tweet -> Editable Tweet

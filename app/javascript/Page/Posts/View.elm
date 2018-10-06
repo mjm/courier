@@ -13,47 +13,66 @@ import Page
 import Page.Posts.Model exposing (Message(..), Model)
 import Time exposing (Posix)
 import Util.Editable as Editable exposing (Editable(..))
+import Util.ExpandingList as EList exposing (ExpandingList)
 import Views.Icon exposing (..)
 import Views.Linkify exposing (linkify)
 
 
 view : Model -> Document Message
 view model =
-    let
-        upcoming =
-            Tweet.upcoming model.tweets
-
-        past =
-            Tweet.past model.tweets
-    in
     Page.view model.page <|
         div []
             [ subscriptionMessage model.page.user model.page.now
             , h2 [ class "title has-text-centered" ]
                 [ text "Upcoming Tweets" ]
             , hr [] []
-            , if List.isEmpty upcoming then
+            , if EList.isEmpty model.upcomingTweets then
                 p [ class "has-text-centered" ]
                     [ text "You don't have any tweets waiting to be posted." ]
 
               else
                 div [] <|
-                    List.map
+                    EList.map
                         (postEntry model.page.user model.page.now)
-                        (List.take 10 upcoming)
+                        model.upcomingTweets
+            , expandButton
+                model.upcomingTweets
+                ExpandUpcomingTweets
+                "Show more upcoming tweets"
             , h2 [ class "title has-text-centered has-top-margin" ]
                 [ text "Past Tweets" ]
             , hr [] []
-            , if List.isEmpty past then
+            , if EList.isEmpty model.pastTweets then
                 p [ class "has-text-centered" ]
                     [ text "You haven't posted any tweets with Courier." ]
 
               else
                 div [] <|
-                    List.map
+                    EList.map
                         (postEntry model.page.user model.page.now)
-                        past
+                        model.pastTweets
+            , expandButton
+                model.pastTweets
+                ExpandPastTweets
+                "Show more past tweets"
             ]
+
+
+expandButton : ExpandingList a -> Message -> String -> Html Message
+expandButton xs msg txt =
+    if EList.hasMore xs then
+        p [ class "has-text-centered show-more" ]
+            [ button
+                [ class "button is-link is-rounded is-outlined"
+                , onClick msg
+                ]
+                [ icon Solid "angle-double-down"
+                , span [] [ text txt ]
+                ]
+            ]
+
+    else
+        text ""
 
 
 subscriptionMessage : User -> Posix -> Html Message

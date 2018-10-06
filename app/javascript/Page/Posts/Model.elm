@@ -6,10 +6,12 @@ import Http
 import Json.Encode as Encode
 import Page exposing (Page)
 import Util.Editable exposing (Editable(..))
+import Util.ExpandingList exposing (ExpandingList)
 
 
 type alias Model =
-    { tweets : List (Editable Tweet)
+    { upcomingTweets : ExpandingList (Editable Tweet)
+    , pastTweets : ExpandingList (Editable Tweet)
     , page : Page Message
     }
 
@@ -17,6 +19,8 @@ type alias Model =
 type Message
     = PageMsg Page.Message
     | EventOccurred Encode.Value
+    | ExpandUpcomingTweets
+    | ExpandPastTweets
     | CancelTweet Tweet
     | CanceledTweet (Result Http.Error Tweet)
     | UncancelTweet Tweet

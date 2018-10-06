@@ -11,6 +11,7 @@ import Page.Posts.Update exposing (update)
 import Page.Posts.View exposing (view)
 import Task
 import Util.Editable exposing (Editable(..))
+import Util.ExpandingList as EList
 
 
 port events : (Encode.Value -> msg) -> Sub msg
@@ -18,7 +19,12 @@ port events : (Encode.Value -> msg) -> Sub msg
 
 init : Flags -> ( Model, Cmd Message )
 init flags =
-    ( { tweets = tweetsFromFlags flags
+    let
+        ( upcoming, past ) =
+            tweetsFromFlags flags
+    in
+    ( { upcomingTweets = EList.wrap 10 upcoming
+      , pastTweets = EList.wrap 10 past
       , page =
             Page.init
                 flags
@@ -28,14 +34,18 @@ init flags =
     )
 
 
-tweetsFromFlags : Flags -> List (Editable Tweet)
+tweetsFromFlags : Flags -> ( List (Editable Tweet), List (Editable Tweet) )
 tweetsFromFlags flags =
     case decodeValue Tweet.listDecoder flags.tweets of
         Ok ts ->
-            List.map Viewing ts
+            let
+                ets =
+                    List.map Viewing ts
+            in
+            ( Tweet.upcoming ets, Tweet.past ets )
 
         Err _ ->
-            []
+            ( [], [] )
 
 
 subscriptions : Model -> Sub Message
