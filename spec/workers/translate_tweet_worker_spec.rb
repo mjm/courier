@@ -43,6 +43,47 @@ RSpec.describe TranslateTweetWorker, type: :worker do
     end
   end
 
+  context 'when the post has been updated since being translated originally' do
+    let(:post) { posts(:example_status) }
+    let(:tweet) { tweets(:alice_example_status) }
+    before { post.update! content_html: '<p>This was a triumph!</p>' }
+    before { feed_subscriptions(:alice_example).update! autopost: true }
+
+    context 'and the tweet is still a draft' do
+      it 'does not create any new tweets' do
+        expect { subject.perform(post.id) }.not_to(change { Tweet.count })
+      end
+
+      it 'updates the body of the tweet with the new translation' do
+        subject.perform(post.id)
+        expect(tweet.reload.body).to eq 'This was a triumph!'
+      end
+
+      it 'enqueues a new job to post the tweet' do
+        subject.perform(post.id)
+        expect(PostTweetsWorker).to have_enqueued_sidekiq_job([tweet.id])
+      end
+    end
+
+    context 'and the tweet has already been posted' do
+      before { tweet.posted! }
+
+      it 'does not create any new tweets' do
+        expect { subject.perform(post.id) }.not_to(change { Tweet.count })
+      end
+
+      it 'does not update the body of the tweet with the new translation' do
+        subject.perform(post.id)
+        expect(tweet.reload.body).not_to eq 'This was a triumph!'
+      end
+
+      it 'does not enqueue any jobs to post new tweets' do
+        subject.perform(post.id)
+        expect(PostTweetsWorker).not_to have_enqueued_sidekiq_job
+      end
+    end
+  end
+
   context 'when the tweet has media URLs' do
     let(:post) { posts(:example_images) }
 

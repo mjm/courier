@@ -5,12 +5,19 @@ alice_example_status:
   post_job_id: abc
   created_at: <%= Time.utc(2018, 2, 2).to_s(:db) %>
 
-alice_example_status2:
-  post: example_status
+alice_example_multiple1:
+  post: example_multiple
+  feed_subscription: alice_example
+  body: This is a first tweet for the same post.
+  post_job_id: def
+  created_at: <%= Time.utc(2018, 2, 2, 0, 0, 1).to_s(:db) %>
+
+alice_example_multiple2:
+  post: example_multiple
   feed_subscription: alice_example
   body: This is a second tweet for the same post.
-  post_job_id: abc
-  created_at: <%= Time.utc(2018, 2, 2, 0, 0, 1).to_s(:db) %>
+  post_job_id: def
+  created_at: <%= Time.utc(2018, 2, 2, 0, 0, 2).to_s(:db) %>
 
 alice_example_post:
   post: example_post

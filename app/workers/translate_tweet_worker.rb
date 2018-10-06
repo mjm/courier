@@ -11,11 +11,10 @@ class TranslateTweetWorker
     @tweets = translated_tweets
 
     post.feed_subscriptions.kept.each do |subscription|
-      existing_tweets = post.tweets.where(feed_subscription: subscription)
-      next if existing_tweets.any?
-
-      created_tweets = tweets.map { |tweet| create_tweet(tweet, subscription) }
-      subscription.schedule_tweets(created_tweets)
+      existing_tweets = existing_tweets_for(subscription)
+      create_or_update_tweets(subscription,
+                              tweets,
+                              existing_tweets)
     end
   end
 
@@ -29,6 +28,22 @@ class TranslateTweetWorker
     ).tweets
   end
 
+  def existing_tweets_for(subscription)
+    post.tweets.where(feed_subscription: subscription).order(:id)
+  end
+
+  def create_or_update_tweets(subscription, tweets, existing_tweets)
+    created_tweets = tweets.zip(existing_tweets).map { |tweet, existing_tweet|
+      if existing_tweet.present?
+        update_tweet(existing_tweet, tweet) unless existing_tweet.posted?
+      else
+        create_tweet(tweet, subscription)
+      end
+    }.compact
+
+    subscription.schedule_tweets(created_tweets)
+  end
+
   def create_tweet(tweet, sub)
     logger.info "Creating tweet of post #{post.id} for #{sub.user.username}"
     Tweet.create(
@@ -37,5 +52,11 @@ class TranslateTweetWorker
       body: tweet.body,
       media_urls: tweet.media_urls
     )
+  end
+
+  def update_tweet(existing_tweet, tweet)
+    logger.info "Updating tweet #{existing_tweet.id}"
+    existing_tweet.update! body: tweet.body, media_urls: tweet.media_urls
+    existing_tweet
   end
 end

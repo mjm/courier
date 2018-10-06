@@ -8,7 +8,8 @@ RSpec.describe TweetsController, type: :rpc do
       expect(response).to eq GetTweetsResponse.new(
         tweets: [
           tweets(:alice_example_post).to_message,
-          tweets(:alice_example_status2).to_message,
+          tweets(:alice_example_multiple2).to_message,
+          tweets(:alice_example_multiple1).to_message,
           tweets(:alice_example_status).to_message
         ]
       )

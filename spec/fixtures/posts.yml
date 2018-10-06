@@ -6,6 +6,14 @@ example_status:
   published_at: <%= Time.utc(2018, 2, 2).to_s(:db) %>
   modified_at: <%= Time.utc(2018, 2, 3).to_s(:db) %>
 
+example_multiple:
+  feed: example
+  item_id: eityuewrtyw
+  url: https://example.org/eityuewrtyw
+  content_html: <p>This is an example status post.</p>
+  published_at: <%= Time.utc(2018, 2, 2).to_s(:db) %>
+  modified_at: <%= Time.utc(2018, 2, 3).to_s(:db) %>
+
 example_untranslated:
   feed: example
   item_id: def
