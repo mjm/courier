@@ -27,3 +27,7 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 .form-text {
   padding: 6px 1px;
 }
+
+.is-grayscale {
+  filter: grayscale(1);
+}

@@ -137,14 +137,24 @@ tweetCard user postTweet now =
             editTweetCard user tweet now
 
         Saving _ tweet ->
-            savingTweetCard user tweet.post
+            savingTweetCard user tweet
 
 
 viewTweetCard : User -> Tweet -> Posix -> Html Message
 viewTweetCard user tweet now =
-    article [ class "card" ]
-        [ div [ class "card-content" ]
-            ([ tweetUserInfo user tweet.post
+    article
+        [ classList
+            [ ( "card", True )
+            , ( "has-background-light", useLightBackground tweet )
+            ]
+        ]
+        [ div
+            [ classList
+                [ ( "card-content", True )
+                , ( "is-grayscale", useLightBackground tweet )
+                ]
+            ]
+            ([ tweetUserInfo user tweet
              , p [ class "tweet-content" ] (linkify tweet.body)
              ]
                 ++ List.map viewMediaItem tweet.mediaUrls
@@ -162,6 +172,16 @@ viewTweetCard user tweet now =
         ]
 
 
+useLightBackground : Tweet -> Bool
+useLightBackground t =
+    case t.status of
+        Canceled ->
+            True
+
+        _ ->
+            False
+
+
 viewMediaItem : String -> Html Message
 viewMediaItem url =
     figure [ class "image is-128x128" ]
@@ -173,7 +193,7 @@ editTweetCard user tweet now =
     Html.form [ action "javascript:void(0);" ]
         [ article [ class "card" ]
             [ div [ class "card-content" ]
-                [ tweetUserInfo user tweet.post
+                [ tweetUserInfo user tweet
                 , div [ class "field" ]
                     [ div [ class "control" ]
                         [ textarea
@@ -191,11 +211,11 @@ editTweetCard user tweet now =
         ]
 
 
-savingTweetCard : User -> PostInfo -> Html Message
-savingTweetCard user post =
+savingTweetCard : User -> Tweet -> Html Message
+savingTweetCard user tweet =
     article [ class "card" ]
         [ div [ class "card-content" ]
-            [ tweetUserInfo user post
+            [ tweetUserInfo user tweet
             , p [ class "is-size-5 has-text-centered" ]
                 [ span [ class "icon is-medium" ]
                     [ i [ class "fas fa-spinner fa-spin" ] [] ]
@@ -337,11 +357,12 @@ editActions user tweet now =
            )
 
 
-tweetUserInfo : User -> PostInfo -> Html Message
-tweetUserInfo user post =
+tweetUserInfo : User -> Tweet -> Html Message
+tweetUserInfo user tweet =
     header [ class "media" ]
         [ div [ class "media-left" ]
-            [ figure [ class "image is-48x48" ]
+            [ figure
+                [ class "image is-48x48" ]
                 [ img [ src (User.avatarUrl user), class "is-rounded" ] [] ]
             ]
         , div [ class "media-content" ]
