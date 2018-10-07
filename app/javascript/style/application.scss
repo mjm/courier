@@ -1,5 +1,9 @@
 $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
-@import 'bulma/css/bulma.css';
+@import url('https://fonts.googleapis.com/css?family=Cabin:400,700');
+
+$family-sans-serif: "Cabin";
+
+@import '~bulma/bulma';
 @import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';
 @import '~@fortawesome/fontawesome-free/scss/brands.scss';
 @import '~@fortawesome/fontawesome-free/scss/solid.scss';
