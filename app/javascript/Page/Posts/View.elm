@@ -27,8 +27,8 @@ view model =
                 [ text "Upcoming Tweets" ]
             , hr [] []
             , if EList.isEmpty model.upcomingTweets then
-                p [ class "has-text-centered" ]
-                    [ text "You don't have any tweets waiting to be posted." ]
+                p [ class "is-size-5 has-text-centered" ]
+                    [ text "🎉 You don't have any tweets waiting to be posted. 🎉" ]
 
               else
                 div [] <|
@@ -43,7 +43,7 @@ view model =
                 [ text "Past Tweets" ]
             , hr [] []
             , if EList.isEmpty model.pastTweets then
-                p [ class "has-text-centered" ]
+                p [ class "is-size-5 has-text-centered" ]
                     [ text "You haven't posted any tweets with Courier." ]
 
               else
@@ -316,7 +316,8 @@ relativeETA date now =
 canceledActions : Tweet -> List (Html Message)
 canceledActions tweet =
     [ div [ class "card-footer-item" ]
-        [ span [] [ text "Canceled.\u{00A0}" ]
+        [ icon Solid "ban"
+        , span [] [ text "Canceled.\u{00A0}" ]
         , a [ onClick (UncancelTweet tweet) ] [ text "Undo?" ]
         ]
     ]
@@ -365,14 +366,14 @@ editActions user tweet now =
         [ class "card-footer-item"
         , onClick (SaveTweet tweet False)
         ]
-        [ span [] [ text "Save Draft" ] ]
+        [ icon Solid "check", span [] [ text "Save Draft" ] ]
     ]
         ++ (if Account.isActive user now then
                 [ a
                     [ class "card-footer-item"
                     , onClick (SaveTweet tweet True)
                     ]
-                    [ span [] [ text "Post Now " ] ]
+                    [ icon Solid "share", span [] [ text "Post Now " ] ]
                 ]
 
             else
