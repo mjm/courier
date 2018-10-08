@@ -9,6 +9,7 @@ import DateFormat.Relative exposing (relativeTime)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Html.Keyed as Keyed
 import Page
 import Page.Posts.Model exposing (Message(..), Model)
 import Time exposing (Posix)
@@ -31,7 +32,7 @@ view model =
                     [ text "🎉 You don't have any tweets waiting to be posted. 🎉" ]
 
               else
-                div [] <|
+                Keyed.node "div" [] <|
                     EList.map
                         (postEntry model.page.user model.page.now)
                         model.upcomingTweets
@@ -47,7 +48,7 @@ view model =
                     [ text "You haven't posted any tweets with Courier." ]
 
               else
-                div [] <|
+                Keyed.node "div" [] <|
                     EList.map
                         (postEntry model.page.user model.page.now)
                         model.pastTweets
@@ -90,9 +91,10 @@ subscriptionMessage user now =
             ]
 
 
-postEntry : User -> Posix -> Editable Tweet -> Html Message
+postEntry : User -> Posix -> Editable Tweet -> ( String, Html Message )
 postEntry user now tweet =
-    div []
+    ( String.fromInt (Editable.value tweet).id
+    , div []
         [ div [ class "columns" ]
             [ div [ class "column is-two-thirds" ]
                 [ tweetCard user tweet now ]
@@ -100,6 +102,7 @@ postEntry user now tweet =
                 [ postDetails tweet now ]
             ]
         ]
+    )
 
 
 postDetails : Editable Tweet -> Posix -> Html Message
