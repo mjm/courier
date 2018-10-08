@@ -105,9 +105,9 @@ compare a b =
 
 upcoming : List (Editable Tweet) -> List (Editable Tweet)
 upcoming =
-    Editable.filter (\t -> t.status == Draft)
+    Editable.sortWith compare << Editable.filter (\t -> t.status == Draft)
 
 
 past : List (Editable Tweet) -> List (Editable Tweet)
 past =
-    Editable.filter (\t -> t.status /= Draft)
+    Editable.sortWith compare << Editable.filter (\t -> t.status /= Draft)

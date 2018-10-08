@@ -1,4 +1,4 @@
-module Util.Editable exposing (Editable(..), cancel, edit, filter, save, saving, updateDraft, value)
+module Util.Editable exposing (Editable(..), cancel, edit, filter, save, saving, sortWith, updateDraft, value)
 
 {-| When viewing, this simply holds a value.
 
@@ -30,6 +30,11 @@ value x =
 filter : (a -> Bool) -> List (Editable a) -> List (Editable a)
 filter f xs =
     List.filter (\x -> f (value x)) xs
+
+
+sortWith : (a -> a -> Order) -> List (Editable a) -> List (Editable a)
+sortWith cmp =
+    List.sortWith (\x y -> cmp (value x) (value y))
 
 
 transform : (a -> Editable a) -> (a -> a -> Editable a) -> (a -> a -> Editable a) -> List (Editable a) -> List (Editable a)
