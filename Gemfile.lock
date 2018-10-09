@@ -106,6 +106,7 @@ GEM
     http_parser.rb (0.6.0)
     i18n (1.1.0)
       concurrent-ruby (~> 1.0)
+    idn-ruby (0.1.0)
     json (2.1.0)
     jwt (2.1.0)
     listen (3.1.5)
@@ -279,6 +280,9 @@ GEM
       multipart-post (~> 2.0)
       naught (~> 1.0)
       simple_oauth (~> 0.3.0)
+    twitter-text (2.1.0)
+      idn-ruby
+      unf (~> 0.1.0)
     typhoeus (1.3.0)
       ethon (>= 0.9.0)
     tzinfo (1.2.5)
@@ -346,6 +350,7 @@ DEPENDENCIES
   timecop
   twirp
   twitter
+  twitter-text
   typhoeus
   uglifier (>= 1.3.0)
   web-console (>= 3.3.0)
