@@ -6,9 +6,9 @@ class AllowedUsers
     @users = user_string.split(',')
 
     if users.empty?
-      logger.info "Only allowing Twitter users: #{users.join(' ')}"
-    else
       logger.info 'Allowing all Twitter users'
+    else
+      logger.info "Only allowing Twitter users: #{users.join(' ')}"
     end
   end
 
