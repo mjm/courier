@@ -16,7 +16,7 @@ class AllowedUsers
     if users.empty?
       true
     else
-      users.include?(username)
+      users.include?(username.downcase)
     end
   end
 end

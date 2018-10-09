@@ -23,12 +23,12 @@ RSpec.describe AllowedUsers do
   end
 
   context 'when the users to allow is present' do
-    let(:allowed_users) { 'abc,def,ghi' }
+    let(:allowed_users) { 'abc,DEF,ghi' }
 
     it 'allows the usernames in the list' do
       expect(subject.include?('abc')).to be true
       expect(subject.include?('def')).to be true
-      expect(subject.include?('ghi')).to be true
+      expect(subject.include?('GHI')).to be true
     end
 
     it 'denies any usernames that are not in the list' do
