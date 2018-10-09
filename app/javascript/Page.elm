@@ -304,7 +304,17 @@ navbarMenu page =
         [ class "navbar-menu"
         , classList [ ( "is-active", page.navbar.isMenuOpen ) ]
         ]
-        [ div [ class "navbar-end" ]
+        [ div [ class "navbar-start" ]
+            [ a
+                [ class "navbar-item"
+                , href "/"
+                ]
+                [ span [ class "icon is-hidden-desktop" ]
+                    [ i [ class "fas fa-tachometer-alt" ] [] ]
+                , span [] [ text "Dashboard" ]
+                ]
+            ]
+        , div [ class "navbar-end" ]
             [ profileNavbarItem page ]
         ]
 
