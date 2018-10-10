@@ -1,4 +1,5 @@
 require 'translator'
+require 'tweet_splitter'
 
 class TranslateTweetWorker
   include Sidekiq::Worker
@@ -21,11 +22,16 @@ class TranslateTweetWorker
   private
 
   def translated_tweets
-    Translator.new(
+    tweet = Translator.translate(
       title: post.title,
       url: post.url,
       content_html: post.content_html
-    ).tweets
+    )
+    first, *rest = TweetSplitter.split(tweet.body)
+
+    # For now, just put all media on the first tweet
+    first_tweet = Translator::Tweet.new(first, tweet.media_urls)
+    [first_tweet] + rest.map { |t| Translator::Tweet.new(t, []) }
   end
 
   def existing_tweets_for(subscription)

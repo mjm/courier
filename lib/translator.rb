@@ -13,16 +13,17 @@ class Translator
     @content_html = content_html
   end
 
-  def tweets
-    translate
-    @tweets
+  def self.translate(*args)
+    new(*args).tweet
+  end
+
+  def tweet
+    @tweet ||= translate
   end
 
   private
 
   def translate
-    return if @tweets
-
     if title.present? && url.present?
       translate_with_title
     else
@@ -31,12 +32,12 @@ class Translator
   end
 
   def translate_with_title
-    @tweets = [Tweet.new("#{title} #{url}", [])]
+    Tweet.new("#{title} #{url}", [])
   end
 
   def translate_without_title
     parser.parse(content_html)
-    @tweets = [Tweet.new(document.contents, document.media_urls)]
+    Tweet.new(document.contents, document.media_urls)
   end
 
   def document
