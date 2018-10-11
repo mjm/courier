@@ -62,17 +62,17 @@ RSpec.describe Feed, type: :model do
     end
 
     context 'when the feed is registered to another user' do
-      let(:feed) do
-        Feed.register(users(:bob), url: 'https://example.org/feed.json')
-      end
+      let(:subscription) { create(:feed_subscription) }
+      let(:user) { create(:user) }
+      let(:feed) { Feed.register(user, url: subscription.feed.url) }
 
       it 'does not create a new feed' do
-        expect(feed).to eq feeds(:example)
+        expect(feed).to eq subscription.feed
       end
 
       it 'creates a subscription for the user registering' do
         feed
-        expect(users(:bob).feed_ids).to include(feed.id)
+        expect(user.feed_ids).to include(feed.id)
       end
     end
   end

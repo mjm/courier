@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe FeedSubscription, type: :model do
-  subject { FeedSubscription.new }
+  subject { create(:feed_subscription) }
 
   describe '#autopost_delay' do
     context 'when set to autopost' do
-      before { subject.autopost = true }
+      subject { create(:feed_subscription, :autopost) }
 
       it 'is five minutes' do
         expect(subject.autopost_delay).to eq 5.minutes
@@ -20,8 +20,6 @@ RSpec.describe FeedSubscription, type: :model do
   end
 
   describe 'updating settings' do
-    subject { feed_subscriptions(:alice_example) }
-
     context 'autopost' do
       it 'does not change the setting when :UNCHANGED' do
         expect(subject.autopost).to be false
@@ -47,14 +45,19 @@ RSpec.describe FeedSubscription, type: :model do
   end
 
   describe '#to_message' do
+    subject {
+      create(:feed_subscription, :autopost,
+             feed: create(:feed, :cached,
+                          refreshed_at: Time.utc(2018, 1, 1)))
+    }
+    let(:feed) { subject.feed }
+
     it 'represents a feed with settings included' do
-      sub = feed_subscriptions(:bob_refreshed_example)
-      feed = sub.feed
-      expect(sub.to_message).to eq FeedMessage.new(
+      expect(subject.to_message).to eq FeedMessage.new(
         id: feed.id,
-        url: 'https://example.com/feed.json',
-        title: 'Example.com',
-        home_page_url: 'https://example.com/',
+        url: feed.url,
+        title: 'Example Web Site',
+        home_page_url: feed.home_page_url,
         refreshed_at: '2018-01-01T00:00:00Z',
         created_at: feed.created_at.to_s(:iso8601),
         updated_at: feed.updated_at.to_s(:iso8601),
