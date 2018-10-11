@@ -3,50 +3,43 @@ require 'rails_helper'
 RSpec.describe Feed, type: :model do
   describe '#to_message' do
     it 'represents a simple feed' do
-      feed = feeds(:example)
+      feed = create(:feed)
       expect(feed.to_message).to eq FeedMessage.new(
         id: feed.id,
-        url: 'https://example.org/feed.json',
-        title: 'Example.org',
-        home_page_url: 'https://example.org/',
+        url: feed.url,
+        status: :REFRESHING,
         created_at: feed.created_at.to_s(:iso8601),
         updated_at: feed.updated_at.to_s(:iso8601)
       )
     end
 
-    it 'represents a refreshed feed' do
-      feed = feeds(:refreshed_example)
+    it 'represents a feed that has been loaded' do
+      feed = create(:feed, :loaded,
+                    refreshed_at: Time.utc(2018, 1, 1))
       expect(feed.to_message).to eq FeedMessage.new(
         id: feed.id,
-        url: 'https://example.com/feed.json',
-        title: 'Example.com',
-        home_page_url: 'https://example.com/',
+        url: feed.url,
+        title: 'Example Web Site',
+        home_page_url: feed.home_page_url,
         refreshed_at: '2018-01-01T00:00:00Z',
         created_at: feed.created_at.to_s(:iso8601),
         updated_at: feed.updated_at.to_s(:iso8601)
       )
     end
 
-    it 'represents a refreshing feed' do
-      feed = feeds(:example)
-      feed.refreshing!
-      msg = feed.to_message
-      expect(msg.status).to eq :REFRESHING
-    end
-
     it 'represents a failed feed' do
-      feed = feeds(:example)
-      feed.update! status: :failed, refresh_message: 'Foo bar'
+      feed = create(:feed, :failed)
       msg = feed.to_message
       expect(msg.status).to eq :FAILED
-      expect(msg.refresh_message).to eq 'Foo bar'
+      expect(msg.refresh_message).to eq 'Could not load feed'
     end
   end
 
   describe '.register' do
     context 'when the feed has never been registered' do
+      let(:user) { create(:user) }
       let(:feed) do
-        Feed.register(users(:alice), url: 'https://foo.example.org/feed.json')
+        Feed.register(user, url: 'https://foo.example.org/feed.json')
       end
 
       it 'creates a new feed' do
@@ -59,7 +52,7 @@ RSpec.describe Feed, type: :model do
 
       it 'creates a subscription for the user registering' do
         feed
-        expect(users(:alice).feed_ids).to include(feed.id)
+        expect(user.feed_ids).to include(feed.id)
       end
 
       it 'enqueues a job to load the contents of the feed' do
@@ -85,7 +78,7 @@ RSpec.describe Feed, type: :model do
   end
 
   describe '#refresh' do
-    let(:feed) { feeds(:example) }
+    let(:feed) { create(:feed, :loaded) }
 
     it 'sets the feed status to refreshing' do
       feed.refresh

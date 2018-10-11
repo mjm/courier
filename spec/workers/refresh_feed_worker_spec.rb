@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe RefreshFeedWorker, type: :worker do
-  let(:feed) { feeds(:example) }
+  let(:feed) { create(:feed) }
   let(:downloader) { instance_double('FeedDownloader', feed: downloaded_feed) }
   let(:downloaded_feed) do
     FeedDownloader::Feed.new(
@@ -23,7 +23,7 @@ RSpec.describe RefreshFeedWorker, type: :worker do
   it 'downloads posts from the feed URL' do
     subject.perform(feed.id)
     expect(FeedDownloader).to have_received(:new).with(
-      'https://example.org/feed.json',
+      feed.url,
       etag: nil,
       last_modified: nil,
       logger: an_instance_of(Logger)
@@ -44,19 +44,24 @@ RSpec.describe RefreshFeedWorker, type: :worker do
     expect(feed.home_page_url).to eq 'https://example.com/'
   end
 
-  it 'sets the feed status to succeeded' do
-    feed.failed!
-    subject.perform(feed.id)
-    expect(feed.reload).to be_succeeded
-  end
+  context 'when the feed had failed before' do
+    let(:feed) { create(:feed, :failed) }
 
-  it 'clears the refresh message on the feed' do
-    feed.update! refresh_message: 'Foo bar'
-    subject.perform(feed.id)
-    expect(feed.reload.refresh_message).to be_blank
+    it 'sets the feed status to succeeded' do
+      feed.failed!
+      subject.perform(feed.id)
+      expect(feed.reload).to be_succeeded
+    end
+
+    it 'clears the refresh message on the feed' do
+      feed.update! refresh_message: 'Foo bar'
+      subject.perform(feed.id)
+      expect(feed.reload.refresh_message).to be_blank
+    end
   end
 
   context 'when the feed has new posts' do
+    let(:feed) { feeds(:example) }
     let(:first_post) do
       {
         item_id: 'abc',
@@ -113,11 +118,11 @@ RSpec.describe RefreshFeedWorker, type: :worker do
   end
 
   context 'when the feed has been fetched before' do
-    let(:feed) { feeds(:refreshed_example) }
+    let(:feed) { create(:feed, :cached) }
 
     it 'passes the caching headers to the feed downloader' do
       expect(FeedDownloader).to receive(:new).with(
-        'https://example.com/feed.json',
+        feed.url,
         etag: '"abcdef"',
         last_modified: 'Mon Sep 10 19:12:35 CDT 2018',
         logger: an_instance_of(Logger)
@@ -127,7 +132,7 @@ RSpec.describe RefreshFeedWorker, type: :worker do
   end
 
   context 'when the downloaded feed is not modified' do
-    let(:feed) { feeds(:refreshed_example) }
+    let(:feed) { create(:feed, :cached) }
     let(:downloaded_feed) { nil } # FeedDownloader returns nil for 304
 
     it 'updates the refreshed_at time of the feed' do
@@ -143,10 +148,11 @@ RSpec.describe RefreshFeedWorker, type: :worker do
     end
 
     it 'does not change the site information fields in the feed' do
+      old_home_page = feed.home_page_url
       subject.perform(feed.id)
       feed.reload
-      expect(feed.title).to eq 'Example.com'
-      expect(feed.home_page_url).to eq 'https://example.com/'
+      expect(feed.title).to eq 'Example Web Site'
+      expect(feed.home_page_url).to eq old_home_page
     end
 
     it 'only requests the feed once' do
