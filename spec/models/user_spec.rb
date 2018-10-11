@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
+  subject { create(:user) }
+
   it_behaves_like 'billable'
 
   describe '#from_omniauth' do
@@ -38,19 +40,20 @@ RSpec.describe User, type: :model do
     end
 
     context 'when the user has logged in before' do
+      let(:alice) { create(:user) }
       before do
-        auth.uid = 'alice123'
+        auth.uid = alice.uid
       end
 
       it 'does not create a new user' do
         expect { user }.not_to(change { User.count })
-        expect(user).to eq users(:alice)
+        expect(user).to eq alice
       end
 
       it 'updates the information from the auth hash' do
         expect(user.reload).to have_attributes(
           provider: 'twitter',
-          uid: 'alice123',
+          uid: '12345',
           username: 'example123',
           name: 'Example 123',
           twitter_access_token: 'fake token',
@@ -72,6 +75,34 @@ RSpec.describe User, type: :model do
 
       it 'raises an error' do
         expect { user }.to raise_error(User::LoginNotAllowed)
+      end
+    end
+  end
+
+  describe '#to_message' do
+    context 'when the user does not have a subscription' do
+      it 'creates a valid message' do
+        expect(subject.to_message).to eq UserMessage.new(
+          username: 'alice',
+          name: 'Alice'
+        )
+      end
+    end
+
+    context 'when the user has an active subscription' do
+      subject {
+        create(:user, :active,
+               subscription_renews_at: Time.utc(2018, 1, 1))
+      }
+
+      it 'creates a valid message' do
+        expect(subject.to_message).to eq UserMessage.new(
+          username: 'alice',
+          name: 'Alice',
+          subscribed: true,
+          subscription_renews_at: '2018-01-01T00:00:00Z',
+          subscription_expires_at: '2018-01-02T00:00:00Z'
+        )
       end
     end
   end

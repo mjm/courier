@@ -51,6 +51,7 @@ gem 'bootsnap', '>= 1.1.0', require: false
 group :development, :test do
   gem 'action-cable-testing'
   gem 'byebug'
+  gem 'factory_bot_rails'
   gem 'rspec-rails', '~> 3.8'
   gem 'stripe-ruby-mock', '~> 2.5', require: 'stripe_mock'
   gem 'timecop'
