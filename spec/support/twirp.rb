@@ -27,7 +27,7 @@ end
 
 RSpec.shared_examples 'a request from another user' do
   context 'when a different user is logged in' do
-    let(:current_user) { users(:bob) }
+    let(:current_user) { create(:user) }
 
     it 'returns a forbidden response' do
       expect(response).to be_a_twirp_error :permission_denied
@@ -45,7 +45,7 @@ module RPCHelpers
     super
     base.subject { described_class.service }
     base.let(:request) { {} }
-    base.let(:current_user) { users(:alice) }
+    base.let(:current_user) { create(:user) }
     base.let(:env) { { user: current_user } }
   end
 end

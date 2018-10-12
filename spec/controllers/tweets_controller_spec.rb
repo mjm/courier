@@ -1,20 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe TweetsController, type: :rpc do
-  fixtures :all
-
   describe '#get_tweets' do
     rpc_method :GetTweets
+    let(:current_user) { create(:user, :with_feed) }
+    let(:subscription) { current_user.feed_subscriptions.reload.first }
+
+    let!(:tweets) {
+      [5.seconds.ago, 5.minutes.ago, 5.hours.ago].map { |x|
+        post = create(:post, feed: subscription.feed, published_at: x)
+        create(:tweet, post: post, feed_subscription: subscription)
+      }
+    }
+    let(:messages) { tweets.map(&:to_message) }
 
     it 'responds with a list of tweets in descending order of publication' do
-      expect(response).to eq GetTweetsResponse.new(
-        tweets: [
-          tweets(:alice_example_post).to_message,
-          tweets(:alice_example_multiple2).to_message,
-          tweets(:alice_example_multiple1).to_message,
-          tweets(:alice_example_status).to_message
-        ]
-      )
+      expect(response).to eq GetTweetsResponse.new(tweets: messages)
     end
 
     include_examples 'an unauthenticated request'
@@ -32,7 +33,7 @@ RSpec.describe TweetsController, type: :rpc do
 
   shared_examples 'a request from a different user' do
     context 'when the tweet belongs to someone else' do
-      let(:current_user) { users(:bob) }
+      let(:current_user) { create(:user) }
 
       it 'responds with a not found error' do
         expect(response).to be_a_twirp_error :not_found
@@ -42,7 +43,8 @@ RSpec.describe TweetsController, type: :rpc do
 
   describe '#cancel_tweet' do
     rpc_method :CancelTweet
-    let(:tweet) { tweets(:alice_example_status) }
+    let(:tweet) { create(:tweet) }
+    let(:current_user) { tweet.user }
     let(:request) { { id: tweet.id } }
 
     it 'moves the tweet to the canceled status' do
@@ -61,12 +63,9 @@ RSpec.describe TweetsController, type: :rpc do
 
   describe '#uncancel_tweet' do
     rpc_method :UncancelTweet
-    let(:tweet) { tweets(:alice_example_status) }
+    let(:tweet) { create(:tweet, :canceled) }
+    let(:current_user) { tweet.user }
     let(:request) { { id: tweet.id } }
-
-    before do
-      tweet.canceled!
-    end
 
     it 'moves the tweet to the draft status' do
       response
@@ -84,7 +83,8 @@ RSpec.describe TweetsController, type: :rpc do
 
   describe '#update_tweet' do
     rpc_method :UpdateTweet
-    let(:tweet) { tweets(:alice_example_status) }
+    let(:tweet) { create(:tweet) }
+    let(:current_user) { tweet.user }
     let(:request) { { id: tweet.id, body: 'Foo bar baz' } }
 
     it 'updates the body of the tweet' do
@@ -122,7 +122,8 @@ RSpec.describe TweetsController, type: :rpc do
 
   describe '#post_tweet' do
     rpc_method :PostTweet
-    let(:tweet) { tweets(:alice_example_status) }
+    let(:tweet) { create(:tweet) }
+    let(:current_user) { tweet.user }
     let(:request) { { id: tweet.id } }
 
     it 'enqueues a job to post the tweet' do

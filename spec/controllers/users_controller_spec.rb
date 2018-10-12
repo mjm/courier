@@ -1,8 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe UsersController, type: :rpc do
-  fixtures :all
-
+  let(:current_user) { create(:user) }
   let(:stripe_helper) { StripeMock.create_test_helper }
 
   describe '#create_subscription' do
