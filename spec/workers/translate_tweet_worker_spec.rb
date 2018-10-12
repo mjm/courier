@@ -16,25 +16,27 @@ RSpec.describe TranslateTweetWorker, type: :worker do
   end
 
   context 'when the tweet has not been translated' do
-    let(:post) { posts(:example_untranslated) }
+    let(:post) { create(:post, :subscribed) }
+    let(:subscription) { post.feed.feed_subscriptions.reload.first }
 
     it 'creates a new translated tweet for the post' do
       subject.perform(post.id)
       expect(tweet).to have_attributes(
-        body: 'Foo bar baz',
-        feed_subscription_id: feed_subscriptions(:alice_example).id,
+        body: 'This is some content.',
+        feed_subscription_id: subscription.id,
         post_id: post.id
       )
     end
 
     context 'when autopost is disabled' do
       it 'does not enqueue any jobs to post new tweets' do
+        subject.perform(post.id)
         expect(PostTweetsWorker).not_to have_enqueued_sidekiq_job
       end
     end
 
     context 'when autopost is enabled' do
-      before { feed_subscriptions(:alice_example).update! autopost: true }
+      before { subscription.update! autopost: true }
 
       it 'does not enqueue any jobs to post new tweets' do
         subject.perform(post.id)
@@ -85,7 +87,7 @@ RSpec.describe TranslateTweetWorker, type: :worker do
   end
 
   context 'when the tweet has media URLs' do
-    let(:post) { posts(:example_images) }
+    let(:post) { create(:post, :subscribed, :image) }
 
     it 'adds the media URLs to the created tweet' do
       subject.perform(post.id)

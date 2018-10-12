@@ -33,5 +33,15 @@ FactoryBot.define do
         feed.update! status: :failed
       end
     end
+
+    trait :with_posts do
+      transient do
+        posts_count { 3 }
+      end
+
+      after(:create) do |feed, evaluator|
+        create_list(:post, evaluator.posts_count, feed: feed)
+      end
+    end
   end
 end

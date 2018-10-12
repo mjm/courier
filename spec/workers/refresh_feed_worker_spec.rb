@@ -61,10 +61,12 @@ RSpec.describe RefreshFeedWorker, type: :worker do
   end
 
   context 'when the feed has new posts' do
-    let(:feed) { feeds(:example) }
+    let(:feed) { create(:feed, :with_posts) }
+    let(:existing_post) { feed.posts.first }
+
     let(:first_post) do
       {
-        item_id: 'abc',
+        item_id: existing_post.item_id,
         title: 'Foo',
         content_text: 'bar baz',
         content_html: '',
@@ -99,7 +101,7 @@ RSpec.describe RefreshFeedWorker, type: :worker do
 
     it 'updates an existing post' do
       subject.perform(feed.id)
-      expect(posts(:example_status)).to have_attributes(
+      expect(existing_post.reload).to have_attributes(
         title: 'Foo',
         content_text: 'bar baz',
         content_html: '',
@@ -113,7 +115,7 @@ RSpec.describe RefreshFeedWorker, type: :worker do
 
       expect(TranslateTweetWorker).to have_enqueued_sidekiq_job(new_post.id)
       expect(TranslateTweetWorker)
-        .to have_enqueued_sidekiq_job(posts(:example_status).id)
+        .to have_enqueued_sidekiq_job(existing_post.id)
     end
   end
 

@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :feed_subscription do
-    user
+    association :user, :active
     association :feed, :cached
 
     trait :autopost do
