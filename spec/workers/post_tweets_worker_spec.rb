@@ -10,6 +10,7 @@ RSpec.describe PostTweetsWorker, type: :worker do
   let(:ids) { tweets_to_post.map(&:id) }
 
   STATUS_UPDATE_URL = 'https://api.twitter.com/1.1/statuses/update.json'.freeze
+  UPLOAD_URL = 'https://upload.twitter.com/1.1/media/upload.json'.freeze
 
   before do
     subject.jid = 'abc'
@@ -85,6 +86,40 @@ RSpec.describe PostTweetsWorker, type: :worker do
     it 'does not post the tweet' do
       subject.perform(ids)
       expect(a_request(:post, STATUS_UPDATE_URL)).not_to have_been_made
+    end
+  end
+
+  context 'when the tweet has a media URL' do
+    let(:tweets_to_post) { [create(:tweet, :queued, :image)] }
+    let(:image_url) { 'https://example.org/media/foo.jpg' }
+
+    before do
+      stub_request(:get, image_url).to_return(body: 'asdf')
+      stub_request(:post, UPLOAD_URL).to_return(
+        body: File.new(file_fixture('upload.json')),
+        headers: { content_type: 'application/json; charset=utf8' }
+      )
+    end
+
+    it 'downloads the file at the media URL' do
+      subject.perform(ids)
+      expect(a_request(:get, image_url)).to have_been_made
+    end
+
+    it 'uploads the file to Twitter' do
+      subject.perform(ids)
+      expect(a_request(:post, UPLOAD_URL)).to have_been_made
+    end
+
+    it 'attaches the uploaded media item to the posted tweet' do
+      subject.perform(ids)
+      expect(a_request(:post, STATUS_UPDATE_URL)
+        .with(
+          body: {
+            status: 'This is some content.',
+            media_ids: '470030289822314497'
+          }
+        )).to have_been_made
     end
   end
 end

@@ -19,5 +19,10 @@ FactoryBot.define do
       posted_tweet_id { '12345' }
       posted_at { 1.second.ago }
     end
+
+    trait :image do
+      association :post, :subscribed, :image
+      media_urls { ['https://example.org/media/foo.jpg'] }
+    end
   end
 end
