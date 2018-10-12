@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe TweetsController, type: :rpc do
+  fixtures :all
+
   describe '#get_tweets' do
     rpc_method :GetTweets
 

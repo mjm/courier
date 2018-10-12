@@ -3,6 +3,8 @@ require 'rails_helper'
 require 'webmock/rspec'
 
 RSpec.describe PostTweetsWorker, type: :worker do
+  fixtures :all
+
   let(:tweets_to_post) do
     [
       tweets(:alice_example_multiple1),
