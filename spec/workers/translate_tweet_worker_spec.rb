@@ -4,7 +4,8 @@ RSpec.describe TranslateTweetWorker, type: :worker do
   let(:tweet) { post.tweets.first }
 
   context 'when the tweet has already been translated' do
-    let(:post) { posts(:example_status) }
+    let!(:tweet) { create(:tweet) }
+    let(:post) { tweet.post }
 
     it 'does not create any new tweets' do
       expect { subject.perform(post.id) }.not_to(change { Tweet.count })
@@ -46,10 +47,9 @@ RSpec.describe TranslateTweetWorker, type: :worker do
   end
 
   context 'when the post has been updated since being translated originally' do
-    let(:post) { posts(:example_status) }
-    let(:tweet) { tweets(:alice_example_status) }
-    before { post.update! content_html: '<p>This was a triumph!</p>' }
-    before { feed_subscriptions(:alice_example).update! autopost: true }
+    let!(:tweet) { create(:tweet, body: 'This is some old content.') }
+    let(:post) { tweet.post }
+    before { tweet.feed_subscription.update! autopost: true }
 
     context 'and the tweet is still a draft' do
       it 'does not create any new tweets' do
@@ -58,7 +58,7 @@ RSpec.describe TranslateTweetWorker, type: :worker do
 
       it 'updates the body of the tweet with the new translation' do
         subject.perform(post.id)
-        expect(tweet.reload.body).to eq 'This was a triumph!'
+        expect(tweet.reload.body).to eq 'This is some content.'
       end
 
       it 'enqueues a new job to post the tweet' do

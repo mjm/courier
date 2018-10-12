@@ -2,24 +2,56 @@ require 'rails_helper'
 
 RSpec.describe Tweet, type: :model do
   describe '#to_message' do
-    it 'represents a simple tweet' do
-      tweet = tweets(:alice_example_status)
-      expect(tweet.to_message).to eq TweetMessage.new(
-        id: tweet.id,
-        body: 'This is an example status post.',
-        post: PostMessage.new(
-          id: posts(:example_status).id,
-          url: 'https://example.org/abc',
-          published_at: '2018-02-02T00:00:00Z',
-          modified_at: '2018-02-03T00:00:00Z'
-        ),
-        feed: feeds(:example).to_message
-      )
+    let(:message) { subject.to_message }
+
+    context 'when the tweet is a draft' do
+      subject { create(:tweet) }
+
+      it 'represents the tweet' do
+        expect(message).to eq TweetMessage.new(
+          id: subject.id,
+          body: 'This is some content.',
+          post: subject.post.to_message,
+          feed: subject.feed.to_message
+        )
+      end
+    end
+
+    context 'when the tweet is queued' do
+      subject { create(:tweet, :queued, will_post_at: Time.utc(2018, 1, 1)) }
+
+      it 'includes the expected post date' do
+        expect(message.will_post_at).to eq '2018-01-01T00:00:00Z'
+      end
+    end
+
+    context 'when the tweet is canceled' do
+      subject { create(:tweet, :canceled) }
+
+      it 'includes the correct status' do
+        expect(message.status).to eq :CANCELED
+      end
+    end
+
+    context 'when the tweet is posted' do
+      subject { create(:tweet, :posted, posted_at: Time.utc(2018, 1, 1)) }
+
+      it 'includes the correct status' do
+        expect(message.status).to eq :POSTED
+      end
+
+      it 'includes the ID of the posted tweet' do
+        expect(message.posted_tweet_id).to eq '12345'
+      end
+
+      it 'includes the timestamp when the tweet was posted' do
+        expect(message.posted_at).to eq '2018-01-01T00:00:00Z'
+      end
     end
   end
 
   describe 'changing status' do
-    subject { tweets(:alice_example_status) }
+    subject { create(:tweet) }
 
     it 'changes from draft to canceled' do
       subject.canceled!
@@ -58,9 +90,9 @@ RSpec.describe Tweet, type: :model do
 
   # rubocop:disable Rails/TimeZone
   describe 'posting tweets to Twitter' do
-    let(:the_tweets) { [tweets(:alice_example_post)] }
-    let(:tweet_ids) { [tweets(:alice_example_post).id] }
-    before { Timecop.freeze(2018) }
+    let(:the_tweets) { [create(:tweet)] }
+    let(:tweet_ids) { the_tweets.map(&:id) }
+    before { Timecop.freeze }
     after { Timecop.return }
 
     it 'enqueues a job to post the tweets' do
@@ -94,7 +126,9 @@ RSpec.describe Tweet, type: :model do
     end
 
     context 'when the user is not currently subscribed' do
-      before { users(:alice).update! subscription_expires_at: 1.day.ago }
+      before do
+        the_tweets.first.user.update! subscription_expires_at: 1.day.ago
+      end
 
       it 'does not enqueue a job' do
         Tweet.post_to_twitter(the_tweets)
@@ -105,11 +139,12 @@ RSpec.describe Tweet, type: :model do
   # rubocop:enable Rails/TimeZone
 
   describe 'creating a new tweet' do
-    let(:post) { posts(:example_untranslated) }
-    let(:user) { users(:alice) }
+    let(:post) { create(:post, :subscribed) }
+    let(:subscription) { post.feed.feed_subscriptions.reload.first }
+    let(:user) { subscription.user }
     subject {
       post.tweets.create(
-        feed_subscription: feed_subscriptions(:alice_example),
+        feed_subscription: subscription,
         body: 'Foo bar baz'
       )
     }
@@ -122,20 +157,23 @@ RSpec.describe Tweet, type: :model do
     end
 
     it 'does not broadcast to other users' do
-      expect { subject }.not_to broadcast_to("events:#{users(:bob).id}")
+      other_user = create(:user)
+      expect { subject }.not_to broadcast_to("events:#{other_user.id}")
     end
   end
 
   describe 'updating a tweet' do
-    let(:user) { users(:alice) }
-    subject { tweets(:alice_example_status).canceled! }
+    let(:tweet) { create(:tweet) }
+    let(:user) { tweet.user }
+    subject { tweet.canceled! }
 
     it 'broadcasts an event to the user' do
       expect { subject }.to broadcast_to("events:#{user.id}")
     end
 
     it 'does not broadcast to other users' do
-      expect { subject }.not_to broadcast_to("events:#{users(:bob).id}")
+      other_user = create(:user)
+      expect { subject }.not_to broadcast_to("events:#{other_user.id}")
     end
   end
 end
