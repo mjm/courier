@@ -29,7 +29,11 @@ RSpec.describe PostTweetsWorker, type: :worker do
     ).to have_been_made
     expect(
       a_request(:post, STATUS_UPDATE_URL).with(
-        body: { status: 'Second tweet!', media_ids: '' }
+        body: {
+          status: 'Second tweet!',
+          media_ids: '',
+          in_reply_to_status_id: '540897316908331009'
+        }
       )
     ).to have_been_made
   end

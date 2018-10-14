@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 
 ruby '2.5.1'
 
+gem 'acts_as_list'
 gem 'addressable'
 gem 'bunny'
 gem 'devise'

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_02_020211) do
+ActiveRecord::Schema.define(version: 2018_10_14_001926) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -69,6 +69,7 @@ ActiveRecord::Schema.define(version: 2018_10_02_020211) do
     t.string "post_job_id"
     t.datetime "will_post_at"
     t.string "media_urls", default: [], array: true
+    t.integer "position", default: 0, null: false
     t.index ["feed_subscription_id"], name: "index_tweets_on_feed_subscription_id"
     t.index ["post_id"], name: "index_tweets_on_post_id"
   end

@@ -25,7 +25,8 @@ RSpec.describe TranslateTweetWorker, type: :worker do
       expect(tweet).to have_attributes(
         body: 'This is some content.',
         feed_subscription_id: subscription.id,
-        post_id: post.id
+        post_id: post.id,
+        position: 1
       )
     end
 

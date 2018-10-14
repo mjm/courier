@@ -5,6 +5,8 @@ class Tweet < ApplicationRecord
   delegate :feed, to: :post
   delegate :user, to: :feed_subscription
 
+  acts_as_list scope: %i[post_id feed_subscription_id]
+
   enum status: %i[draft canceled posted]
   validate :valid_status_change
 
