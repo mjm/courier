@@ -24,75 +24,162 @@ RSpec.describe FeedDownloader do
     end
   end
 
-  context 'when the feed can be loaded successfully' do
-    context 'and the feed has no items' do
-      before do
-        download_request.to_return(status: 200, body: empty_feed_content)
+  context 'when the feed is a JSON feed' do
+    context 'when the feed can be loaded successfully' do
+      context 'and the feed has no items' do
+        before do
+          download_request.to_return(
+            status: 200,
+            body: empty_feed_content,
+            headers: { content_type: 'application/json' }
+          )
+        end
+
+        it 'attempts to get the feed' do
+          subject.feed
+          expect(WebMock).to have_requested(:get, url)
+            .with(headers: { 'If-None-Match' => '"asdf"',
+                             'If-Modified-Since' => 'fake date' })
+        end
+
+        it 'returns a feed with no posts' do
+          expect(subject.feed.posts).to be_empty
+        end
+
+        it 'includes some information about the site' do
+          expect(subject.feed.title).to eq 'Example Blog'
+          expect(subject.feed.home_page_url).to be_nil
+        end
       end
 
-      it 'attempts to get the feed' do
-        subject.feed
-        expect(WebMock).to have_requested(:get, url)
-          .with(headers: { 'If-None-Match' => '"asdf"',
-                           'If-Modified-Since' => 'fake date' })
-      end
+      context 'and the feed has items' do
+        before do
+          download_request.to_return(status: 200,
+                                     body: feed_content,
+                                     headers: {
+                                       'Content-Type' => 'application/json',
+                                       'Etag' => '"asdf"',
+                                       'Last-Modified' => 'fake date'
+                                     })
+        end
 
-      it 'returns a feed with no posts' do
-        expect(subject.feed.posts).to be_empty
-      end
+        it 'attempts to get the feed' do
+          subject.feed
+          expect(download_request).to have_been_requested
+        end
 
-      it 'includes some information about the site' do
-        expect(subject.feed.title).to eq 'Example Blog'
-        expect(subject.feed.home_page_url).to be_nil
+        it 'returns a feed with posts' do
+          expect(subject.feed.posts).to eq [
+            {
+              item_id: '123',
+              title: '',
+              url: '',
+              content_html: '',
+              content_text: 'This is some content.',
+              published_at: Time.utc(2018, 7, 20, 19, 14, 38),
+              modified_at: Time.utc(2018, 7, 20, 19, 14, 38)
+            },
+            {
+              item_id: '124',
+              title: 'My Fancy Post Title',
+              url: 'https://example.com/my-fancy-post-title',
+              content_html: '<p>I have some thoughts <em>about things</em>!</p>',
+              content_text: '',
+              published_at: nil,
+              modified_at: nil
+            }
+          ]
+        end
+
+        it 'includes the caching headers in the feed' do
+          expect(subject.feed.etag).to eq '"asdf"'
+          expect(subject.feed.last_modified).to eq 'fake date'
+        end
+
+        it 'includes information about the site' do
+          expect(subject.feed.title).to eq 'Example Blog'
+          expect(subject.feed.home_page_url).to eq 'https://example.com/'
+        end
       end
     end
+  end
 
-    context 'and the feed has items' do
-      before do
-        download_request.to_return(status: 200,
-                                   body: feed_content,
-                                   headers: {
-                                     'Etag' => '"asdf"',
-                                     'Last-Modified' => 'fake date'
-                                   })
+  context 'when the feed is an RSS feed' do
+    context 'when the feed can be loaded successfully' do
+      context 'and the feed has no items' do
+        before do
+          download_request.to_return(
+            status: 200,
+            body: empty_rss_content,
+            headers: { content_type: 'application/rss+xml' }
+          )
+        end
+
+        it 'attempts to get the feed' do
+          subject.feed
+          expect(WebMock).to have_requested(:get, url)
+            .with(headers: { 'If-None-Match' => '"asdf"',
+                             'If-Modified-Since' => 'fake date' })
+        end
+
+        it 'returns a feed with no posts' do
+          expect(subject.feed.posts).to be_empty
+        end
+
+        it 'includes some information about the site' do
+          expect(subject.feed.title).to eq 'Example Blog'
+          expect(subject.feed.home_page_url).to eq 'https://example.com/'
+        end
       end
 
-      it 'attempts to get the feed' do
-        subject.feed
-        expect(download_request).to have_been_requested
-      end
+      context 'and the feed has items' do
+        before do
+          download_request.to_return(status: 200,
+                                     body: rss_content,
+                                     headers: {
+                                       'Content-Type' => 'application/rss+xml',
+                                       'Etag' => '"asdf"',
+                                       'Last-Modified' => 'fake date'
+                                     })
+        end
 
-      it 'returns a feed with posts' do
-        expect(subject.feed.posts).to eq [
-          {
-            item_id: '123',
-            title: '',
-            url: '',
-            content_html: '',
-            content_text: 'This is some content.',
-            published_at: Time.utc(2018, 7, 20, 19, 14, 38),
-            modified_at: Time.utc(2018, 7, 20, 19, 14, 38)
-          },
-          {
-            item_id: '124',
-            title: 'My Fancy Post Title',
-            url: 'https://example.com/my-fancy-post-title',
-            content_html: '<p>I have some thoughts <em>about things</em>!</p>',
-            content_text: '',
-            published_at: nil,
-            modified_at: nil
-          }
-        ]
-      end
+        it 'attempts to get the feed' do
+          subject.feed
+          expect(download_request).to have_been_requested
+        end
 
-      it 'includes the caching headers in the feed' do
-        expect(subject.feed.etag).to eq '"asdf"'
-        expect(subject.feed.last_modified).to eq 'fake date'
-      end
+        it 'returns a feed with posts' do
+          expect(subject.feed.posts).to eq [
+            {
+              item_id: '123',
+              title: '',
+              url: '',
+              content_html: '',
+              content_text: 'This is some content.',
+              published_at: Time.utc(2018, 7, 20, 19, 14, 38),
+              modified_at: Time.utc(2018, 7, 20, 19, 14, 38)
+            },
+            {
+              item_id: '124',
+              title: 'My Fancy Post Title',
+              url: 'https://example.com/my-fancy-post-title',
+              content_html: '<p>I have some thoughts <em>about things</em>!</p>',
+              content_text: '',
+              published_at: nil,
+              modified_at: nil
+            }
+          ]
+        end
 
-      it 'includes information about the site' do
-        expect(subject.feed.title).to eq 'Example Blog'
-        expect(subject.feed.home_page_url).to eq 'https://example.com/'
+        it 'includes the caching headers in the feed' do
+          expect(subject.feed.etag).to eq '"asdf"'
+          expect(subject.feed.last_modified).to eq 'fake date'
+        end
+
+        it 'includes information about the site' do
+          expect(subject.feed.title).to eq 'Example Blog'
+          expect(subject.feed.home_page_url).to eq 'https://example.com/'
+        end
       end
     end
   end
@@ -135,5 +222,51 @@ RSpec.describe FeedDownloader do
         }
       ]
     }.to_json
+  end
+
+  let(:empty_rss_content) do
+    <<~RSS
+      <?xml version="1.0" encoding="UTF-8"?>
+      <rss version="2.0"
+        xmlns:atom="http://www.w3.org/2005/Atom"
+        >
+        <channel>
+	        <title>Example Blog</title>
+          <link>https://example.com</link>
+	        <description></description>
+        </channel>
+      </rss>
+    RSS
+  end
+
+  let(:rss_content) do
+    <<~RSS
+      <?xml version="1.0" encoding="UTF-8"?>
+      <rss version="2.0"
+        xmlns:content="http://purl.org/rss/1.0/modules/content/"
+        xmlns:atom="http://www.w3.org/2005/Atom"
+        >
+        <channel>
+	        <title>Example Blog</title>
+          <atom:link href="https://example.com/feed.xml" rel="self" type="application/rss+xml" />
+          <link>https://example.com</link>
+	        <description></description>
+	        <lastBuildDate>Sat, 13 Oct 2018 10:49:30 +0000</lastBuildDate>
+	        <language>en-US</language>
+          <item>
+		        <title></title>
+		        <pubDate>Fri, 20 Jul 2018 19:14:38 +0000</pubDate>
+		        <guid isPermaLink="false">123</guid>
+            <description><![CDATA[This is some content.]]></description>
+          </item>
+          <item>
+            <title>My Fancy Post Title</title>
+		        <link>https://example.com/my-fancy-post-title</link>
+		        <guid isPermaLink="false">124</guid>
+            <content:encoded><![CDATA[<p>I have some thoughts <em>about things</em>!</p>]]></content:encoded>
+          </item>
+        </channel>
+      </rss>
+    RSS
   end
 end
