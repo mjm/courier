@@ -19,6 +19,18 @@ RSpec.describe FeedFinder do
     %({ "feed_url": "https://www.example.org/feed.json" })
   }
 
+  let(:rss_body) {
+    <<~RSS
+      <?xml version="1.0" encoding="UTF-8"?>
+      <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+        <channel>
+          <atom:link href="https://example.org/" />
+          <atom:link href="https://www.example.org/feed.xml" rel="self" type="application/rss+xml" />
+        </channel>
+      </rss>
+    RSS
+  }
+
   before do
     # Set up a bunch of fake URLs
     stub_request(:get, 'https://example.com/').to_return(
@@ -36,6 +48,14 @@ RSpec.describe FeedFinder do
     stub_request(:get, 'https://www.example.org/feed.json').to_return(
       body: feed_body,
       headers: { 'Content-Type': 'application/json' }
+    )
+    stub_request(:get, 'https://example.org/feed.xml').to_return(
+      status: 301,
+      headers: { 'Location': 'https://www.example.org/feed.xml' }
+    )
+    stub_request(:get, 'https://www.example.org/feed.xml').to_return(
+      body: rss_body,
+      headers: { 'Content-Type': 'application/rss+xml' }
     )
     stub_request(:get, 'https://example.org/foo/').to_return(
       body: '<html><head></head><body></body></html>',
@@ -82,5 +102,19 @@ RSpec.describe FeedFinder do
 
   it 'returns nil if the content is not HTML or JSON' do
     expect(find('example.org/bar/')).to be_nil
+  end
+
+  context 'when there is no JSON feed on the page' do
+    let(:html_body) {
+      %(<html><head>
+        <link rel="alternate" type="application/rss+xml"
+              href="https://example.org/feed.xml">
+        </head><body>Foo!</body></html>)
+    }
+
+    it 'finds the RSS feed' do
+      expect(find('example.org'))
+        .to eq 'https://www.example.org/feed.xml'
+    end
   end
 end

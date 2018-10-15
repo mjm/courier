@@ -37,7 +37,8 @@ class FeedFinder
     type = response.headers.fetch(:content_type, '')
     case type
     when %r{^text/html} then handle_html_response(response)
-    when %r{^application/json} then handle_feed_response(response)
+    when %r{^application/json} then handle_json_response(response)
+    when %r{^application/rss\+xml} then handle_rss_response(response)
     else
       Rails.logger.warn "Unexpected content type #{type}"
       nil
@@ -46,12 +47,20 @@ class FeedFinder
 
   def handle_html_response(response)
     html = Nokogiri::HTML(response.body)
-    feeds = html.css('link[rel=alternate][type="application/json"]')
-    attempt_url(feeds.first['href']) unless feeds.empty?
+    feed = html.css('link[rel=alternate][type="application/json"]').first
+    feed = html.css('link[rel=alternate][type="application/rss+xml"]').first if feed.blank?
+    attempt_url(feed['href']) if feed.present?
   end
 
-  def handle_feed_response(response)
+  def handle_json_response(response)
     contents = JSON.parse(response.body)
     contents.fetch('feed_url')
+  end
+
+  def handle_rss_response(response)
+    feed = Nokogiri::XML(response.body)
+    link = feed.xpath('//atom:link[@rel="self"]',
+                      'atom' => 'http://www.w3.org/2005/Atom').first
+    link.attr('href') if link.present?
   end
 end
