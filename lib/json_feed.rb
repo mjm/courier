@@ -14,6 +14,11 @@ class JSONFeed
     )
   end
 
+  def find(response)
+    contents = JSON.parse(response.body)
+    contents.fetch('feed_url')
+  end
+
   private
 
   def parse_posts(posts)

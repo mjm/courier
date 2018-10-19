@@ -26,7 +26,7 @@ module FeedType
   end
 
   def self.by_mime_type(type)
-    prioritized.detect { |t| t.mime_type_regex =~ type }
+    all.values.detect { |t| t.mime_type_regex =~ type }
   end
 
   # It's important that we normalize URLs because we need to be able to

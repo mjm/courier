@@ -1,3 +1,5 @@
+require 'feed_type'
+
 class FeedFinder
   attr_reader :url
 
@@ -35,32 +37,25 @@ class FeedFinder
 
   def handle_successful_response(response)
     type = response.headers.fetch(:content_type, '')
-    case type
-    when %r{^text/html} then handle_html_response(response)
-    when %r{^application/json} then handle_json_response(response)
-    when %r{^application/rss\+xml} then handle_rss_response(response)
+
+    if %r{^text/html}.match?(type)
+      handle_html_response(response)
     else
-      Rails.logger.warn "Unexpected content type #{type}"
-      nil
+      feed_type = FeedType.by_mime_type(type)
+      if feed_type
+        feed_type.find(response)
+      else
+        Rails.logger.warn "Unexpected content type #{type}"
+        nil
+      end
     end
   end
 
   def handle_html_response(response)
     html = Nokogiri::HTML(response.body)
-    feed = html.css('link[rel=alternate][type="application/json"]').first
-    feed = html.css('link[rel=alternate][type="application/rss+xml"]').first if feed.blank?
+    feed = FeedType.prioritized.lazy.map { |t|
+      html.css(%(link[rel=alternate][type="#{t.mime_type}"])).first
+    }.detect(&:itself)
     attempt_url(feed['href']) if feed.present?
-  end
-
-  def handle_json_response(response)
-    contents = JSON.parse(response.body)
-    contents.fetch('feed_url')
-  end
-
-  def handle_rss_response(response)
-    feed = Nokogiri::XML(response.body)
-    link = feed.xpath('//atom:link[@rel="self"]',
-                      'atom' => 'http://www.w3.org/2005/Atom').first
-    link.attr('href') if link.present?
   end
 end

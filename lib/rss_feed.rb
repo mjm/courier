@@ -16,6 +16,13 @@ class RSSFeed
     )
   end
 
+  def find(response)
+    feed = Nokogiri::XML(response.body)
+    link = feed.xpath('//atom:link[@rel="self"]',
+                      'atom' => 'http://www.w3.org/2005/Atom').first
+    link.attr('href') if link.present?
+  end
+
   private
 
   def parse_posts(items)
