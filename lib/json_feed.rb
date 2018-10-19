@@ -1,11 +1,7 @@
-require 'feed_utils'
-
 class JSONFeed
-  include FeedUtils
+  include FeedType
 
-  def mime_type
-    'application/json'
-  end
+  register 'application/json', 1
 
   def parse(response)
     parsed = JSON.parse(response.body)

@@ -1,5 +1,4 @@
-require 'json_feed'
-require 'rss_feed'
+require 'feed_type'
 
 class FeedDownloader
   attr_reader :url, :etag, :last_modified, :logger
@@ -45,13 +44,9 @@ class FeedDownloader
     end
   end
 
-  FEED_TYPES = [JSONFeed.new, RSSFeed.new].freeze
-
   def parse_feed(response)
     type = response.headers.fetch(:content_type, '')
-    feed_type = FEED_TYPES.detect { |t|
-      type =~ /^#{Regexp.quote(t.mime_type)}/
-    }
+    feed_type = FeedType.by_mime_type(type)
 
     raise InvalidFormat, type if feed_type.blank?
 

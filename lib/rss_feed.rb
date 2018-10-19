@@ -1,12 +1,9 @@
 require 'rss'
-require 'feed_utils'
 
 class RSSFeed
-  include FeedUtils
+  include FeedType
 
-  def mime_type
-    'application/rss+xml'
-  end
+  register 'application/rss+xml', 3
 
   def parse(response)
     parsed = ::RSS::Parser.parse(response.body)
