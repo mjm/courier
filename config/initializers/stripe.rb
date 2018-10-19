@@ -16,7 +16,7 @@ Plan::MONTHLY = Plan.new(
   interval: 'month'
 )
 
-# rubocop:disable Metrics/BlockLength,Metrics/LineLength
+# rubocop:disable Metrics/BlockLength
 StripeEvent.configure do |events|
   events.subscribe 'invoice.upcoming' do |event|
     invoice = event.data.object
@@ -58,4 +58,4 @@ StripeEvent.configure do |events|
     end
   end
 end
-# rubocop:enable Metrics/BlockLength,Metrics/LineLength
+# rubocop:enable Metrics/BlockLength

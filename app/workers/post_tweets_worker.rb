@@ -19,9 +19,7 @@ class PostTweetsWorker
   def post_tweet(tweet, prev)
     media_files = download_media_files(tweet)
     options = {}
-    if prev&.posted_tweet_id.present?
-      options[:in_reply_to_status_id] = prev.posted_tweet_id
-    end
+    options[:in_reply_to_status_id] = prev.posted_tweet_id if prev&.posted_tweet_id.present?
     posted_tweet =
       twitter(tweet.user).update_with_media(tweet.body, media_files, options)
 
