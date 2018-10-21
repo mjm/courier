@@ -37,4 +37,5 @@ module FeedType
 end
 
 require 'json_feed'
+require 'atom_feed'
 require 'rss_feed'

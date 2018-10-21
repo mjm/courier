@@ -6,6 +6,8 @@ RSpec.describe FeedFinder do
     %(<html><head>
       <link rel="alternate" type="application/rss+xml"
             href="https://example.org/feed.xml">
+      <link rel="alternate" type="application/atom+xml"
+            href="https://example.org/feed.atom">
       <link rel="alternate" type="application/json"
             href="https://example.org/feed.json">
       <link rel="alternate" type="application/json"
@@ -29,6 +31,23 @@ RSpec.describe FeedFinder do
         </channel>
       </rss>
     RSS
+  }
+
+  let(:atom_body) {
+    <<~ATOM
+      <?xml version="1.0" encoding="UTF-8"?>
+      <feed
+        xmlns="http://www.w3.org/2005/Atom"
+        xml:lang="en-US">
+        <link rel="alternate" type="text/html" href="https://example.org/" />
+        <link rel="self" type="application/atom+xml" href="https://www.example.org/feed.atom" />
+        <id>https://example.com/feed.atom</id>
+        <author>
+          <name>John</name>
+          <uri>https://john.example.com</uri>
+        </author>
+      </feed>
+    ATOM
   }
 
   before do
@@ -56,6 +75,14 @@ RSpec.describe FeedFinder do
     stub_request(:get, 'https://www.example.org/feed.xml').to_return(
       body: rss_body,
       headers: { 'Content-Type': 'application/rss+xml' }
+    )
+    stub_request(:get, 'https://example.org/feed.atom').to_return(
+      status: 301,
+      headers: { 'Location': 'https://www.example.org/feed.atom' }
+    )
+    stub_request(:get, 'https://www.example.org/feed.atom').to_return(
+      body: atom_body,
+      headers: { 'Content-Type': 'application/atom+xml' }
     )
     stub_request(:get, 'https://example.org/foo/').to_return(
       body: '<html><head></head><body></body></html>',
@@ -104,7 +131,23 @@ RSpec.describe FeedFinder do
     expect(find('example.org/bar/')).to be_nil
   end
 
-  context 'when there is no JSON feed on the page' do
+  context 'when there is an Atom feed on the page' do
+    let(:html_body) {
+      %(<html><head>
+        <link rel="alternate" type="application/rss+xml"
+              href="https://example.org/feed.xml">
+        <link rel="alternate" type="application/atom+xml"
+              href="https://example.org/feed.atom">
+        </head><body>Foo!</body></html>)
+    }
+
+    it 'finds the Atom feed' do
+      expect(find('example.org'))
+        .to eq 'https://www.example.org/feed.atom'
+    end
+  end
+
+  context 'when there is only an RSS feed on the page' do
     let(:html_body) {
       %(<html><head>
         <link rel="alternate" type="application/rss+xml"
