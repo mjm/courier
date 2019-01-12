@@ -100,6 +100,16 @@ RSpec.describe Translator do
     end
   end
 
+  context 'when the html has a link to a Twitter user' do
+    let(:content_html) do
+      %(This reminds me of something <a href="https://twitter.com/example123">Example 123</a> said.)
+    end
+
+    it 'converts the link into an @mention' do
+      should translate_to %(This reminds me of something @example123 said.)
+    end
+  end
+
   context 'when the html has a block quote' do
     let(:content_html) do
       %(<p>Check this thing out:</p><blockquote>I said a thing</blockquote>)
