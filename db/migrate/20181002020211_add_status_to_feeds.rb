@@ -1,6 +1,8 @@
 class AddStatusToFeeds < ActiveRecord::Migration[5.2]
   def change
-    add_column :feeds, :status, :integer, null: false, default: 0
-    add_column :feeds, :refresh_message, :string
+    change_table :feeds, bulk: true do
+      t.integer :status, null: false, default: 0
+      t.string :refresh_message
+    end
   end
 end

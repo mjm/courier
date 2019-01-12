@@ -1,6 +1,8 @@
 class AddCachingToFeeds < ActiveRecord::Migration[5.2]
   def change
-    add_column :feeds, :etag, :string
-    add_column :feeds, :last_modified_at, :string
+    change_table :feeds, bulk: true do
+      t.string :etag
+      t.string :last_modified_at
+    end
   end
 end

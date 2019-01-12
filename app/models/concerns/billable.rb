@@ -42,6 +42,7 @@ module Billable
   def reactivate_subscription
     sub = fetch_subscription
     raise NoSubscription, 'User does not have a subscription' if sub.blank?
+
     unless sub.cancel_at_period_end
       raise SubscriptionNotCanceled, 'Cannot reactivate subscription ' \
         "because it isn't canceled"
@@ -69,6 +70,7 @@ module Billable
 
   def fetch_subscription
     return nil if stripe_subscription_id.blank?
+
     Stripe::Subscription.retrieve(stripe_subscription_id)
   end
 
