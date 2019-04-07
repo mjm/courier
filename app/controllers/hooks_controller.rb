@@ -1,5 +1,6 @@
 class HooksController < ApplicationController
   def webhook
-    logger.info "Got webhook: #{params.inspect}"
+    Feed.by_home_page(params[:url]).each(&:refresh)
+    render text: 'Refreshed!'
   end
 end
