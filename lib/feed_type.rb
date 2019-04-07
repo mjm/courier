@@ -6,7 +6,11 @@ module FeedType
       define_method(:mime_type) do
         type
       end
-      type_regex = /^#{Regexp.quote(type)}/
+
+      all_types = [type] + extra_types
+      types_pattern = all_types.map { |t| Regexp.quote(t) }.join('|')
+      type_regex = /^(#{types_pattern})/
+
       define_method(:mime_type_regex) do
         type_regex
       end
