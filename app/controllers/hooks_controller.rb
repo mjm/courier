@@ -3,6 +3,6 @@ class HooksController < ApplicationController
 
   def webhook
     Feed.by_home_page(params[:url]).each(&:refresh)
-    render text: 'Refreshed!'
+    render plain: 'Refreshed!'
   end
 end
