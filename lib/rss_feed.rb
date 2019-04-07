@@ -3,7 +3,7 @@ require 'rss'
 class RSSFeed
   include FeedType
 
-  register 'application/rss+xml', 3
+  register 'application/rss+xml', 3, %w[application/xml]
 
   def parse(response)
     parsed = ::RSS::Parser.parse(response.body)

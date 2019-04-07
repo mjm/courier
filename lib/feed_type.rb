@@ -2,7 +2,7 @@ module FeedType
   extend ActiveSupport::Concern
 
   class_methods do
-    def register(type, priority)
+    def register(type, priority, extra_types = [])
       define_method(:mime_type) do
         type
       end
@@ -13,7 +13,11 @@ module FeedType
       define_method(:priority) do
         priority
       end
+
       FeedType.all[type] = new
+      extra_types.each do |t|
+        FeedType.all[t] = new
+      end
     end
   end
 
