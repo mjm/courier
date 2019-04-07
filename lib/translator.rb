@@ -24,11 +24,15 @@ class Translator
   private
 
   def translate
-    if title.present? && url.present?
+    if title? && url.present?
       translate_with_title
     else
       translate_without_title
     end
+  end
+
+  def title?
+    title.present? && title != 'No title'
   end
 
   def translate_with_title
