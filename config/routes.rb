@@ -16,6 +16,9 @@ Rails.application.routes.draw do
   # XML-RPC ping service
   mount PingService, at: '/ping'
 
+  # Netlify webhook
+  post '/webhook', to: 'hooks#webhook'
+
   # Stripe
   mount StripeEvent::Engine, at: '/stripe/webhook'
   post '/subscribe', to: 'stripe#subscribe'
