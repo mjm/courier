@@ -41,7 +41,7 @@ class Translator
 
   def translate_without_title
     parser.parse(content_html)
-    media_urls = document.media_urls.map {|u| Addressable::URI.join(@url, u).to_s }
+    media_urls = document.media_urls.map { |u| Addressable::URI.join(@url, u).to_s }
     Tweet.new(document.contents, media_urls)
   end
 
