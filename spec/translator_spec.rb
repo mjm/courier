@@ -8,7 +8,7 @@ require 'translator'
 
 RSpec.describe Translator do
   let(:title) { '' }
-  let(:url) { '' }
+  let(:url) { %(https://example.com/abc/) }
   let(:content_html) { '' }
   subject { Translator.new(title: title, url: url, content_html: content_html) }
 
@@ -156,6 +156,25 @@ RSpec.describe Translator do
       expect(subject.tweet.media_urls).to eq %w[
         https://example.com/foo.jpg
         https://example.com/bar.jpg
+      ]
+    end
+  end
+
+  context 'when the html has image tags with relative paths in it' do
+    let(:content_html) do
+      %(<p>Check it out!</p>
+        <p><img src="/media/foo.jpg">
+           <img src="/media/bar.jpg"></p>)
+    end
+
+    it 'translates the body text' do
+      should translate_to 'Check it out!'
+    end
+
+    it 'attaches the image URLs as a media item' do
+      expect(subject.tweet.media_urls).to eq %w[
+        https://example.com/media/foo.jpg
+        https://example.com/media/bar.jpg
       ]
     end
   end
