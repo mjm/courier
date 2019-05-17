@@ -39,7 +39,7 @@ decoder : Decoder Tweet
 decoder =
     succeed Tweet
         |> required "id" int
-        |> required "body" string
+        |> optional "body" string ""
         |> required "post" postDecoder
         |> optional "status" (Decode.map statusFromString string) Draft
         |> optional "postedAt" (maybe Iso8601.decoder) Nothing
